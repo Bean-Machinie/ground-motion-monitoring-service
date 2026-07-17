@@ -69,11 +69,12 @@ textarea {
   color: inherit;
 }
 
-/* Visible focus states for keyboard navigation. */
+/* Visible focus states for keyboard navigation.
+   The ring follows each element's own border-radius (box-shadow tracks it),
+   so no radius is forced here. */
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
 }
 
 /* Shared page container. */

@@ -11,7 +11,6 @@ import {
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { site } from "@/config/site";
 import { NAV_ITEMS, type NavMenuEntry } from "@/config/navigation";
-import { GlobalSearch } from "@/components/layout/TopPanel/GlobalSearch";
 import { ProfileMenu } from "@/components/layout/TopPanel/ProfileMenu";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import logoLong from "@/assets/logo/Black/HELIOSYN_Long_Black.png";
@@ -185,11 +184,10 @@ export function TopPanel() {
 
   return (
     <header className={styles.topPanel} ref={headerRef}>
-      {/* Top bar row: search | brand | profile */}
+      {/* Top bar row: (spacer) | brand | profile — the empty first cell
+          keeps the brand perfectly centered in the 3-column grid. */}
       <div className={styles.topBar}>
-        <div className={styles.topBarSearch}>
-          <GlobalSearch />
-        </div>
+        <div className={styles.topBarSpacer} aria-hidden="true" />
         <Link to="/" className={styles.brand} aria-label={site.name}>
           <img
             src={logoLong}
@@ -318,3 +316,4 @@ export function TopPanel() {
     </header>
   );
 }
+ 

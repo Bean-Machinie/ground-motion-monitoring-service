@@ -35,7 +35,8 @@
   position: relative;
   min-height: 16rem;
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
+  /* Large banner element: largest radius tier. */
+  border-radius: var(--radius-xl);
   background-color: var(--color-primary-soft);
   overflow: hidden;
 }

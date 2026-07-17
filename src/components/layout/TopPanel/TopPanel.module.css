@@ -1,4 +1,4 @@
-/* Sticky two-row top panel: top bar (search | brand | social) + nav bar. */
+/* Sticky two-row top panel: top bar (brand | profile) + nav bar. */
 
 .topPanel {
   position: sticky;
@@ -18,14 +18,13 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-4);
-  min-height: 4rem;
+  min-height: 4.5rem;
   padding: var(--space-2) var(--space-5);
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
-.topBarSearch {
+.topBarSpacer {
   justify-self: start;
-  min-width: 0;
 }
 
 .topBarMeta {
@@ -33,26 +32,27 @@
   min-width: 0;
 }
 
+/* Brand logo: strict, clean scale on hover — transform only, no filters,
+   so the company logo never blurs or morphs. */
 .brand {
   justify-self: center;
   display: inline-flex;
   align-items: center;
   min-width: 0;
   max-width: 100%;
-  transform: scale(1);
-  transition:
-    filter 300ms ease,
-    transform 300ms ease;
+  transform: scale(1) translateZ(0);
+  transform-origin: center;
+  backface-visibility: hidden;
+  transition: transform 180ms ease-out;
 }
 
 .brand:hover {
-  filter: drop-shadow(0 0 10px rgba(85, 146, 167, 0.55));
-  transform: scale(1.025);
+  transform: scale(1.03) translateZ(0);
 }
 
 .brandLogo {
   display: block;
-  height: 2.25rem;
+  height: 3.5rem;
   width: auto;
   max-width: 100%;
   object-fit: contain;
@@ -62,10 +62,12 @@
 /* Nav bar row                                                             */
 /* ---------------------------------------------------------------------- */
 
+/* No bottom padding: nav items sit flush on the panel's bottom border so
+   the highlight can meet the horizontal line. */
 .navBar {
   display: flex;
   justify-content: center;
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--space-4) 0;
 }
 
 .navList {
@@ -109,14 +111,16 @@
   text-decoration: none;
 }
 
-/* Shared floating hover-highlight pill. */
+/* Shared floating hover-highlight: subtly rounded top corners only, its
+   base sits on the panel's bottom border and the amber underline pokes
+   3px past the panel edge like a tab marker. */
 .highlight {
   position: absolute;
-  top: 0;
+  top: 3px;
   left: 0;
-  bottom: 0;
+  bottom: -3px;
   z-index: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   background-color: var(--color-primary-highlight);
   box-shadow: inset 0 -3px 0 0 var(--color-accent-amber);
   pointer-events: none;
@@ -155,7 +159,8 @@
   min-width: 14rem;
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
+  /* Concentric: entry radius + panel padding. */
+  border-radius: calc(var(--radius-sm) + var(--space-2));
   box-shadow: var(--shadow-dropdown);
   padding: var(--space-2);
 }
@@ -233,13 +238,13 @@
   }
 
   .brandLogo {
-    height: 1.625rem;
+    height: 2.25rem;
   }
 
   /* Nav becomes a horizontally scrollable strip; scrollbar hidden. */
   .navBar {
     justify-content: flex-start;
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-1) var(--space-2) 0;
   }
 
   .navList {

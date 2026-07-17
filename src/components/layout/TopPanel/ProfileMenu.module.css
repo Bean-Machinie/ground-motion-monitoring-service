@@ -13,7 +13,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
   font-size: var(--font-size-sm);
@@ -38,7 +38,7 @@
   color: var(--color-primary-dark);
 }
 
-/* Signed-in trigger */
+/* Signed-in trigger — small element: subtle radius (avatar stays a circle). */
 .trigger {
   display: inline-flex;
   align-items: center;
@@ -46,7 +46,7 @@
   max-width: 16rem;
   padding: var(--space-1) var(--space-2);
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background: none;
   cursor: pointer;
   color: var(--color-text);
@@ -106,7 +106,8 @@
   max-width: min(20rem, 92vw);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
+  /* Concentric: entry radius + panel padding. */
+  border-radius: calc(var(--radius-sm) + var(--space-2));
   box-shadow: var(--shadow-dropdown);
   padding: var(--space-2);
 }
