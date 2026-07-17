@@ -5,17 +5,57 @@
 }
 
 .inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   padding-top: var(--space-6);
   padding-bottom: var(--space-6);
 }
 
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
+
 .name {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
 }
 
 .meta {
-  margin: 0 0 var(--space-1);
+  margin: 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg);
+  opacity: 0.85;
+  transition: opacity 150ms ease, border-color 150ms ease;
+}
+
+.socialLink:hover {
+  opacity: 1;
+  border-color: var(--color-border-strong);
 }

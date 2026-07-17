@@ -1,0 +1,204 @@
+.root {
+  position: relative;
+}
+
+/* Signed-out actions */
+.signedOut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.signInButton {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+.signInButton:hover {
+  background-color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.signUpLink {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.signUpLink:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Signed-in trigger */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 16rem;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.trigger:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.03em;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.chevron {
+  width: 6px;
+  height: 6px;
+  margin-top: -2px;
+  flex-shrink: 0;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  margin-top: 2px;
+  transform: rotate(225deg);
+}
+
+/* Dropdown */
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  min-width: 15rem;
+  max-width: min(20rem, 92vw);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  padding: var(--space-2);
+}
+
+.menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 1.25rem;
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-surface);
+  border-left: var(--border-width) solid var(--color-border);
+  border-top: var(--border-width) solid var(--color-border);
+  transform: rotate(45deg);
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  margin-bottom: var(--space-1);
+}
+
+.menuName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuEmail {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuEntry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuEntry:hover,
+.menuEntry:focus-visible {
+  background-color: var(--color-bg);
+  color: var(--color-primary-dark);
+}
+
+.menuIcon {
+  display: inline-flex;
+  opacity: 0.68;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.menuEntry:hover .menuIcon,
+.menuEntry:focus-visible .menuIcon {
+  opacity: 0.9;
+  transform: translateX(1px);
+}
+
+.menuDivider {
+  height: 0;
+  border-bottom: var(--border-width) solid var(--color-border);
+  margin: var(--space-1) 0;
+}
+
+@media (max-width: 720px) {
+  .name {
+    display: none;
+  }
+
+  .signUpLink {
+    display: none;
+  }
+
+  .signInButton {
+    padding: var(--space-1) var(--space-3);
+  }
+}

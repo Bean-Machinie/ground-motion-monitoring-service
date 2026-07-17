@@ -1,9 +1,8 @@
-// Application routes: public pages, auth pages, the protected portal,
-// the admin placeholder, and the not-found fallback.
+// Application routes. Every page shares one AppLayout (header + footer);
+// /portal routes add the auth guard via PortalShell.
 import { Route, Routes } from "react-router-dom";
-import { PublicLayout } from "@/components/layout/PublicLayout/PublicLayout";
-import { PortalLayout } from "@/components/layout/PortalLayout/PortalLayout";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute";
+import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
+import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 import { AdminRoute } from "@/components/auth/AdminRoute/AdminRoute";
 import { RedirectIfAuthenticated } from "@/components/auth/RedirectIfAuthenticated/RedirectIfAuthenticated";
 import { HomePage } from "@/pages/home/HomePage";
@@ -20,7 +19,7 @@ import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 export function App() {
   return (
     <Routes>
-      <Route element={<PublicLayout />}>
+      <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
         <Route
           path="sign-in"
@@ -39,31 +38,25 @@ export function App() {
           }
         />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
+
+        <Route path="portal" element={<PortalShell />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/:slug" element={<ProjectDetailPage />} />
+          <Route path="account" element={<AccountPage />} />
+        </Route>
+
+        <Route
+          path="admin"
+          element={
+            <AdminRoute>
+              <AdminPlaceholderPage />
+            </AdminRoute>
+          }
+        />
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-
-      <Route
-        path="portal"
-        element={
-          <ProtectedRoute>
-            <PortalLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<DashboardPage />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="projects/:slug" element={<ProjectDetailPage />} />
-        <Route path="account" element={<AccountPage />} />
-      </Route>
-
-      <Route
-        path="admin"
-        element={
-          <AdminRoute>
-            <AdminPlaceholderPage />
-          </AdminRoute>
-        }
-      />
     </Routes>
   );
 }

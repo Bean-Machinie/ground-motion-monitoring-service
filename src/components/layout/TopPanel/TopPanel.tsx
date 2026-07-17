@@ -1,5 +1,6 @@
-// Sticky two-row top panel: top bar (search | brand | social) and the main
-// nav bar with an animated hover-highlight pill and accessible dropdowns.
+// Sticky two-row top panel shared by the whole site: top bar
+// (search | brand logo | profile) and the main nav bar with an animated
+// hover-highlight pill and accessible dropdowns.
 import {
   useCallback,
   useEffect,
@@ -9,17 +10,12 @@ import {
 } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { site } from "@/config/site";
-import type { NavAction, NavItem, NavMenuEntry } from "@/config/navigation";
+import { NAV_ITEMS, type NavMenuEntry } from "@/config/navigation";
 import { GlobalSearch } from "@/components/layout/TopPanel/GlobalSearch";
-import { FacebookFollowCallout } from "@/components/layout/TopPanel/FacebookFollowCallout";
-import { NavIcon } from "@/components/layout/TopPanel/NavIcon";
+import { ProfileMenu } from "@/components/layout/TopPanel/ProfileMenu";
+import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
+import logoLong from "@/assets/logo/Black/HELIOSYN_Long_Black.png";
 import styles from "./TopPanel.module.css";
-
-interface TopPanelProps {
-  navItems: NavItem[];
-  /** Handles app-level menu actions such as "sign-out". */
-  onAction?: (action: NavAction) => void;
-}
 
 interface HighlightState {
   x: number;
@@ -55,7 +51,7 @@ function scrollToHash(to: string) {
   }, 0);
 }
 
-export function TopPanel({ navItems, onAction }: TopPanelProps) {
+export function TopPanel() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -118,8 +114,7 @@ export function TopPanel({ navItems, onAction }: TopPanelProps) {
     [],
   );
 
-  // While a menu is open the highlight sticks under its trigger; it also
-  // re-measures on open. Mobile disables the highlight entirely.
+  // While a menu is open the highlight sticks under its trigger.
   useEffect(() => {
     if (isMobile) return;
     if (openMenuId) {
@@ -184,28 +179,26 @@ export function TopPanel({ navItems, onAction }: TopPanelProps) {
 
   function handleEntrySelect(entry: NavMenuEntry) {
     setOpenMenuId(null);
-    if (entry.action) {
-      onAction?.(entry.action);
-      return;
-    }
-    if (entry.to) {
-      navigate(entry.to);
-      scrollToHash(entry.to);
-    }
+    navigate(entry.to);
+    scrollToHash(entry.to);
   }
 
   return (
     <header className={styles.topPanel} ref={headerRef}>
-      {/* Top bar row: search | brand | meta */}
+      {/* Top bar row: search | brand | profile */}
       <div className={styles.topBar}>
         <div className={styles.topBarSearch}>
           <GlobalSearch />
         </div>
-        <Link to="/" className={styles.brand}>
-          {site.name}
+        <Link to="/" className={styles.brand} aria-label={site.name}>
+          <img
+            src={logoLong}
+            alt={`${site.companyName} — ${site.name}`}
+            className={styles.brandLogo}
+          />
         </Link>
         <div className={styles.topBarMeta}>
-          <FacebookFollowCallout />
+          <ProfileMenu />
         </div>
       </div>
 
@@ -233,7 +226,7 @@ export function TopPanel({ navItems, onAction }: TopPanelProps) {
             />
           ) : null}
 
-          {navItems.map((item) =>
+          {NAV_ITEMS.map((item) =>
             item.kind === "link" ? (
               <li
                 key={item.to}
@@ -307,7 +300,7 @@ export function TopPanel({ navItems, onAction }: TopPanelProps) {
                           >
                             {entry.icon ? (
                               <span className={styles.menuIcon} aria-hidden="true">
-                                <NavIcon name={entry.icon} />
+                                <AppIcon name={entry.icon} />
                               </span>
                             ) : null}
                             <span>{entry.label}</span>

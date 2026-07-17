@@ -1,22 +1,13 @@
 // Navigation configuration for the top panel.
-// Items are either plain links or dropdown menus (NAV_ITEMS pattern).
-
-export type NavIconName =
-  | "monitor"
-  | "steps"
-  | "user"
-  | "sign-out"
-  | "projects";
-
-export type NavAction = "sign-out";
+// One unified menu for the whole site: signed-out visitors clicking a
+// portal link are redirected to sign-in by the route guard.
+import type { IconName } from "@/lib/icons";
 
 export interface NavMenuEntry {
   label: string;
   /** Route (or route + hash) to navigate to. */
-  to?: string;
-  /** App-level action handled by the layout (e.g. sign out). */
-  action?: NavAction;
-  icon?: NavIconName;
+  to: string;
+  icon?: IconName;
   /** Draw a thin divider below this entry. */
   dividerBelow?: boolean;
 }
@@ -25,8 +16,8 @@ export type NavItem =
   | { kind: "link"; label: string; to: string; end?: boolean }
   | { kind: "menu"; id: string; label: string; items: NavMenuEntry[] };
 
-/** Main menu for public pages. */
-export const PUBLIC_NAV_ITEMS: NavItem[] = [
+/** Single main menu shared across the entire site. */
+export const NAV_ITEMS: NavItem[] = [
   { kind: "link", label: "Home", to: "/", end: true },
   {
     kind: "menu",
@@ -36,35 +27,17 @@ export const PUBLIC_NAV_ITEMS: NavItem[] = [
       {
         label: "Monitoring & reporting",
         to: "/#overview-heading",
-        icon: "monitor",
+        icon: "satellite",
       },
       {
         label: "How it works",
         to: "/#process-heading",
-        icon: "steps",
+        icon: "graph",
         dividerBelow: true,
       },
-      { label: "Request access", to: "/sign-up", icon: "user" },
+      { label: "Request access", to: "/sign-up", icon: "user-group" },
     ],
   },
-];
-
-/** Main menu for the authenticated portal. */
-export const PORTAL_NAV_ITEMS: NavItem[] = [
   { kind: "link", label: "Dashboard", to: "/portal", end: true },
   { kind: "link", label: "Projects", to: "/portal/projects" },
-  {
-    kind: "menu",
-    id: "account",
-    label: "Account",
-    items: [
-      {
-        label: "Account settings",
-        to: "/portal/account",
-        icon: "user",
-        dividerBelow: true,
-      },
-      { label: "Sign out", action: "sign-out", icon: "sign-out" },
-    ],
-  },
 ];

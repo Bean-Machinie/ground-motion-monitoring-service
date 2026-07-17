@@ -35,27 +35,27 @@
 
 .brand {
   justify-self: center;
+  display: inline-flex;
+  align-items: center;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-dark);
-  text-decoration: none;
   transform: scale(1);
   transition:
-    color 300ms ease,
-    text-shadow 300ms ease,
+    filter 300ms ease,
     transform 300ms ease;
 }
 
 .brand:hover {
-  color: var(--color-primary);
-  text-shadow: 0 0 18px rgba(85, 146, 167, 0.45);
+  filter: drop-shadow(0 0 10px rgba(85, 146, 167, 0.55));
   transform: scale(1.025);
-  text-decoration: none;
+}
+
+.brandLogo {
+  display: block;
+  height: 2.25rem;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -232,8 +232,8 @@
     gap: var(--space-2);
   }
 
-  .brand {
-    font-size: var(--font-size-md);
+  .brandLogo {
+    height: 1.625rem;
   }
 
   /* Nav becomes a horizontally scrollable strip; scrollbar hidden. */
