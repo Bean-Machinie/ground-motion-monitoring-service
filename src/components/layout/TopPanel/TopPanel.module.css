@@ -67,7 +67,7 @@
 .navBar {
   display: flex;
   justify-content: center;
-  padding: var(--space-1) var(--space-4) 0;
+  padding: 0 var(--space-4);
 }
 
 .navList {
@@ -116,7 +116,7 @@
    3px past the panel edge like a tab marker. */
 .highlight {
   position: absolute;
-  top: 3px;
+  top: 0;
   left: 0;
   bottom: -3px;
   z-index: 0;
@@ -244,7 +244,7 @@
   /* Nav becomes a horizontally scrollable strip; scrollbar hidden. */
   .navBar {
     justify-content: flex-start;
-    padding: var(--space-1) var(--space-2) 0;
+    padding: 0 var(--space-2);
   }
 
   .navList {
