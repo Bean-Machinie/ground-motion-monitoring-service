@@ -66,4 +66,10 @@ begin
     (customer_id, project_id, service_name, status, billing_status)
   values
     (
-    
+      customer_id,
+      project_id,
+      'Annual monitoring subscription',
+      'in_progress',
+      'not_applicable'
+    );
+end $$;
