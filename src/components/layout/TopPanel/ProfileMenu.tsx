@@ -67,14 +67,9 @@ export function ProfileMenu() {
 
   if (!user) {
     return (
-      <div className={styles.signedOut}>
-        <Link to="/sign-in" className={styles.signInButton}>
-          Sign in
-        </Link>
-        <Link to="/sign-up" className={styles.signUpLink}>
-          Create account
-        </Link>
-      </div>
+      <Link to="/sign-in" className={styles.loginButton}>
+        Log in
+      </Link>
     );
   }
 
@@ -109,10 +104,11 @@ export function ProfileMenu() {
     <div className={styles.root} ref={rootRef}>
       <button
         type="button"
-        className={styles.trigger}
+        className={`${styles.trigger}${open ? ` ${styles.triggerOpen}` : ""}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account menu"
+        title={displayName}
         ref={triggerRef}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={handleTriggerKeyDown}
@@ -120,11 +116,6 @@ export function ProfileMenu() {
         <span className={styles.avatar} aria-hidden="true">
           {initials}
         </span>
-        <span className={styles.name}>{displayName}</span>
-        <span
-          className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`}
-          aria-hidden="true"
-        />
       </button>
 
       {open ? (

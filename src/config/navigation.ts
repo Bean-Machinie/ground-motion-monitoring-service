@@ -18,7 +18,6 @@ export type NavItem =
 
 /** Single main menu shared across the entire site. */
 export const NAV_ITEMS: NavItem[] = [
-  { kind: "link", label: "Home", to: "/", end: true },
   {
     kind: "menu",
     id: "services",

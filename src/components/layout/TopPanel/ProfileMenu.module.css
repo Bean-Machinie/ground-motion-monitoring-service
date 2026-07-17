@@ -2,58 +2,71 @@
   position: relative;
 }
 
-/* Signed-out actions */
-.signedOut {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.signInButton {
+/* Signed-out action: single yellow log-in button, styled like the hero CTA. */
+.loginButton {
   display: inline-flex;
   align-items: center;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 4px;
+  background: #fcd900;
+  color: #111111;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-  transition: background-color 150ms ease;
-}
-
-.signInButton:hover {
-  background-color: var(--color-primary-dark);
-  text-decoration: none;
-}
-
-.signUpLink {
-  font-size: var(--font-size-sm);
+  letter-spacing: 0.02em;
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
-  white-space: nowrap;
+  text-decoration: none;
+  transform: translateZ(0) scale(1);
+  transform-origin: center;
+  transition: background-color 160ms ease, transform 160ms ease;
+  will-change: transform;
 }
 
-.signUpLink:hover {
-  color: var(--color-primary-dark);
+.loginButton:hover {
+  background: #ffe44d;
+  color: #111111;
+  text-decoration: none;
+  transform: scale(1.04);
 }
 
-/* Signed-in trigger — small element: subtle radius (avatar stays a circle). */
+/* Signed-in trigger — just the circular avatar; springy lift/tilt on hover. */
 .trigger {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  max-width: 16rem;
-  padding: var(--space-1) var(--space-2);
+  justify-content: center;
+  padding: 0;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: none;
   cursor: pointer;
   color: var(--color-text);
+  transform: translateY(0) rotate(0deg);
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
 }
 
-.trigger:hover {
-  background-color: var(--color-surface-muted);
+.trigger:hover,
+.trigger:focus-visible {
+  transform: translateY(-3px) rotate(-6deg);
+}
+
+.trigger:active {
+  transform: translateY(0) rotate(0deg);
+  transition-duration: 90ms;
+}
+
+/* While the menu is open the trigger rests — no lift/tilt, no jitter. */
+.triggerOpen,
+.triggerOpen:hover,
+.triggerOpen:focus-visible,
+.triggerOpen:active {
+  transform: translateY(0) rotate(0deg);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid rgba(252, 217, 0, 0.75);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .avatar {
@@ -71,32 +84,7 @@
   letter-spacing: 0.03em;
 }
 
-.name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.chevron {
-  width: 6px;
-  height: 6px;
-  margin-top: -2px;
-  flex-shrink: 0;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  transition: transform 200ms ease;
-}
-
-.chevronOpen {
-  margin-top: 2px;
-  transform: rotate(225deg);
-}
-
-/* Dropdown */
+/* Dropdown — anchored to the avatar and springs out of it. */
 .menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -110,13 +98,28 @@
   border-radius: calc(var(--radius-sm) + var(--space-1));
   box-shadow: var(--shadow-dropdown);
   padding: var(--space-1);
+  /* Expand from the avatar: origin sits at the icon's center above the panel. */
+  transform-origin: calc(100% - 17px) -10px;
+  animation: menuPop 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pointer tab centered under the avatar (avatar is 34px wide). */
 .menu::before {
   content: "";
   position: absolute;
   top: -6px;
-  right: 1.25rem;
+  right: 12px;
   width: 10px;
   height: 10px;
   background-color: var(--color-surface);
@@ -208,15 +211,8 @@
 }
 
 @media (max-width: 720px) {
-  .name {
-    display: none;
-  }
-
-  .signUpLink {
-    display: none;
-  }
-
-  .signInButton {
-    padding: var(--space-1) var(--space-3);
+  .loginButton {
+    min-height: 34px;
+    padding: 0 14px;
   }
 }
