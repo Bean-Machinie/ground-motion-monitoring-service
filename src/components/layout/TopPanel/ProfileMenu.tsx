@@ -177,10 +177,10 @@ export function ProfileMenu() {
           <button
             type="button"
             role="menuitem"
-            className={styles.menuEntry}
+            className={`${styles.menuEntry} ${styles.menuEntryDanger}`}
             onClick={handleSignOut}
           >
-            <span className={styles.menuIcon}>
+            <span className={`${styles.menuIcon} ${styles.menuIconDanger}`}>
               <AppIcon name="logout" />
             </span>
             Sign out

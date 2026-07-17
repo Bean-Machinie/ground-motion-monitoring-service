@@ -190,6 +190,23 @@
   margin: var(--space-1) 0;
 }
 
+/* Destructive entry: red text, red hover highlight, red-tinted icon. */
+.menuEntryDanger {
+  color: var(--color-danger);
+}
+
+.menuEntryDanger:hover,
+.menuEntryDanger:focus-visible {
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* Tints the black icon asset to the danger red. */
+.menuIconDanger {
+  filter: invert(25%) sepia(34%) saturate(3703%) hue-rotate(347deg)
+    brightness(94%) contrast(84%);
+}
+
 @media (max-width: 720px) {
   .name {
     display: none;
