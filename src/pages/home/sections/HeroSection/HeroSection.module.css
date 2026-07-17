@@ -44,8 +44,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(31, 78, 107, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(31, 78, 107, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(85, 146, 167, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(85, 146, 167, 0.08) 1px, transparent 1px);
   background-size: 2.5rem 2.5rem;
 }
 
@@ -59,19 +59,19 @@
 
 .ridgeBack {
   bottom: -25%;
-  background-color: rgba(31, 78, 107, 0.18);
+  background-color: rgba(85, 146, 167, 0.18);
   transform: rotate(-2deg);
 }
 
 .ridgeMid {
   bottom: -32%;
-  background-color: rgba(46, 125, 107, 0.25);
+  background-color: rgba(243, 200, 92, 0.35);
   transform: rotate(1.5deg);
 }
 
 .ridgeFront {
   bottom: -42%;
-  background-color: rgba(31, 78, 107, 0.4);
+  background-color: rgba(85, 146, 167, 0.4);
   transform: rotate(-1deg);
 }
 
@@ -81,7 +81,7 @@
   height: 0.625rem;
   border-radius: var(--radius-full);
   background-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(31, 78, 107, 0.2);
+  box-shadow: 0 0 0 4px rgba(85, 146, 167, 0.2);
 }
 
 @media (min-width: 64rem) {

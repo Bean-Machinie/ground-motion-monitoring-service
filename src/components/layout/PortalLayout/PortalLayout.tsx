@@ -1,8 +1,8 @@
-// Protected portal layout shared by all /portal routes:
-// portal navigation, sign-out action, and the routed page content.
+// Protected portal layout shared by all /portal routes: top panel with
+// portal navigation (sign-out lives in the Account dropdown) and content.
 import { Outlet, useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header/Header";
-import { portalNavLinks } from "@/config/navigation";
+import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
+import { PORTAL_NAV_ITEMS, type NavAction } from "@/config/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PortalLayout.module.css";
 
@@ -10,26 +10,15 @@ export function PortalLayout() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSignOut() {
-    await signOut();
-    navigate("/", { replace: true });
+  function handleAction(action: NavAction) {
+    if (action === "sign-out") {
+      void signOut().then(() => navigate("/", { replace: true }));
+    }
   }
 
   return (
     <div className={styles.layout}>
-      <Header
-        links={portalNavLinks}
-        homeTo="/portal"
-        actions={
-          <button
-            type="button"
-            className={styles.signOut}
-            onClick={() => void handleSignOut()}
-          >
-            Sign out
-          </button>
-        }
-      />
+      <TopPanel navItems={PORTAL_NAV_ITEMS} onAction={handleAction} />
       <main className={`container ${styles.main}`}>
         <Outlet />
       </main>

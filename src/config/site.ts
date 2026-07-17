@@ -8,4 +8,5 @@ export const site = {
     "A secure portal for organizations to access ground-motion monitoring " +
     "and analysis results for their projects.",
   contactEmail: "contact@example.com",
+  facebookUrl: "https://www.facebook.com/",
 } as const;

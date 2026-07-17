@@ -1,0 +1,274 @@
+/* Sticky two-row top panel: top bar (search | brand | social) + nav bar. */
+
+.topPanel {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-bg);
+  border-bottom: var(--border-width) solid var(--color-border);
+  box-shadow: var(--shadow-header);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Top bar row: 3-column grid keeps the brand perfectly centered.          */
+/* ---------------------------------------------------------------------- */
+
+.topBar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 4rem;
+  padding: var(--space-2) var(--space-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.topBarSearch {
+  justify-self: start;
+  min-width: 0;
+}
+
+.topBarMeta {
+  justify-self: end;
+  min-width: 0;
+}
+
+.brand {
+  justify-self: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  transform: scale(1);
+  transition:
+    color 300ms ease,
+    text-shadow 300ms ease,
+    transform 300ms ease;
+}
+
+.brand:hover {
+  color: var(--color-primary);
+  text-shadow: 0 0 18px rgba(85, 146, 167, 0.45);
+  transform: scale(1.025);
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Nav bar row                                                             */
+/* ---------------------------------------------------------------------- */
+
+.navBar {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-1) var(--space-4);
+}
+
+.navList {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+}
+
+.navButton {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-nav);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 160ms ease;
+  white-space: nowrap;
+}
+
+.navButton:hover,
+.navButtonActive {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+/* Shared floating hover-highlight pill. */
+.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary-highlight);
+  box-shadow: inset 0 -3px 0 0 var(--color-accent-amber);
+  pointer-events: none;
+  transition:
+    transform 360ms var(--ease-nav),
+    width 360ms var(--ease-nav),
+    opacity 200ms ease;
+}
+
+/* Chevron: rotated CSS border corner; flips when the menu is open. */
+.chevron {
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 200ms ease;
+}
+
+.chevronOpen {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Dropdown menu panel                                                     */
+/* ---------------------------------------------------------------------- */
+
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  min-width: 14rem;
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  padding: var(--space-2);
+}
+
+/* Speech-bubble pointer tab: a rotated square poking out of the top. */
+.menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-surface);
+  border-left: var(--border-width) solid var(--color-border);
+  border-top: var(--border-width) solid var(--color-border);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.menuList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menuEntry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.menuEntry:hover,
+.menuEntry:focus-visible {
+  background-color: var(--color-bg);
+  color: var(--color-primary-dark);
+}
+
+.menuIcon {
+  display: inline-flex;
+  opacity: 0.68;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.menuEntry:hover .menuIcon,
+.menuEntry:focus-visible .menuIcon {
+  opacity: 0.9;
+  transform: translateX(1px);
+}
+
+.menuEntryDivider {
+  border-bottom: var(--border-width) solid var(--color-border);
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-1);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Responsive (≤720px)                                                     */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .topBar {
+    min-height: 3.25rem;
+    padding: var(--space-1) var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .brand {
+    font-size: var(--font-size-md);
+  }
+
+  /* Nav becomes a horizontally scrollable strip; scrollbar hidden. */
+  .navBar {
+    justify-content: flex-start;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .navList {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    width: 100%;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .navList::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Dropdown becomes a fixed full-width panel pinned below the header. */
+  .menu {
+    position: fixed;
+    left: var(--space-2);
+    right: var(--space-2);
+    transform: none;
+    min-width: 0;
+    margin-top: var(--space-2);
+  }
+
+  .menu::before {
+    display: none;
+  }
+
+  .menuEntry {
+    white-space: normal;
+  }
+}

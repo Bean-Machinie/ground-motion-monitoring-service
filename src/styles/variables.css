@@ -1,30 +1,35 @@
-/* Global design tokens for Ground Motion Monitoring Service. */
+/* Global design tokens for Ground Motion Monitoring Service.
+   Warm off-white theme with muted teal primary and amber accent. */
 
 :root {
   /* Colors */
-  --color-bg: #f7f8fa;
+  --color-bg: #faf7f2;
   --color-surface: #ffffff;
-  --color-surface-muted: #eef1f5;
-  --color-border: #d9dee6;
-  --color-border-strong: #b9c2cf;
+  --color-surface-muted: #f3eee5;
+  --color-border: #e7e0d6;
+  --color-border-strong: #d6ccba;
 
-  --color-text: #1c2733;
-  --color-text-muted: #556674;
-  --color-text-subtle: #8492a3;
+  --color-text: #2b2620;
+  --color-text-muted: #6b6357;
+  --color-text-subtle: #9b9283;
   --color-text-inverse: #ffffff;
 
-  --color-primary: #1f4e6b;
-  --color-primary-hover: #17405a;
-  --color-primary-soft: #e3edf3;
+  --color-primary: #5592a7;
+  --color-primary-dark: #477b8d;
+  --color-primary-hover: #477b8d;
+  --color-primary-soft: #e4eef2;
+  /* --color-primary at 13% opacity, used by the nav hover highlight. */
+  --color-primary-highlight: rgba(85, 146, 167, 0.13);
 
   --color-accent: #2e7d6b;
+  --color-accent-amber: #f3c85c;
   --color-danger: #b3392f;
   --color-danger-soft: #f9e8e6;
   --color-success: #2e6b45;
   --color-success-soft: #e5f2ea;
   --color-warning: #8a6116;
   --color-warning-soft: #f7efdd;
-  --color-neutral-soft: #e8ebef;
+  --color-neutral-soft: #ece7dd;
 
   /* Typography */
   --font-family-base:
@@ -44,6 +49,7 @@
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-nav: 650;
   --font-weight-bold: 700;
 
   --line-height-tight: 1.25;
@@ -68,20 +74,27 @@
   --radius-full: 999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(28, 39, 51, 0.06);
-  --shadow-md: 0 2px 8px rgba(28, 39, 51, 0.08);
-  --shadow-lg: 0 8px 24px rgba(28, 39, 51, 0.1);
+  --shadow-sm: 0 1px 2px rgba(43, 38, 32, 0.06);
+  --shadow-md: 0 2px 8px rgba(43, 38, 32, 0.08);
+  --shadow-lg: 0 8px 24px rgba(43, 38, 32, 0.1);
+  --shadow-header: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-dropdown: 0 12px 28px rgba(0, 0, 0, 0.14);
 
   /* Layout */
   --content-max-width: 72rem;
   --content-narrow-width: 28rem;
   --header-height: 4rem;
 
-  /* Breakpoints (reference values; used in media queries as literals) */
+  /* Breakpoints (reference values; used in media queries as literals).
+     The top panel collapses at 720px. */
   --breakpoint-sm: 40rem;
+  --breakpoint-nav: 720px;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
 
+  /* Motion */
+  --ease-nav: cubic-bezier(0.22, 1, 0.36, 1);
+
   /* Focus */
-  --focus-ring: 0 0 0 3px rgba(31, 78, 107, 0.35);
+  --focus-ring: 0 0 0 3px rgba(85, 146, 167, 0.4);
 }

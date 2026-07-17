@@ -1,27 +1,24 @@
-// Layout for public pages: header with public navigation, content, footer.
+// Layout for public pages: top panel with public navigation, content, footer.
 import { Outlet } from "react-router-dom";
-import { Header } from "@/components/layout/Header/Header";
+import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Footer } from "@/components/layout/Footer/Footer";
-import { publicNavLinks } from "@/config/navigation";
+import { PUBLIC_NAV_ITEMS, type NavItem } from "@/config/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button/Button";
 import styles from "./PublicLayout.module.css";
 
 export function PublicLayout() {
   const { user } = useAuth();
 
+  const navItems: NavItem[] = [
+    ...PUBLIC_NAV_ITEMS,
+    user
+      ? { kind: "link", label: "Portal", to: "/portal" }
+      : { kind: "link", label: "Sign in", to: "/sign-in" },
+  ];
+
   return (
     <div className={styles.layout}>
-      <Header
-        links={publicNavLinks.filter((link) => !(user && link.to === "/sign-in"))}
-        actions={
-          user ? (
-            <Button to="/portal" variant="secondary">
-              Go to portal
-            </Button>
-          ) : undefined
-        }
-      />
+      <TopPanel navItems={navItems} />
       <main className={styles.main}>
         <Outlet />
       </main>
