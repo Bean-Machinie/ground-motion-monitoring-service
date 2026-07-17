@@ -160,9 +160,9 @@
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   /* Concentric: entry radius + panel padding. */
-  border-radius: calc(var(--radius-sm) + var(--space-2));
+  border-radius: calc(var(--radius-sm) + var(--space-1));
   box-shadow: var(--shadow-dropdown);
-  padding: var(--space-2);
+  padding: var(--space-1);
 }
 
 /* Speech-bubble pointer tab: a rotated square poking out of the top. */
