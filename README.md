@@ -1,1 +1,1 @@
-# ground-motion-monitoring-service
+# Ground Motion Monitoring Service

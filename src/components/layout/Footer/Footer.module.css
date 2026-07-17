@@ -1,0 +1,21 @@
+.footer {
+  margin-top: auto;
+  background-color: var(--color-surface);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.inner {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
+}
+
+.name {
+  margin: 0 0 var(--space-2);
+  font-weight: var(--font-weight-semibold);
+}
+
+.meta {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

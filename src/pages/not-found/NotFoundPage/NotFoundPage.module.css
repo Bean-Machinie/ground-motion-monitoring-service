@@ -1,0 +1,22 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-9);
+  padding-bottom: var(--space-9);
+}
+
+.code {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-subtle);
+  letter-spacing: 0.1em;
+}
+
+.text {
+  max-width: 28rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+}

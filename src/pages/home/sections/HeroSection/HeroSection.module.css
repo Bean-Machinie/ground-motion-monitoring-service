@@ -1,0 +1,94 @@
+.hero {
+  background-color: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-6);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.copy {
+  max-width: 36rem;
+}
+
+.title {
+  margin-bottom: var(--space-4);
+}
+
+.lead {
+  margin-bottom: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Abstract layered-terrain visual. */
+.visual {
+  position: relative;
+  min-height: 16rem;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-primary-soft);
+  overflow: hidden;
+}
+
+.gridLines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(31, 78, 107, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 78, 107, 0.08) 1px, transparent 1px);
+  background-size: 2.5rem 2.5rem;
+}
+
+.ridge {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 60%;
+  border-radius: 50% 50% 0 0;
+}
+
+.ridgeBack {
+  bottom: -25%;
+  background-color: rgba(31, 78, 107, 0.18);
+  transform: rotate(-2deg);
+}
+
+.ridgeMid {
+  bottom: -32%;
+  background-color: rgba(46, 125, 107, 0.25);
+  transform: rotate(1.5deg);
+}
+
+.ridgeFront {
+  bottom: -42%;
+  background-color: rgba(31, 78, 107, 0.4);
+  transform: rotate(-1deg);
+}
+
+.marker {
+  position: absolute;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(31, 78, 107, 0.2);
+}
+
+@media (min-width: 64rem) {
+  .inner {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    padding-top: var(--space-9);
+    padding-bottom: var(--space-9);
+  }
+}

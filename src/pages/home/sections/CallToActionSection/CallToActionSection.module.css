@@ -1,0 +1,23 @@
+.section {
+  padding: var(--space-8) 0;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.text {
+  max-width: 36rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}

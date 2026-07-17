@@ -1,0 +1,90 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pageHeader h1 {
+  margin-bottom: var(--space-2);
+}
+
+.lede {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.statsGrid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.statValue {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.statLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.recentList {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.recentItem {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.recentItem:hover {
+  text-decoration: none;
+  border-color: var(--color-primary);
+}
+
+.recentName {
+  font-weight: var(--font-weight-medium);
+}
+
+.recentMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 48rem) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
