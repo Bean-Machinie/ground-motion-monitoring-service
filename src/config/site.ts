@@ -8,7 +8,8 @@ export const site = {
   description:
     "A secure portal for organizations to access ground-motion monitoring " +
     "and analysis results for their projects.",
-  contactEmail: "contact@example.com",
+  contactEmail: "contact@heliosyn.eu",
+  contactPhone: "+45 29 44 98 17",
   linkedinUrl: "https://www.linkedin.com/",
   instagramUrl: "https://www.instagram.com/",
 } as const;

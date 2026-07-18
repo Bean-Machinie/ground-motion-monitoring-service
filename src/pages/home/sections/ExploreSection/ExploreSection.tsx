@@ -1,5 +1,5 @@
-// Homepage intro section: short pitch with a yellow CTA that jumps to the
-// services grid below.
+// Homepage intro section: short pitch with a yellow CTA to the services page.
+import { Link } from "react-router-dom";
 import arrowAsset from "@/assets/icons/arrow.svg";
 import styles from "./ExploreSection.module.css";
 
@@ -16,10 +16,10 @@ export function ExploreSection() {
           into ground movement - so you can detect risk early and act with
           confidence.
         </p>
-          <a href="#services" className={styles.ctaButton}>
+          <Link to="/services" className={styles.ctaButton}>
             <span>View Services</span>
             <img src={arrowAsset} alt="" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

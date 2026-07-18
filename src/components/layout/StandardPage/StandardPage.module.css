@@ -1,0 +1,14 @@
+.page {
+  padding: var(--space-7) 0 var(--space-8);
+}
+
+.title {
+  margin-bottom: var(--space-4);
+}
+
+.lede {
+  max-width: 46rem;
+  margin-bottom: var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+}

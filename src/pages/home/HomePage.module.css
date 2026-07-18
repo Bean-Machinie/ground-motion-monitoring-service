@@ -1,26 +1,36 @@
-/* Wrapper for the Explore intro + services grid so the faint earth
-   backdrop can bleed behind both sections. */
-.exploreArea {
+/* Wrapper for the four content sections sharing the decorative watermark.
+   Self-contained stacking context; the watermark can never leak outside. */
+.contentBackdrop {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* Globe artwork is trimmed to its bounding box, so these offsets place it
-   exactly: tucked up under the hero and pulled slightly in from the right. */
-.earthBg {
+/* Decorative watermark pinned top-right, dimmed, tinted gold via a filter
+   chain, and feathered out on its left and bottom edges via dual masks. */
+.backgroundWord {
   position: absolute;
-  top: -4rem;
-  right: 5vw;
-  z-index: -1;
-  width: min(46vw, 46rem);
+  top: 0;
+  right: 0;
+  z-index: 0;
+  width: min(1000px, 80vw);
   height: auto;
+  opacity: 0.35;
   pointer-events: none;
-  user-select: none;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 28%),
+    linear-gradient(to bottom, black 68%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 28%),
+    linear-gradient(to bottom, black 68%, transparent 100%);
+  mask-composite: intersect;
+  filter: grayscale(1) sepia(1) hue-rotate(10deg) saturate(4)
+    brightness(0.95);
 }
 
-@media (max-width: 48rem) {
-  .earthBg {
-    display: none;
-  }
+/* Content sections always render above the watermark. */
+.contentBackdrop > section {
+  position: relative;
+  z-index: 1;
 }

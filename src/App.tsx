@@ -6,6 +6,12 @@ import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 import { AdminRoute } from "@/components/auth/AdminRoute/AdminRoute";
 import { RedirectIfAuthenticated } from "@/components/auth/RedirectIfAuthenticated/RedirectIfAuthenticated";
 import { HomePage } from "@/pages/home/HomePage";
+import { ServicesPage } from "@/pages/services/ServicesPage/ServicesPage";
+import { ServiceDetailPage } from "@/pages/services/ServiceDetailPage/ServiceDetailPage";
+import { AboutPage } from "@/pages/about/AboutPage/AboutPage";
+import { TechnologyPage } from "@/pages/technology/TechnologyPage/TechnologyPage";
+import { IndustriesPage } from "@/pages/industries/IndustriesPage/IndustriesPage";
+import { CaseStudiesPage } from "@/pages/case-studies/CaseStudiesPage/CaseStudiesPage";
 import { SignInPage } from "@/pages/auth/SignInPage/SignInPage";
 import { SignUpPage } from "@/pages/auth/SignUpPage/SignUpPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage/ForgotPasswordPage";
@@ -21,6 +27,12 @@ export function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="services" element={<ServicesPage />} />
+        <Route path="services/:slug" element={<ServiceDetailPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="technology" element={<TechnologyPage />} />
+        <Route path="industries" element={<IndustriesPage />} />
+        <Route path="case-studies" element={<CaseStudiesPage />} />
         <Route
           path="sign-in"
           element={

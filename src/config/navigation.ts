@@ -16,7 +16,9 @@ export type NavItem =
   | { kind: "link"; label: string; to: string; end?: boolean }
   | { kind: "menu"; id: string; label: string; items: NavMenuEntry[] };
 
-/** Single main menu shared across the entire site. */
+/** Single main menu shared across the entire site.
+    All entries navigate to real pages, except Contact, which scrolls to
+    the contact block (id="contact") in the shared footer. */
 export const NAV_ITEMS: NavItem[] = [
   {
     kind: "menu",
@@ -24,19 +26,30 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Services",
     items: [
       {
-        label: "Monitoring & reporting",
-        to: "/#overview-heading",
-        icon: "satellite",
-      },
-      {
-        label: "How it works",
-        to: "/#process-heading",
-        icon: "graph",
+        label: "View Services",
+        to: "/services",
+        icon: "box",
         dividerBelow: true,
       },
-      { label: "Request access", to: "/sign-up", icon: "user-group" },
+      { label: "Screening", to: "/services/screening", icon: "graph" },
+      { label: "Monitoring", to: "/services/monitoring", icon: "desktop" },
+      {
+        label: "Research & Collaboration",
+        to: "/services/research-collaboration",
+        icon: "user-group",
+      },
     ],
   },
-  { kind: "link", label: "Dashboard", to: "/portal", end: true },
-  { kind: "link", label: "Projects", to: "/portal/projects" },
+  {
+    kind: "menu",
+    id: "explore",
+    label: "Explore",
+    items: [
+      { label: "InSAR Technology", to: "/technology", icon: "satellite" },
+      { label: "Industries", to: "/industries", icon: "globe" },
+      { label: "Case Studies", to: "/case-studies", icon: "push-pin" },
+    ],
+  },
+  { kind: "link", label: "About", to: "/about" },
+  { kind: "link", label: "Contact", to: "/#contact" },
 ];

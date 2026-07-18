@@ -235,8 +235,13 @@ export function TopPanel() {
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `${styles.navButton} ${isActive ? styles.navButtonActive : ""}`
+                    `${styles.navButton} ${
+                      isActive && !item.to.includes("#")
+                        ? styles.navButtonActive
+                        : ""
+                    }`
                   }
+                  onClick={() => scrollToHash(item.to)}
                 >
                   {item.label}
                 </NavLink>

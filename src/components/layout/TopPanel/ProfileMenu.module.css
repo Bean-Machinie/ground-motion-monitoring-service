@@ -9,7 +9,7 @@
   justify-content: center;
   min-height: 40px;
   padding: 0 18px;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   background: #fcd900;
   color: #111111;
   font-size: var(--font-size-sm);

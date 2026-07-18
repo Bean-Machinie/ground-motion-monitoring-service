@@ -5,7 +5,11 @@ import styles from "./AboutSection.module.css";
 
 export function AboutSection() {
   return (
-    <section className={styles.section} aria-labelledby="about-heading">
+    <section
+      id="about"
+      className={styles.section}
+      aria-labelledby="about-heading"
+    >
       <div className={`container ${styles.grid}`}>
         <div className={styles.imageWrap}>
           <img

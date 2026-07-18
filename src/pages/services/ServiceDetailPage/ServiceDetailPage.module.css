@@ -1,27 +1,21 @@
-.section {
-  padding: var(--space-8) 0 var(--space-7);
-}
-
-.inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.layout {
+  display: grid;
   gap: var(--space-6);
-  flex-wrap: wrap;
+  align-items: start;
 }
 
-.copy {
-  max-width: 44rem;
+.block {
+  margin-bottom: var(--space-5);
 }
 
-.heading {
-  max-width: 22ch;
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
+.blockHeading {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xl);
 }
 
-.text {
+.blockText {
   margin: 0;
+  max-width: 40rem;
   color: var(--color-text-muted);
 }
 
@@ -31,12 +25,12 @@
   gap: var(--space-4);
   min-height: 48px;
   padding: 0 var(--space-4) 0 var(--space-5);
+  margin-top: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--yellow);
   color: var(--ink);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
-  letter-spacing: 0.02em;
   text-decoration: none;
   transition: background-color 0.15s ease;
 }
@@ -49,4 +43,23 @@
 .ctaButton img {
   width: 1rem;
   height: 1rem;
+}
+
+.imageWrap {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 18rem;
+  object-fit: cover;
+}
+
+@media (min-width: 48rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  }
 }

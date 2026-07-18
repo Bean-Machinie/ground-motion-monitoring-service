@@ -1,47 +1,30 @@
+/* Full-bleed divider line above the footer (CTA -> footer boundary). */
 .footer {
   margin-top: auto;
-  background-color: var(--color-surface);
   border-top: var(--border-width) solid var(--color-border);
-}
-
-.inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  padding-top: var(--space-7);
-  padding-bottom: var(--space-6);
 }
 
 .columns {
   display: grid;
   gap: var(--space-6);
+  padding: var(--space-7) 0;
 }
 
 .brandCol {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  align-items: flex-start;
 }
 
 .logo {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 9rem;
+  height: auto;
   object-fit: contain;
 }
 
-.name {
-  margin: 0;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.06em;
-}
-
 .colHeading {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-xs);
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-subtle);
 }
 
 .linkList {
@@ -50,12 +33,12 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .link {
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -65,51 +48,31 @@
   text-decoration: none;
 }
 
-.meta {
+.contactLine {
   margin: 0 0 var(--space-3);
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
 }
 
-.socials {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.socialLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-full);
-  background-color: var(--color-bg);
-  opacity: 0.85;
-  transition: opacity 150ms ease, border-color 150ms ease;
-}
-
-.socialLink:hover {
-  opacity: 1;
-  border-color: var(--color-border-strong);
+/* Full-bleed divider line above the legal line. */
+.legalBar {
+  border-top: var(--border-width) solid var(--color-border);
 }
 
 .legal {
   margin: 0;
-  padding-top: var(--space-4);
-  border-top: var(--border-width) solid var(--color-border);
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
+  padding: var(--space-4) 0 var(--space-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 @media (min-width: 48rem) {
   .columns {
-    grid-template-columns: 1.5fr 1fr 1fr;
+    grid-template-columns: 1.2fr 1fr 1fr 1.1fr;
     align-items: start;
   }
 
   .brandCol {
-    align-items: flex-start;
+    justify-content: center;
   }
 }

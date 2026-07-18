@@ -1,5 +1,7 @@
 // Homepage services grid: four full-bleed image cards (offerings) with a
-// dark overlay, yellow eyebrow label, and top-aligned text.
+// dark overlay, yellow eyebrow label, and top-aligned text. Each card links
+// to its dedicated page.
+import { Link } from "react-router-dom";
 import deformationImage from "@/assets/images/offering-deformation.jpg";
 import riskImage from "@/assets/images/offering-risk.jpg";
 import researchImage from "@/assets/images/offering-research.jpg";
@@ -12,6 +14,7 @@ const OFFERINGS = [
     image: deformationImage,
     title: "Screening",
     description: "One-time check: is your site moving?",
+    to: "/services/screening",
   },
   {
     label: "Operations",
@@ -19,6 +22,7 @@ const OFFERINGS = [
     title: "Monitoring",
     description:
       "Continuous tracking with change alerts. Recurring, and includes early-warning signals.",
+    to: "/services/monitoring",
   },
   {
     label: "Science",
@@ -26,6 +30,7 @@ const OFFERINGS = [
     title: "Research & Collaboration",
     description:
       "Bespoke studies and scientific partnerships — our premium custom work.",
+    to: "/services/research-collaboration",
   },
   {
     label: "Results",
@@ -33,6 +38,7 @@ const OFFERINGS = [
     title: "Case Studies",
     description:
       "Real-world projects and outcomes — see how our monitoring performs in the field.",
+    to: "/case-studies",
   },
 ] as const;
 
@@ -49,7 +55,7 @@ export function ServiceOverviewSection() {
         </h2>
         <div className={styles.grid}>
           {OFFERINGS.map((item) => (
-            <article key={item.title} className={styles.card}>
+            <Link key={item.title} to={item.to} className={styles.card}>
               <img src={item.image} alt="" className={styles.cardImage} />
               <div className={styles.cardOverlay} aria-hidden="true" />
               <div className={styles.cardContent}>
@@ -57,7 +63,7 @@ export function ServiceOverviewSection() {
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 <p className={styles.cardText}>{item.description}</p>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

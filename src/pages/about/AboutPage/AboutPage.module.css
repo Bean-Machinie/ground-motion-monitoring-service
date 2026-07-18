@@ -1,33 +1,11 @@
-/* Full-bleed divider line above the section. */
-.section {
-  padding: var(--space-8) 0;
-  border-top: var(--border-width) solid var(--color-border);
-}
-
-.grid {
+.layout {
   display: grid;
   gap: var(--space-6);
   align-items: center;
 }
 
-.imageWrap {
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-}
-
-.image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 18rem;
-  object-fit: cover;
-}
-
-.body {
-  max-width: 36rem;
-}
-
 .text {
+  max-width: 40rem;
   color: var(--color-text-muted);
   margin-bottom: var(--space-4);
 }
@@ -51,8 +29,21 @@
   text-decoration: none;
 }
 
+.imageWrap {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 18rem;
+  object-fit: cover;
+}
+
 @media (min-width: 48rem) {
-  .grid {
+  .layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   }
 }

@@ -11,6 +11,9 @@ import instagram from "@/assets/icons/instagram.svg";
 import bell from "@/assets/icons/bell.svg";
 import file from "@/assets/icons/file.svg";
 import globe from "@/assets/icons/globe.svg";
+import box from "@/assets/icons/box.svg";
+import desktop from "@/assets/icons/desktop.svg";
+import pushPin from "@/assets/icons/push-pin.svg";
 
 export const ICONS = {
   satellite,
@@ -25,6 +28,9 @@ export const ICONS = {
   bell,
   file,
   globe,
+  box,
+  desktop,
+  "push-pin": pushPin,
 } as const;
 
 export type IconName = keyof typeof ICONS;

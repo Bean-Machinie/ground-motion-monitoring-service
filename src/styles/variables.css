@@ -38,13 +38,18 @@
   --font-family-mono:
     "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-md: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.375rem;
-  --font-size-2xl: 1.75rem;
-  --font-size-3xl: 2.25rem;
+  /* Golden-ratio modular type scale: every size is a power of φ (1.618)
+     in quarter steps. Core hierarchy scales by exactly φ per tier:
+     body (md, φ⁰ = 1rem) → h2 (2xl, φ¹ = 1.618rem) → h1 (3xl, φ² = 2.618rem).
+     h3 (xl) sits at the geometric midpoint √φ. */
+  --font-size-xs: 0.786rem; /* φ^-1/2 */
+  --font-size-sm: 0.887rem; /* φ^-1/4 */
+  --font-size-md: 1rem; /* φ^0  — standard text */
+  --font-size-lg: 1.128rem; /* φ^1/4 */
+  --font-size-xl: 1.272rem; /* φ^1/2 — h3 */
+  --font-size-2xl: 1.618rem; /* φ^1  — h2 */
+  --font-size-3xl: 2.618rem; /* φ^2  — h1 */
+  --font-size-4xl: 4.236rem; /* φ^3  — hero display */
 
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -75,10 +80,10 @@
      Nested concentricity: outer radius = inner radius + padding,
      e.g. border-radius: calc(var(--radius-sm) + var(--space-2)). */
   --border-width: 1px;
-  --radius-sm: 2px;
-  --radius-md: 5px;
-  --radius-lg: 10px;
-  --radius-xl: 18px;
+  --radius-sm: 1px;
+  --radius-md: 3px;
+  --radius-lg: 5px;
+  --radius-xl: 8px;
   --radius-full: 999px;
 
   /* Shadows */
@@ -89,7 +94,7 @@
   --shadow-dropdown: 0 12px 28px rgba(0, 0, 0, 0.14);
 
   /* Layout */
-  --content-max-width: 72rem;
+  --content-max-width: 84rem;
   --content-narrow-width: 28rem;
   --header-height: 4rem;
 

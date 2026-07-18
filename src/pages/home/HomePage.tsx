@@ -1,30 +1,31 @@
-// Public homepage: hero, explore intro + services grid (shared earth
-// backdrop), about story, process, and call to action.
+// Public homepage: hero, then four sections (Explore, services grid, About,
+// Process) sharing one content backdrop with the decorative watermark, then
+// the call to action.
 import { HeroSection } from "@/pages/home/sections/HeroSection/HeroSection";
 import { ExploreSection } from "@/pages/home/sections/ExploreSection/ExploreSection";
 import { ServiceOverviewSection } from "@/pages/home/sections/ServiceOverviewSection/ServiceOverviewSection";
 import { AboutSection } from "@/pages/home/sections/AboutSection/AboutSection";
 import { ProcessSection } from "@/pages/home/sections/ProcessSection/ProcessSection";
 import { CallToActionSection } from "@/pages/home/sections/CallToActionSection/CallToActionSection";
-import earthBackdrop from "@/assets/images/back_earth_yellow.png";
+import backgroundWord from "@/assets/images/background-word.png";
 import styles from "./HomePage.module.css";
 
 export function HomePage() {
   return (
     <>
       <HeroSection />
-      <div className={styles.exploreArea}>
+      <div className={styles.contentBackdrop}>
         <img
-          src={earthBackdrop}
+          src={backgroundWord}
           alt=""
           aria-hidden="true"
-          className={styles.earthBg}
+          className={styles.backgroundWord}
         />
         <ExploreSection />
         <ServiceOverviewSection />
+        <AboutSection />
+        <ProcessSection />
       </div>
-      <AboutSection />
-      <ProcessSection />
       <CallToActionSection />
     </>
   );

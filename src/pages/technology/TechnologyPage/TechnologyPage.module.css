@@ -1,0 +1,44 @@
+.imageRow {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.figure {
+  margin: 0;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 18rem;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.caption {
+  margin-top: var(--space-2);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.block {
+  margin-bottom: var(--space-5);
+}
+
+.blockHeading {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xl);
+}
+
+.blockText {
+  margin: 0;
+  max-width: 44rem;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .imageRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

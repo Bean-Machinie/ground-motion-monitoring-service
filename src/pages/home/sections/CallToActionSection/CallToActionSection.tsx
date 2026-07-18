@@ -1,32 +1,27 @@
-// Homepage closing call to action: full-width banner directing users to
-// sign in or request access.
+// Homepage closing call to action: heading and copy on the left, yellow
+// arrow CTA button on the right.
 import { Link } from "react-router-dom";
-import { site } from "@/config/site";
+import arrowAsset from "@/assets/icons/arrow.svg";
 import styles from "./CallToActionSection.module.css";
 
 export function CallToActionSection() {
   return (
     <section className={styles.section} aria-labelledby="cta-heading">
-      <div className="container">
-        <div className={styles.banner}>
+      <div className={`container ${styles.inner}`}>
+        <div className={styles.copy}>
           <h2 id="cta-heading" className={styles.heading}>
             Ready to discuss a monitoring need?
           </h2>
           <p className={styles.text}>
-            Already a customer? Sign in to view your projects. New to{" "}
-            {site.shortName}? Create an account or contact us at{" "}
-            <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a> to
-            discuss a monitoring engagement.
+            Whether you need a one-off ground motion assessment, continuous
+            monitoring, or help defining the right InSAR service, our team can
+            help scope the right approach.
           </p>
-          <div className={styles.ctas}>
-            <Link to="/sign-in" className={`${styles.btn} ${styles.btnAmber}`}>
-              Sign in
-            </Link>
-            <Link to="/sign-up" className={`${styles.btn} ${styles.btnGhost}`}>
-              Create an account
-            </Link>
-          </div>
         </div>
+        <Link to="/sign-up" className={styles.ctaButton}>
+          <span>Start a Ground Motion Request</span>
+          <img src={arrowAsset} alt="" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
