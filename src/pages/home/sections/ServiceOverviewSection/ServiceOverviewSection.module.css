@@ -1,11 +1,17 @@
 .section {
-  padding: var(--space-8) 0;
+  padding: var(--space-4) 0 var(--space-8);
 }
 
-.intro {
-  max-width: 40rem;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-6);
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .grid {
@@ -13,19 +19,90 @@
   gap: var(--space-4);
 }
 
-.cardTitle {
-  font-size: var(--font-size-lg);
+/* Card radius follows the app-wide proportional radius scale: rounded top
+   corners only (--radius-lg), so the yellow base bar stays square-edged,
+   mirroring the top panel's amber tab-marker underline. */
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  min-height: 28rem;
+  background-color: #111;
+}
+
+/* Thick yellow accent bar along the bottom edge, square-edged like the
+   nav highlight underline. */
+.card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  background: var(--yellow);
+}
+
+.cardImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.card:hover .cardImage {
+  transform: scale(1.04);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+.cardContent {
+  position: relative;
+  padding: var(--space-5);
+}
+
+.cardLabel {
+  display: inline-block;
   margin-bottom: var(--space-2);
+  color: var(--yellow);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
 }
 
 .cardText {
   margin: 0;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.9);
   font-size: var(--font-size-sm);
 }
 
 @media (min-width: 48rem) {
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }

@@ -2,17 +2,29 @@
   padding: var(--space-8) 0;
 }
 
-.inner {
+.banner {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  padding: var(--space-7) var(--space-5);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-primary-dark);
+}
+
+.heading {
+  color: var(--color-text-inverse);
+  margin-bottom: var(--space-3);
 }
 
 .text {
   max-width: 36rem;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: var(--space-5);
+}
+
+.text a {
+  color: var(--color-accent-amber);
 }
 
 .ctas {
@@ -20,4 +32,41 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btnAmber {
+  background-color: var(--color-accent-amber);
+  color: var(--color-text);
+}
+
+.btnAmber:hover {
+  background-color: #eebb45;
+}
+
+.btnGhost {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-inverse);
+}
+
+.btnGhost:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.8);
 }

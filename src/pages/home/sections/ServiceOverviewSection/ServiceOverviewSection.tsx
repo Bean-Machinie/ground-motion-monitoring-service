@@ -1,40 +1,63 @@
-// Homepage section describing what the service provides.
-import { Card } from "@/components/ui/Card/Card";
+// Homepage services grid: four full-bleed image cards (offerings) with a
+// dark overlay, yellow eyebrow label, and top-aligned text.
+import deformationImage from "@/assets/images/offering-deformation.jpg";
+import riskImage from "@/assets/images/offering-risk.jpg";
+import researchImage from "@/assets/images/offering-research.jpg";
+import infrastructureThumb from "@/assets/icons/infrastructure_thumb.webp";
 import styles from "./ServiceOverviewSection.module.css";
 
-const OVERVIEW_ITEMS = [
+const OFFERINGS = [
   {
-    title: "Ongoing monitoring and reporting",
-    description:
-      "Receive monitoring updates and analysis results for your projects on a structured, ongoing basis.",
+    label: "Analysis",
+    image: deformationImage,
+    title: "Screening",
+    description: "One-time check: is your site moving?",
   },
   {
-    title: "Secure access to project information",
+    label: "Operations",
+    image: riskImage,
+    title: "Monitoring",
     description:
-      "Results are tied to your account and projects. Only you and your organization can view your project data.",
+      "Continuous tracking with change alerts. Recurring, and includes early-warning signals.",
   },
   {
-    title: "Clear presentation of technical findings",
+    label: "Science",
+    image: researchImage,
+    title: "Research & Collaboration",
     description:
-      "Analysis outputs are delivered as organized, readable records so your team can review findings efficiently.",
+      "Bespoke studies and scientific partnerships — our premium custom work.",
+  },
+  {
+    label: "Results",
+    image: infrastructureThumb,
+    title: "Case Studies",
+    description:
+      "Real-world projects and outcomes — see how our monitoring performs in the field.",
   },
 ] as const;
 
 export function ServiceOverviewSection() {
   return (
-    <section className={styles.section} aria-labelledby="overview-heading">
+    <section
+      id="services"
+      className={styles.section}
+      aria-labelledby="services-heading"
+    >
       <div className="container">
-        <h2 id="overview-heading">What the service provides</h2>
-        <p className={styles.intro}>
-          A single place for your organization to access ground-motion
-          monitoring results, analysis reports, and project updates.
-        </p>
+        <h2 id="services-heading" className={styles.srOnly}>
+          Our services
+        </h2>
         <div className={styles.grid}>
-          {OVERVIEW_ITEMS.map((item) => (
-            <Card key={item.title} className={styles.card}>
-              <h3 className={styles.cardTitle}>{item.title}</h3>
-              <p className={styles.cardText}>{item.description}</p>
-            </Card>
+          {OFFERINGS.map((item) => (
+            <article key={item.title} className={styles.card}>
+              <img src={item.image} alt="" className={styles.cardImage} />
+              <div className={styles.cardOverlay} aria-hidden="true" />
+              <div className={styles.cardContent}>
+                <span className={styles.cardLabel}>{item.label}</span>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <p className={styles.cardText}>{item.description}</p>
+              </div>
+            </article>
           ))}
         </div>
       </div>

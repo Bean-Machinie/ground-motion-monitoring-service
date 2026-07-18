@@ -1,0 +1,26 @@
+/* Wrapper for the Explore intro + services grid so the faint earth
+   backdrop can bleed behind both sections. */
+.exploreArea {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Globe artwork is trimmed to its bounding box, so these offsets place it
+   exactly: tucked up under the hero and pulled slightly in from the right. */
+.earthBg {
+  position: absolute;
+  top: -4rem;
+  right: 5vw;
+  z-index: -1;
+  width: min(46vw, 46rem);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 48rem) {
+  .earthBg {
+    display: none;
+  }
+}

@@ -1,0 +1,38 @@
+.section {
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.inner {
+  max-width: 45rem;
+  margin: 0;
+}
+
+.text {
+  max-width: 34rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.ctaButton:hover {
+  background: #ffe44d;
+  text-decoration: none;
+}
+
+.ctaButton img {
+  width: 0.875rem;
+  height: 0.875rem;
+}
