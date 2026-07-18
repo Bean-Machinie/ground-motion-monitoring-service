@@ -114,3 +114,43 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Tablet (2-column grid): cards don't need the full desktop height. */
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .card {
+    min-height: 26rem;
+  }
+}
+
+/* Phone: 2x2 grid of portrait cards — mirrors the desktop "pillars next to
+   each other" look at phone scale. */
+@media (max-width: 47.999rem) {
+  .section {
+    padding: var(--space-7) 0 var(--space-6);
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .card {
+    min-height: 19rem;
+  }
+
+  .card::after {
+    height: 8px;
+  }
+
+  .cardContent {
+    padding: var(--space-3);
+  }
+
+  .cardTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .cardText {
+    font-size: var(--font-size-xs);
+  }
+}

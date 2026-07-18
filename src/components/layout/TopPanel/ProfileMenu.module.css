@@ -2,6 +2,38 @@
   position: relative;
 }
 
+/* Row holding the social icons + log-in button (or avatar). */
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Social icons: same springy lift/tilt hover as the avatar trigger. */
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  transform: translateY(0) rotate(0deg);
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+.socialLink:hover,
+.socialLink:focus-visible {
+  transform: translateY(-3px) rotate(-6deg);
+}
+
+.socialLink:active {
+  transform: translateY(0) rotate(0deg);
+  transition-duration: 90ms;
+}
+
+.socialLink img {
+  display: block;
+}
+
 /* Signed-out action: single yellow log-in button, styled like the hero CTA. */
 .loginButton {
   display: inline-flex;
@@ -215,5 +247,14 @@
   .loginButton {
     min-height: 34px;
     padding: 0 14px;
+  }
+
+  /* Keep the narrow top bar clean: socials live in the footer on phones. */
+  .socialLink {
+    display: none;
+  }
+
+  .metaRow {
+    gap: var(--space-2);
   }
 }

@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
 import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 import { AdminRoute } from "@/components/auth/AdminRoute/AdminRoute";
 import { RedirectIfAuthenticated } from "@/components/auth/RedirectIfAuthenticated/RedirectIfAuthenticated";
+import { RootPage } from "@/pages/home/RootPage";
 import { HomePage } from "@/pages/home/HomePage";
 import { ServicesPage } from "@/pages/services/ServicesPage/ServicesPage";
 import { ServiceDetailPage } from "@/pages/services/ServiceDetailPage/ServiceDetailPage";
@@ -26,7 +27,10 @@ export function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
+        <Route index element={<RootPage />} />
+        {/* Marketing homepage stays reachable for signed-in users
+            (Explore menu -> Home). */}
+        <Route path="home" element={<HomePage />} />
         <Route path="services" element={<ServicesPage />} />
         <Route path="services/:slug" element={<ServiceDetailPage />} />
         <Route path="about" element={<AboutPage />} />

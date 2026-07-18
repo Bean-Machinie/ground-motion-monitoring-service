@@ -53,3 +53,33 @@ export const NAV_ITEMS: NavItem[] = [
   { kind: "link", label: "About", to: "/about" },
   { kind: "link", label: "Contact", to: "/#contact" },
 ];
+
+/** Nav for signed-in users: portal-first, with the public site collected
+    under a single Explore menu (GitHub-style app view). */
+export const PORTAL_NAV_ITEMS: NavItem[] = [
+  { kind: "link", label: "Dashboard", to: "/", end: true },
+  { kind: "link", label: "Projects", to: "/portal/projects" },
+  {
+    kind: "menu",
+    id: "explore",
+    label: "Explore",
+    items: [
+      {
+        label: "Home",
+        to: "/home",
+        icon: "lighthouse",
+        dividerBelow: true,
+      },
+      {
+        label: "View Services",
+        to: "/services",
+        icon: "box",
+        dividerBelow: true,
+      },
+      { label: "InSAR Technology", to: "/technology", icon: "satellite" },
+      { label: "Industries", to: "/industries", icon: "globe" },
+      { label: "Case Studies", to: "/case-studies", icon: "push-pin" },
+      { label: "About", to: "/about", icon: "user-group" },
+    ],
+  },
+];

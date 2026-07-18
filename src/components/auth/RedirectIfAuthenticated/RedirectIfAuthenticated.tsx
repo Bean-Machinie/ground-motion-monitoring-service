@@ -1,4 +1,5 @@
-// Redirects already-authenticated users away from auth pages to the portal.
+// Redirects already-authenticated users away from auth pages to "/",
+// which renders their dashboard (auth-aware root).
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,7 +13,7 @@ export function RedirectIfAuthenticated({ children }: { children: ReactNode }) {
   }
 
   if (user) {
-    return <Navigate to="/portal" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

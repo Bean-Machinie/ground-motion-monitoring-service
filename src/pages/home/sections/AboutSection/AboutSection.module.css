@@ -75,3 +75,19 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   }
 }
+
+/* Phone: tighter spacing, shorter image. */
+@media (max-width: 47.999rem) {
+  .section {
+    padding: var(--space-7) 0;
+  }
+
+  .grid {
+    gap: var(--space-5);
+  }
+
+  .image {
+    min-height: 13rem;
+    max-height: 16rem;
+  }
+}

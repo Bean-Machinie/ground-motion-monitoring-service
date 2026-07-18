@@ -64,3 +64,14 @@
   width: 28px;
   height: 28px;
 }
+
+/* Phone: smaller heading, tighter padding. CTA stays a normal inline button. */
+@media (max-width: 720px) {
+  .section {
+    padding: var(--space-7) 0 var(--space-6);
+  }
+
+  .heading {
+    font-size: var(--font-size-2xl);
+  }
+}

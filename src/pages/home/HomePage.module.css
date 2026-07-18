@@ -34,3 +34,12 @@
   position: relative;
   z-index: 1;
 }
+
+/* Phone: shrink and dim the watermark so it stays decorative instead of
+   dominating the narrow viewport. */
+@media (max-width: 720px) {
+  .backgroundWord {
+    width: min(320px, 64vw);
+    opacity: 0.22;
+  }
+}

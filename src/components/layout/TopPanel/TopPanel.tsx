@@ -10,7 +10,12 @@ import {
 } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { site } from "@/config/site";
-import { NAV_ITEMS, type NavMenuEntry } from "@/config/navigation";
+import {
+  NAV_ITEMS,
+  PORTAL_NAV_ITEMS,
+  type NavMenuEntry,
+} from "@/config/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { ProfileMenu } from "@/components/layout/TopPanel/ProfileMenu";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import logoLong from "@/assets/logo/Black/HELIOSYN_Long_Black.png";
@@ -53,6 +58,10 @@ function scrollToHash(to: string) {
 export function TopPanel() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Signed-in users get the portal-first nav (GitHub-style app view).
+  const navItems = user ? PORTAL_NAV_ITEMS : NAV_ITEMS;
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -187,16 +196,20 @@ export function TopPanel() {
       {/* Top bar row: (spacer) | brand | profile — the empty first cell
           keeps the brand perfectly centered in the 3-column grid. */}
       <div className={styles.topBar}>
-        <div className={styles.topBarSpacer} aria-hidden="true" />
-        <Link to="/" className={styles.brand} aria-label={site.name}>
-          <img
-            src={logoLong}
-            alt={`${site.companyName} — ${site.name}`}
-            className={styles.brandLogo}
-          />
-        </Link>
-        <div className={styles.topBarMeta}>
-          <ProfileMenu />
+        {/* Same .container as page content, so the right-side cluster
+            aligns with the page content margin. */}
+        <div className={`container ${styles.topBarInner}`}>
+          <div className={styles.topBarSpacer} aria-hidden="true" />
+          <Link to="/" className={styles.brand} aria-label={site.name}>
+            <img
+              src={logoLong}
+              alt={`${site.companyName} — ${site.name}`}
+              className={styles.brandLogo}
+            />
+          </Link>
+          <div className={styles.topBarMeta}>
+            <ProfileMenu />
+          </div>
         </div>
       </div>
 
@@ -224,7 +237,7 @@ export function TopPanel() {
             />
           ) : null}
 
-          {NAV_ITEMS.map((item) =>
+          {navItems.map((item) =>
             item.kind === "link" ? (
               <li
                 key={item.to}

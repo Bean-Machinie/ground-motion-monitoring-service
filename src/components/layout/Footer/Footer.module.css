@@ -76,3 +76,43 @@
     justify-content: center;
   }
 }
+
+/* Phone: compact footer — small logo, Services/Platform side by side,
+   Contact full width below. */
+@media (max-width: 47.999rem) {
+  .columns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6) var(--space-4);
+    padding: var(--space-6) 0;
+  }
+
+  .brandCol {
+    grid-column: 1 / -1;
+  }
+
+  .columns > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .logo {
+    width: 5.5rem;
+  }
+
+  .colHeading {
+    margin-bottom: var(--space-3);
+    font-size: var(--font-size-lg);
+  }
+
+  .linkList {
+    gap: var(--space-2);
+  }
+
+  .link,
+  .contactLine {
+    font-size: var(--font-size-sm);
+  }
+
+  .contactLine {
+    margin-bottom: var(--space-2);
+  }
+}

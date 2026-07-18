@@ -27,7 +27,8 @@ export function SignInPage() {
       return;
     }
     const from = (location.state as { from?: string } | null)?.from;
-    navigate(from ?? "/portal", { replace: true });
+    // Default landing after sign-in is "/", which renders the dashboard.
+    navigate(from ?? "/", { replace: true });
   }
 
   return (

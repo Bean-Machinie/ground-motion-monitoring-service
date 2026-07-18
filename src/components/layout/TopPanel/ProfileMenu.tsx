@@ -10,8 +10,35 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { site } from "@/config/site";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import styles from "./ProfileMenu.module.css";
+
+/** LinkedIn + Instagram links shown left of the log-in button / avatar. */
+function SocialLinks() {
+  return (
+    <>
+      <a
+        href={site.linkedinUrl}
+        target="_blank"
+        rel="noreferrer"
+        className={styles.socialLink}
+        aria-label="HELIOSYN on LinkedIn"
+      >
+        <AppIcon name="linkedin" size={22} />
+      </a>
+      <a
+        href={site.instagramUrl}
+        target="_blank"
+        rel="noreferrer"
+        className={styles.socialLink}
+        aria-label="HELIOSYN on Instagram"
+      >
+        <AppIcon name="instagram" size={22} />
+      </a>
+    </>
+  );
+}
 
 /** Initials for the avatar, derived from the profile name or email. */
 function getInitials(name: string | null | undefined, email: string): string {
@@ -67,9 +94,12 @@ export function ProfileMenu() {
 
   if (!user) {
     return (
-      <Link to="/sign-in" className={styles.loginButton}>
-        Log in
-      </Link>
+      <div className={styles.metaRow}>
+        <SocialLinks />
+        <Link to="/sign-in" className={styles.loginButton}>
+          Log in
+        </Link>
+      </div>
     );
   }
 
@@ -101,8 +131,10 @@ export function ProfileMenu() {
   }
 
   return (
-    <div className={styles.root} ref={rootRef}>
-      <button
+    <div className={styles.metaRow}>
+      <SocialLinks />
+      <div className={styles.root} ref={rootRef}>
+        <button
         type="button"
         className={`${styles.trigger}${open ? ` ${styles.triggerOpen}` : ""}`}
         aria-haspopup="menu"
@@ -178,6 +210,7 @@ export function ProfileMenu() {
           </button>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

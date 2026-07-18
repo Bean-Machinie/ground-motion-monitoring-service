@@ -14,6 +14,7 @@ import globe from "@/assets/icons/globe.svg";
 import box from "@/assets/icons/box.svg";
 import desktop from "@/assets/icons/desktop.svg";
 import pushPin from "@/assets/icons/push-pin.svg";
+import lighthouse from "@/assets/icons/lighthouse.svg";
 
 export const ICONS = {
   satellite,
@@ -31,6 +32,7 @@ export const ICONS = {
   box,
   desktop,
   "push-pin": pushPin,
+  lighthouse,
 } as const;
 
 export type IconName = keyof typeof ICONS;

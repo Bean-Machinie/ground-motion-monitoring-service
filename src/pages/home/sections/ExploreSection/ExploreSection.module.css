@@ -50,3 +50,10 @@
   width: 28px;
   height: 28px;
 }
+
+/* Phone: tighter vertical rhythm. */
+@media (max-width: 720px) {
+  .section {
+    padding: var(--space-7) 0 var(--space-5);
+  }
+}
