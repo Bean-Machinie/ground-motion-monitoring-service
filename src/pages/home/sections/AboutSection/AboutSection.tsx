@@ -1,5 +1,8 @@
-// Homepage About Us story: two-column image + company mission with contact CTA.
+// Homepage About Us story: two-column image + company mission with CTA to the
+// full About page.
+import { Link } from "react-router-dom";
 import { site } from "@/config/site";
+import arrowAsset from "@/assets/icons/arrow.svg";
 import aboutImage from "@/assets/images/hero_2.png";
 import styles from "./AboutSection.module.css";
 
@@ -32,9 +35,10 @@ export function AboutSection() {
             act with confidence, through monitoring results they can actually
             read and use.
           </p>
-          <a href={`mailto:${site.contactEmail}`} className={styles.cta}>
-            Get in Touch
-          </a>
+          <Link to="/about" className={styles.cta}>
+            <span>Our Story</span>
+            <img src={arrowAsset} alt="" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

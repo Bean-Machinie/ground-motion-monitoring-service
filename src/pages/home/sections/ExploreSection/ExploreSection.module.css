@@ -13,26 +13,40 @@
   margin-bottom: var(--space-5);
 }
 
+/* Matches the hero CTA button: big arrow, scale-up hover. */
 .ctaButton {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  contain: paint;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
+  justify-content: center;
+  gap: 22px;
+  padding: 0 8px 0 22px;
   border-radius: var(--radius-md);
   background: var(--yellow);
-  color: var(--ink);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  color: #111111;
+  font-size: var(--font-size-md);
+  letter-spacing: 0.02em;
+  font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.15s ease;
+  text-shadow: none;
+  transform: translateZ(0) scale(1);
+  transform-origin: center;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  will-change: transform;
 }
 
 .ctaButton:hover {
   background: #ffe44d;
+  color: #111111;
   text-decoration: none;
+  transform: scale(1.04);
 }
 
 .ctaButton img {
-  width: 0.875rem;
-  height: 0.875rem;
+  width: 28px;
+  height: 28px;
 }

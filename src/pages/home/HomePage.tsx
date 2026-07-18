@@ -1,11 +1,10 @@
-// Public homepage: hero, then four sections (Explore, services grid, About,
-// Process) sharing one content backdrop with the decorative watermark, then
-// the call to action.
+// Public homepage: hero, then three sections (Explore, services grid, About)
+// sharing one content backdrop with the decorative watermark, then the call
+// to action.
 import { HeroSection } from "@/pages/home/sections/HeroSection/HeroSection";
 import { ExploreSection } from "@/pages/home/sections/ExploreSection/ExploreSection";
 import { ServiceOverviewSection } from "@/pages/home/sections/ServiceOverviewSection/ServiceOverviewSection";
 import { AboutSection } from "@/pages/home/sections/AboutSection/AboutSection";
-import { ProcessSection } from "@/pages/home/sections/ProcessSection/ProcessSection";
 import { CallToActionSection } from "@/pages/home/sections/CallToActionSection/CallToActionSection";
 import backgroundWord from "@/assets/images/background-word.png";
 import styles from "./HomePage.module.css";
@@ -24,7 +23,6 @@ export function HomePage() {
         <ExploreSection />
         <ServiceOverviewSection />
         <AboutSection />
-        <ProcessSection />
       </div>
       <CallToActionSection />
     </>

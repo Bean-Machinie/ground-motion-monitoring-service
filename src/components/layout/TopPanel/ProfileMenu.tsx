@@ -141,7 +141,7 @@ export function ProfileMenu() {
             }}
           >
             <span className={styles.menuIcon}>
-              <AppIcon name="settings" />
+              <AppIcon name="settings" size={22} />
             </span>
             Account settings
           </button>
@@ -157,7 +157,7 @@ export function ProfileMenu() {
               }}
             >
               <span className={styles.menuIcon}>
-                <AppIcon name="shield-lock" />
+                <AppIcon name="shield-lock" size={22} />
               </span>
               Administration
             </button>
@@ -172,7 +172,7 @@ export function ProfileMenu() {
             onClick={handleSignOut}
           >
             <span className={`${styles.menuIcon} ${styles.menuIconDanger}`}>
-              <AppIcon name="logout" />
+              <AppIcon name="logout" size={22} />
             </span>
             Sign out
           </button>
