@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { PortalDataProvider } from "@/context/PortalDataContext";
 import { App } from "@/App";
 import "@/styles/global.css";
 
@@ -15,7 +16,11 @@ createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        {/* Portal data lives above routing so signed-in navigation never
+            refetches or flashes empty sidebar states. */}
+        <PortalDataProvider>
+          <App />
+        </PortalDataProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

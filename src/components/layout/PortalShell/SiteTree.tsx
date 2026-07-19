@@ -85,11 +85,10 @@ function serviceDotTone(
 
 interface SiteTreeProps {
   collapsed: boolean;
-  labelledBy: string;
 }
 
-export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
-  const { sites, services, alerts } = usePortalData();
+export function SiteTree({ collapsed }: SiteTreeProps) {
+  const { sites, services, alerts, loading } = usePortalData();
   const { siteId: activeSiteId, serviceId: activeServiceId } =
     useActiveContext();
 
@@ -159,6 +158,19 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
   function toggleSite(siteId: string) {
     setExpanded((prev) => {
       const next = { ...prev, [siteId]: !prev[siteId] };
+      persistExpanded(next);
+      return next;
+    });
+  }
+
+  /** Row clicks always ensure the site ends up expanded (never collapse).
+      Covers re-clicking the already-active site after collapsing it via
+      the chevron — navigation is a no-op there, so the auto-expand
+      effect would not refire. Only the chevron collapses. */
+  function expandSite(siteId: string) {
+    setExpanded((prev) => {
+      if (prev[siteId]) return prev;
+      const next = { ...prev, [siteId]: true };
       persistExpanded(next);
       return next;
     });
@@ -293,44 +305,51 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
           >
             <p className={styles.menuSectionLabel}>Your sites</p>
             {sites.length === 0 ? (
-              <Link to="/requests/new" className={styles.menuEntry} role="menuitem">
-                <span className={styles.menuEntryLabel}>
-                  No sites yet — new request
-                </span>
-              </Link>
+              <p className={styles.treeEmptyText}>
+                {loading ? "Loading sites…" : "No sites yet"}
+              </p>
             ) : (
-              sites.map((site) => (
-                <div key={site.id} className={styles.flyoutGroup}>
-                  <Link
-                    to={`/sites/${site.slug}`}
-                    className={styles.menuEntry}
-                    role="menuitem"
-                    title={site.name}
-                  >
-                    <span className={styles.menuEntryLabel}>{site.name}</span>
-                  </Link>
-                  {(servicesBySite.get(site.id) ?? []).map((service) => (
+              sites.map((site) => {
+                const siteServices = servicesBySite.get(site.id) ?? [];
+                return (
+                  <div key={site.id} className={styles.flyoutGroup}>
                     <Link
-                      key={service.id}
-                      to={`/services/${service.id}`}
-                      className={`${styles.menuEntry} ${styles.flyoutChild}`}
+                      to={`/sites/${site.slug}`}
+                      className={styles.menuEntry}
                       role="menuitem"
+                      title={site.name}
                     >
-                      <span
-                        className={`${styles.dot} ${
-                          styles[
-                            `dot_${serviceDotTone(service, criticalServiceIds)}`
-                          ]
-                        }`}
-                        aria-hidden="true"
-                      />
-                      <span className={styles.menuEntryLabel}>
-                        {SERVICE_KIND_LABELS[service.kind]}
-                      </span>
+                      <span className={styles.menuEntryLabel}>{site.name}</span>
                     </Link>
-                  ))}
-                </div>
-              ))
+                    {siteServices.length > 0 ? (
+                      /* Same connected guide lines as the expanded tree. */
+                      <ul className={styles.treeChildren}>
+                        {siteServices.map((service) => (
+                          <li key={service.id}>
+                            <Link
+                              to={`/services/${service.id}`}
+                              className={`${styles.row} ${styles.serviceRow}`}
+                              role="menuitem"
+                            >
+                              <span
+                                className={`${styles.dot} ${
+                                  styles[
+                                    `dot_${serviceDotTone(service, criticalServiceIds)}`
+                                  ]
+                                }`}
+                                aria-hidden="true"
+                              />
+                              <span className={styles.menuEntryLabel}>
+                                {SERVICE_KIND_LABELS[service.kind]}
+                              </span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })
             )}
           </div>
         ) : null}
@@ -340,13 +359,22 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
 
   /* --------------------------- Expanded tree -------------------------- */
 
+  // While the org data loads, hold the space with quiet skeleton rows —
+  // never flash the "No sites yet" state.
+  if (loading) {
+    return (
+      <div className={styles.treeSkeleton} aria-hidden="true">
+        <span className={styles.skeletonRow} />
+        <span className={styles.skeletonRow} />
+        <span className={styles.skeletonRow} />
+      </div>
+    );
+  }
+
   if (sites.length === 0) {
     return (
       <div className={styles.treeEmpty}>
         <p className={styles.treeEmptyText}>No sites yet</p>
-        <Link to="/requests/new" className={styles.treeEmptyLink}>
-          Start with a new request →
-        </Link>
       </div>
     );
   }
@@ -368,7 +396,7 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
 
       <ul
         role="tree"
-        aria-labelledby={labelledBy}
+        aria-label="Your sites"
         className={styles.tree}
         onKeyDown={handleTreeKeyDown}
       >
@@ -381,10 +409,10 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
 
           return (
             <li key={site.id} role="none">
-              {/* One whole-row click target: clicking navigates to the
-                  site AND toggles its services open/closed. The chevron
-                  is purely visual. (Navigating to a site from elsewhere
-                  always ends expanded — the auto-expand effect wins.) */}
+              {/* Split behaviour: clicking the chevron purposefully
+                  toggles the disclosure (and never navigates); clicking
+                  anywhere else on the row just navigates to the site
+                  (which auto-expands it on arrival). */}
               <NavLink
                 to={`/sites/${site.slug}`}
                 role="treeitem"
@@ -397,7 +425,7 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
                     : -1
                 }
                 onFocus={() => setFocusedId(siteNodeId)}
-                onClick={() => toggleSite(site.id)}
+                onClick={() => expandSite(site.id)}
                 className={({ isActive }) =>
                   [
                     styles.row,
@@ -414,6 +442,11 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
                     isExpanded ? styles.disclosureOpen : ""
                   }`}
                   aria-hidden="true"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleSite(site.id);
+                  }}
                 >
                   <span className={styles.chevron} />
                 </span>
@@ -432,11 +465,13 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
                           ref={registerRow(nodeId)}
                           tabIndex={focusedId === nodeId ? 0 : -1}
                           onFocus={() => setFocusedId(nodeId)}
-                          className={() =>
+                          className={({ isActive }) =>
                             [
                               styles.row,
                               styles.serviceRow,
-                              activeServiceId === service.id
+                              // Router match OR derived context (e.g. when
+                              // viewing one of this service's reports).
+                              isActive || activeServiceId === service.id
                                 ? styles.rowActive
                                 : "",
                             ]

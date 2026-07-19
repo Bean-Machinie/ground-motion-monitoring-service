@@ -25,7 +25,6 @@ import { SignInPage } from "@/pages/auth/SignInPage/SignInPage";
 import { SignUpPage } from "@/pages/auth/SignUpPage/SignUpPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage/ForgotPasswordPage";
 import { AttentionPage } from "@/pages/attention/AttentionPage/AttentionPage";
-import { SitesPage } from "@/pages/sites/SitesPage/SitesPage";
 import { SiteDetailPage } from "@/pages/sites/SiteDetailPage/SiteDetailPage";
 import { MapPage } from "@/pages/map/MapPage/MapPage";
 import { ReportsLibraryPage } from "@/pages/reports/ReportsLibraryPage/ReportsLibraryPage";
@@ -75,7 +74,9 @@ export function App() {
       {/* Signed-in app: sidebar shell. Real places, not tabs. */}
       <Route element={<PortalShell />}>
         <Route path="attention" element={<AttentionPage />} />
-        <Route path="sites" element={<SitesPage />} />
+        {/* No sites index page — the workspace is the overview. Individual
+            sites keep their detail pages. */}
+        <Route path="sites" element={<Navigate to="/" replace />} />
         <Route path="sites/:slug" element={<SiteDetailPage />} />
         <Route path="map" element={<MapPage />} />
         <Route path="reports" element={<ReportsLibraryPage />} />
@@ -94,7 +95,7 @@ export function App() {
 
       {/* Legacy URLs from the projects/results era. */}
       <Route path="portal" element={<LegacyPortalRedirect />} />
-      <Route path="portal/projects" element={<Navigate to="/sites" replace />} />
+      <Route path="portal/projects" element={<Navigate to="/" replace />} />
       <Route path="portal/projects/:slug" element={<LegacyProjectRedirect />} />
       <Route
         path="portal/requests/new"

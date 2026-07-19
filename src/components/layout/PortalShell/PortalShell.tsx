@@ -14,7 +14,6 @@ import {
 } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute";
-import { PortalDataProvider } from "@/context/PortalDataContext";
 import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Sidebar } from "@/components/layout/PortalShell/Sidebar";
 import {
@@ -117,8 +116,7 @@ export function PortalShell({ children }: { children?: ReactNode }) {
 
   return (
     <ProtectedRoute>
-      <PortalDataProvider>
-        <PortalChromeContext.Provider value={chrome}>
+      <PortalChromeContext.Provider value={chrome}>
           {/* Top panel stays part of the signed-in app; the sidebar +
               content columns live below it. */}
           <div className={styles.layout}>
@@ -175,8 +173,7 @@ export function PortalShell({ children }: { children?: ReactNode }) {
               </div>
             </div>
           </div>
-        </PortalChromeContext.Provider>
-      </PortalDataProvider>
+      </PortalChromeContext.Provider>
     </ProtectedRoute>
   );
 }

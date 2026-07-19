@@ -33,7 +33,7 @@ export function ReportViewerPage() {
   usePortalCrumbs(
     report
       ? [
-          { label: "Sites", to: "/sites" },
+          { label: "Workspace", to: "/" },
           ...(site ? [{ label: site.name, to: `/sites/${site.slug}` }] : []),
           ...(service
             ? [

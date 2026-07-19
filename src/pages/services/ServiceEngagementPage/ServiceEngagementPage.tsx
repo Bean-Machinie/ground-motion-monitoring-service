@@ -57,7 +57,7 @@ export function ServiceEngagementPage() {
     <div className={styles.page}>
       <PortalPageHeader
         crumbs={[
-          { label: "Sites", to: "/sites" },
+          { label: "Workspace", to: "/" },
           ...(site ? [{ label: site.name, to: `/sites/${site.slug}` }] : []),
           { label: SERVICE_KIND_LABELS[service.kind] },
         ]}

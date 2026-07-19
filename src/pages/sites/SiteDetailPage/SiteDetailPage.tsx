@@ -79,7 +79,7 @@ export function SiteDetailPage() {
       <EmptyState
         title="Site not found"
         description="This site does not exist or you do not have access to it."
-        action={<Link to="/sites">Back to sites</Link>}
+        action={<Link to="/">Back to workspace</Link>}
       />
     );
   }
@@ -92,7 +92,6 @@ export function SiteDetailPage() {
       <PortalPageHeader
         crumbs={[
           { label: "Workspace", to: "/" },
-          { label: "Sites", to: "/sites" },
           { label: site.name },
         ]}
         title={site.name}

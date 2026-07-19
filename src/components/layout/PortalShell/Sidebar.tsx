@@ -145,7 +145,6 @@ export function Sidebar() {
           />
         </ul>
 
-        <p className={styles.sectionLabel}>Library</p>
         <ul className={styles.section}>
           <NavRow
             to="/reports"
@@ -156,14 +155,15 @@ export function Sidebar() {
           <NavRow to="/map" icon="globe" label="Map view" collapsed={collapsed} />
         </ul>
 
+        {/* Just breathing room above the sites — no divider here. */}
         <p className={styles.sectionLabel} id="sidebar-sites-label">
-          Your sites
+          Your Sites
         </p>
 
         {/* The tree scrolls on its own (chat-list style); everything else
             in the sidebar stays anchored. */}
         <div className={styles.treeScroll}>
-          <SiteTree collapsed={collapsed} labelledBy="sidebar-sites-label" />
+          <SiteTree collapsed={collapsed} />
         </div>
       </nav>
 

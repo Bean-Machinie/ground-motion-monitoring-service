@@ -1,7 +1,9 @@
-// Shell-level portal data: sites, services, reports, and alerts are
-// fetched ONCE when the signed-in shell mounts and shared with the
-// sidebar and every page through context — pages never refetch the org
-// lists on navigation. RLS scopes all rows to the current org.
+// App-level portal data: sites, services, reports, and alerts are
+// fetched ONCE per session (as soon as a user is signed in) and shared
+// with the sidebar and every page through context. The provider lives
+// ABOVE routing, so navigating between portal pages never remounts it,
+// never refetches, and never flashes empty states. RLS scopes all rows
+// to the current org.
 import {
   createContext,
   useCallback,
@@ -13,6 +15,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
+import { useAuth } from "@/hooks/useAuth";
 import type { Alert, Report, Service, Site } from "@/types/domain";
 
 interface PortalDataState {
@@ -53,6 +56,7 @@ const INITIAL: PortalDataState = {
 };
 
 export function PortalDataProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [state, setState] = useState<PortalDataState>(INITIAL);
 
   const fetchAll = useCallback(async () => {
@@ -89,9 +93,15 @@ export function PortalDataProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Fetch when a user session appears; reset when it goes away. Keyed on
+  // the user id so switching accounts refetches.
   useEffect(() => {
-    void fetchAll();
-  }, [fetchAll]);
+    if (user) {
+      void fetchAll();
+    } else {
+      setState({ ...INITIAL, loading: false });
+    }
+  }, [user?.id, fetchAll]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const value = useMemo<PortalData>(() => {
     const siteById = new Map(state.sites.map((s) => [s.id, s]));
