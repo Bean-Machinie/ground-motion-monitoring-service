@@ -382,7 +382,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
           }}
         >
           <span className={styles.rowIcon} aria-hidden="true">
-            <AppIcon name="push-pin" size={18} />
+            <AppIcon name="push-pin" size={20} />
           </span>
         </button>
 
@@ -467,7 +467,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                                           ? "warning"
                                           : "file"
                                       }
-                                      size={13}
+                                      size={14}
                                     />
                                   </span>
                                   <span className={styles.menuEntryLabel}>
@@ -648,7 +648,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                                   name={
                                     report.kind === "alert" ? "warning" : "file"
                                   }
-                                  size={13}
+                                  size={14}
                                 />
                               </span>
                               <span className={styles.rowLabel}>

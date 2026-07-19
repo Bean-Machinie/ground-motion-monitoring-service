@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   flex: none;
-  width: 15rem; /* ~240px */
+  width: 16rem; /* ~256px */
   height: 100%;
   background-color: var(--color-surface);
   border-right: var(--border-width) solid var(--color-border);
@@ -30,7 +30,7 @@
   bottom: 0;
   left: 0;
   z-index: 200;
-  width: 16.5rem;
+  width: 17.5rem;
   transform: translateX(-100%);
   visibility: hidden;
   transition:
@@ -141,13 +141,13 @@
   align-items: center;
   gap: var(--space-2);
   width: 100%;
-  min-height: 34px;
+  min-height: 38px;
   padding: 0 var(--space-2);
   border: none;
   border-radius: var(--radius-md);
   background: none;
   color: var(--color-text);
-  font-size: var(--font-size-sm);
+  font-size: 15px;
   font-weight: var(--font-weight-medium);
   text-decoration: none;
   cursor: pointer;
@@ -181,8 +181,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   flex: none;
   opacity: 0.75;
 }
@@ -260,7 +260,7 @@
   margin: var(--space-3) 0 var(--space-1);
   padding: 0 var(--space-2);
   color: var(--color-text-subtle);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -365,14 +365,14 @@
 
 /* Branch row: chevron slot, status dot, name. */
 .branchRow {
-  min-height: 30px;
+  min-height: 34px;
 }
 
-/* Leaf row: 12px secondary text linking to a report issue. */
+/* Leaf row: quiet secondary text linking to a report issue. */
 .leafRow {
-  min-height: 26px;
+  min-height: 30px;
   color: var(--color-text-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: var(--font-weight-normal);
 }
 
@@ -380,8 +380,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: none;
   opacity: 0.75;
 }

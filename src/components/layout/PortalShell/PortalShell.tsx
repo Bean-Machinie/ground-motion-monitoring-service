@@ -16,10 +16,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute";
 import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Sidebar } from "@/components/layout/PortalShell/Sidebar";
-import {
-  Breadcrumbs,
-  type Crumb,
-} from "@/components/ui/Breadcrumbs/Breadcrumbs";
+import { type Crumb } from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import styles from "./PortalShell.module.css";
 
 /* ------------------------- Shell chrome context ------------------------ */
@@ -77,7 +74,10 @@ export function PortalShell({ children }: { children?: ReactNode }) {
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [isNarrow, setIsNarrow] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [crumbs, setCrumbs] = useState<Crumb[]>([]);
+  // Crumb state is still collected from pages (usePortalCrumbs), but the
+  // shell no longer renders a breadcrumb bar — kept so the trail can be
+  // reintroduced (e.g. in the top panel) without touching every page.
+  const [, setCrumbs] = useState<Crumb[]>([]);
 
   // Track the 1024px breakpoint: below it the sidebar is a drawer.
   useEffect(() => {
@@ -155,14 +155,6 @@ export function PortalShell({ children }: { children?: ReactNode }) {
                     <span aria-hidden="true" />
                   </button>
                   <span className={styles.mobileBarLabel}>Menu</span>
-                </div>
-
-                {/* Fixed context line under the top panel: breadcrumb on
-                    the left, a slot on the right for future fixed
-                    controls. Stays put while the content scrolls. */}
-                <div className={styles.crumbBar}>
-                  {crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : <span />}
-                  <div className={styles.crumbBarEnd} />
                 </div>
 
                 <main id="portal-main" className={styles.main} tabIndex={-1}>

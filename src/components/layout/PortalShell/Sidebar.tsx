@@ -38,7 +38,7 @@ function NavRow({ to, end, icon, label, badge, collapsed }: NavRowProps) {
         }
       >
         <span className={styles.rowIcon} aria-hidden="true">
-          <AppIcon name={icon} size={18} />
+          <AppIcon name={icon} size={20} />
         </span>
         <span className={styles.rowLabel}>{label}</span>
         {badge !== undefined && badge > 0 ? (
