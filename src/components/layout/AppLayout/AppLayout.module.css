@@ -1,7 +1,43 @@
 .layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Scroll container for everything below the top panel. The stable
+   scrollbar gutter prevents layout shift between scrolling and
+   non-scrolling pages. */
+.scroller {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  /* Subtle, theme-matched scrollbar (Firefox). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+/* Subtle, theme-matched scrollbar (Chrome/Edge/Safari). */
+.scroller::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+  border-radius: var(--radius-full);
+  /* Transparent edge keeps the thumb slim and off the content. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.scroller::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-subtle);
 }
 
 .main {

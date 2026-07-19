@@ -11,7 +11,121 @@
 .lede {
   margin: 0;
   color: var(--color-text-muted);
+  max-width: 44rem;
 }
+
+/* ---------------------------------------------------------------------- */
+/* Tab bar: workspace tabs left, New Request action right.                 */
+/* ---------------------------------------------------------------------- */
+
+.tabRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  border-bottom: var(--border-width) solid var(--color-border-strong);
+}
+
+.tabList {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.tab {
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.tab:hover {
+  color: var(--color-text);
+  background-color: rgba(252, 217, 0, 0.13);
+}
+
+/* Active tab: same amber tab-marker language as the site nav highlight. */
+.tabActive {
+  color: var(--color-text);
+  font-weight: var(--font-weight-nav);
+  background-color: rgba(252, 217, 0, 0.13);
+  box-shadow: inset 0 -4px 0 0 #fcd900;
+}
+
+/* Yellow CTA, matching the hero/log-in button styling. */
+.newRequest {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 16px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  background: #fcd900;
+  color: #111111;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.newRequest:hover {
+  background: #ffe44d;
+  color: #111111;
+  text-decoration: none;
+  transform: scale(1.03);
+}
+
+.tabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Summary bar: inline stats separated by thin dividers.                   */
+/* ---------------------------------------------------------------------- */
+
+.summaryBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) 0;
+  padding: var(--space-3) 0;
+  border-top: var(--border-width) solid var(--color-border);
+  border-bottom: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.summaryItem {
+  padding: 0 var(--space-4);
+  border-left: var(--border-width) solid var(--color-border);
+}
+
+.summaryItem:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.summaryItem strong {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Overview tab                                                            */
+/* ---------------------------------------------------------------------- */
 
 .statsGrid {
   display: grid;
@@ -81,6 +195,135 @@
 .recentMeta {
   color: var(--color-text-subtle);
   font-size: var(--font-size-sm);
+}
+
+.inlineLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.inlineLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Operation / report cards                                                */
+/* ---------------------------------------------------------------------- */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.opCard,
+.reportCard {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.opCard:hover,
+.reportCard:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.opImage {
+  display: block;
+  width: 100%;
+  height: 11rem;
+  object-fit: cover;
+}
+
+.opBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.reportCard {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.kicker {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.opTitle {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+}
+
+.opLocation {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.opDivider {
+  height: 0;
+  border-bottom: var(--border-width) solid var(--color-border);
+  margin: var(--space-3) 0;
+}
+
+.badgeRow {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.reportSummary {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.opMeta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+.opMeta dt {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.opMeta dd {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Full-width action pinned to the card bottom. */
+.opButton {
+  width: 100%;
+  margin-top: auto;
 }
 
 @media (min-width: 48rem) {

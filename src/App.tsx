@@ -1,6 +1,6 @@
 // Application routes. Every page shares one AppLayout (header + footer);
 // /portal routes add the auth guard via PortalShell.
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
 import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 import { AdminRoute } from "@/components/auth/AdminRoute/AdminRoute";
@@ -17,8 +17,8 @@ import { SignInPage } from "@/pages/auth/SignInPage/SignInPage";
 import { SignUpPage } from "@/pages/auth/SignUpPage/SignUpPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage/ForgotPasswordPage";
 import { DashboardPage } from "@/pages/portal/DashboardPage/DashboardPage";
-import { ProjectsPage } from "@/pages/portal/ProjectsPage/ProjectsPage";
 import { ProjectDetailPage } from "@/pages/portal/ProjectDetailPage/ProjectDetailPage";
+import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
 import { AdminPlaceholderPage } from "@/pages/admin/AdminPlaceholderPage/AdminPlaceholderPage";
 import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
@@ -57,8 +57,13 @@ export function App() {
 
         <Route path="portal" element={<PortalShell />}>
           <Route index element={<DashboardPage />} />
-          <Route path="projects" element={<ProjectsPage />} />
+          {/* Projects list merged into the Workspace monitoring tab. */}
+          <Route
+            path="projects"
+            element={<Navigate to="/?tab=monitoring" replace />}
+          />
           <Route path="projects/:slug" element={<ProjectDetailPage />} />
+          <Route path="requests/new" element={<NewRequestPage />} />
           <Route path="account" element={<AccountPage />} />
         </Route>
 

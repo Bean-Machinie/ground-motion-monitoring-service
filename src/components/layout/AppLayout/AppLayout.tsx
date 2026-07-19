@@ -18,10 +18,14 @@ export function AppLayout() {
   return (
     <div className={styles.layout}>
       <TopPanel />
-      <main className={styles.main}>
-        <Outlet />
-      </main>
-      {showFooter ? <Footer /> : null}
+      {/* Scrolling happens below the header, so the scrollbar never runs
+          over the top panel and its gutter is always reserved. */}
+      <div className={styles.scroller}>
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+        {showFooter ? <Footer /> : null}
+      </div>
     </div>
   );
 }

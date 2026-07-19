@@ -60,7 +60,7 @@ export const NAV_ITEMS: NavItem[] = [
     under a single Explore menu (GitHub-style app view). */
 export const PORTAL_NAV_ITEMS: NavItem[] = [
   { kind: "link", label: "Dashboard", to: "/", end: true },
-  { kind: "link", label: "Projects", to: "/portal/projects" },
+  { kind: "link", label: "Projects", to: "/?tab=monitoring" },
   {
     kind: "menu",
     id: "explore",

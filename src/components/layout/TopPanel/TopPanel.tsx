@@ -249,7 +249,9 @@ export function TopPanel() {
                   end={item.end}
                   className={({ isActive }) =>
                     `${styles.navButton} ${
-                      isActive && !item.to.includes("#")
+                      isActive &&
+                      !item.to.includes("#") &&
+                      !item.to.includes("?")
                         ? styles.navButtonActive
                         : ""
                     }`
