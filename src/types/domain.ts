@@ -45,6 +45,26 @@ export function serviceDisplayName(
   return service.name || site?.name || SERVICE_KIND_LABELS[service.kind];
 }
 
+/** Country display codes for tight card lines ("Port of Esbjerg, DK").
+    Unknown countries fall back to their full name. */
+const COUNTRY_CODES: Record<string, string> = {
+  Denmark: "DK",
+  Switzerland: "CH",
+  Germany: "DE",
+  Norway: "NO",
+  Sweden: "SE",
+  Netherlands: "NL",
+  "United Kingdom": "GB",
+  France: "FR",
+};
+
+/** "Port of Esbjerg, DK" — the location line on a card. */
+export function shortLocation(site: Site | undefined): string {
+  if (!site) return "";
+  if (!site.country) return site.name;
+  return `${site.name}, ${COUNTRY_CODES[site.country] ?? site.country}`;
+}
+
 /** The one-line context under a service name, everywhere a service is
     displayed: "{cadence} {kind} · {location}, {country}" — e.g.
     "Quarterly monitoring · Port of Esbjerg, Denmark". Never leads with

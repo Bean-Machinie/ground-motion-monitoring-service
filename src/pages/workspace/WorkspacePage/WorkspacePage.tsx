@@ -1,25 +1,27 @@
-// Signed-in workspace, ordered by what needs attention rather than by
-// table: needs-attention items, latest published reports, and Active
-// work — one card per service, headlined by the customer's own name for
-// it. Data comes from the shell-level portal context (fetched once).
+// Overview (/) — three questions, in order: does anything need me, what
+// do I have, what happened since I last looked. Nothing else.
+//
+//   1. Attention banner (only when something needs acting on).
+//   2. Monitoring, then Screenings: portrait cards — sparkline header,
+//      kicker, name, location, status pill, labelled facts, action.
+//   3. Recent activity in a right-hand column, so the wide screen is
+//      actually used.
+import { useMemo } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
-import { useProfile } from "@/hooks/useProfile";
 import { usePortalData } from "@/context/PortalDataContext";
-import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
-import { AttentionList } from "@/components/portal/AttentionList/AttentionList";
+import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
+import { ActivityFeed } from "@/components/portal/ActivityFeed/ActivityFeed";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
-import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import {
-  REPORT_KIND_LABELS,
-  SERVICE_STATUS_LABELS,
   serviceDisplayName,
-  serviceKindLine,
+  shortLocation,
   type Report,
   type Service,
 } from "@/types/domain";
-import { formatDate, formatShortDate } from "@/lib/dates";
+import { formatShortDate } from "@/lib/dates";
+import { buildActivity } from "@/lib/activity";
 import styles from "./WorkspacePage.module.css";
 
 /** Legacy ?tab=… URLs map onto the new routes. */
@@ -29,69 +31,214 @@ const LEGACY_TAB_ROUTES: Record<string, string> = {
   reports: "/reports",
 };
 
-function reportTitle(report: Report): string {
-  return (
-    report.headline ??
-    `${REPORT_KIND_LABELS[report.kind]} #${report.issue_number}`
+const MAX_CHART_POINTS = 15;
+const FEED_CAP = 8;
+
+/* ------------------------------ Card state ------------------------------ */
+
+type DotTone = "success" | "danger" | "warning" | "neutral";
+
+interface CardState {
+  word: string;
+  tone: DotTone;
+}
+
+/** Customer vocabulary, per product. Never "Completed" for a screening —
+    the customer's word is "Delivered". */
+function cardState(
+  service: Service,
+  hasOpenAlert: boolean,
+  isOverdue: boolean,
+): CardState {
+  if (service.status === "scoping") return { word: "Being scoped", tone: "warning" };
+  if (service.status === "quoted") return { word: "Quoted", tone: "warning" };
+
+  if (service.kind === "monitoring") {
+    if (hasOpenAlert) return { word: "Alert open", tone: "danger" };
+    if (isOverdue) return { word: "Report overdue", tone: "warning" };
+    if (service.status === "active") return { word: "Stable", tone: "success" };
+    if (service.status === "paused") return { word: "Paused", tone: "neutral" };
+    return { word: "Ended", tone: "neutral" };
+  }
+
+  if (service.status === "active") return { word: "In progress", tone: "success" };
+  if (service.status === "completed") return { word: "Delivered", tone: "neutral" };
+  return { word: "Ended", tone: "neutral" };
+}
+
+/* ------------------------------ Chart data ------------------------------ */
+
+/** Cumulative-displacement series: one point per published issue for
+    monitoring, the published report's per-epoch curve for a screening. */
+function chartSeries(service: Service, serviceReports: Report[]): number[] {
+  const published = serviceReports
+    .filter((r) => r.state === "published")
+    .sort((a, b) => a.issue_number - b.issue_number);
+
+  if (service.kind === "screening") {
+    const latest = published[published.length - 1];
+    if (latest?.series_mm && Array.isArray(latest.series_mm)) {
+      const series = latest.series_mm.filter(
+        (v): v is number => typeof v === "number",
+      );
+      if (series.length > 0) return downsample(series);
+    }
+  }
+
+  return downsample(
+    published
+      .map((r) => r.cumulative_mm)
+      .filter((v): v is number => v !== null),
   );
 }
 
-/** Card status dot: red for an unacknowledged alert, green for active,
-    neutral otherwise (scoping and quoted stay deliberately calm). */
-function cardDotTone(
+function downsample(series: number[]): number[] {
+  if (series.length <= MAX_CHART_POINTS) return series;
+  const step = (series.length - 1) / (MAX_CHART_POINTS - 1);
+  return Array.from(
+    { length: MAX_CHART_POINTS },
+    (_, i) => series[Math.round(i * step)] as number,
+  );
+}
+
+/** −14 → "−14", −0.42 → "−0.4". Unicode minus, like the reports. */
+function formatMm(value: number): string {
+  const rounded =
+    Math.abs(value) >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
+  return String(rounded).replace("-", "−");
+}
+
+/** Displacement over the alert window when an alert is open, mean
+    velocity when stable, total displacement for a delivered screening. */
+function headlineFigure(
   service: Service,
-  alertedServiceIds: Set<string>,
-): "danger" | "success" | "neutral" {
-  if (alertedServiceIds.has(service.id)) return "danger";
-  if (service.status === "active") return "success";
-  return "neutral";
-}
+  serviceReports: Report[],
+  hasOpenAlert: boolean,
+): string | null {
+  const published = serviceReports
+    .filter((r) => r.state === "published" && r.cumulative_mm !== null)
+    .sort((a, b) => a.issue_number - b.issue_number);
+  const latest = published[published.length - 1];
 
-/** The card footer: always a date-shaped fact, never a vague promise.
-    "Issue 5 due 10 Sep", "Delivered 2 Mar", "Scoping in progress". */
-function nextDateLine(service: Service, serviceReports: Report[]): string {
-  if (service.status === "scoping") return "Scoping in progress";
-  if (service.status === "quoted") return "Quote ready";
-  if (service.status === "paused") return "Paused";
-  if (service.status === "cancelled") return "Cancelled";
-
-  const published = serviceReports.filter((r) => r.state === "published");
-
-  if (service.status === "completed") {
-    const delivered =
-      published[0]?.published_at ?? service.ended_on ?? service.updated_at;
-    return `Delivered ${formatShortDate(delivered)}`;
+  if (service.kind === "screening") {
+    if (latest?.cumulative_mm == null) return null;
+    return `${formatMm(latest.cumulative_mm)} mm total`;
   }
 
-  // Active monitoring: the next issue number is one past the latest.
-  if (service.kind === "monitoring" && service.next_issue_due) {
-    const latest = serviceReports.reduce(
-      (max, r) => Math.max(max, r.issue_number),
-      0,
+  if (hasOpenAlert && published.length >= 2 && latest) {
+    const previous = published[published.length - 2];
+    const delta =
+      (latest.cumulative_mm as number) - (previous?.cumulative_mm as number);
+    const start = latest.period_start ? Date.parse(latest.period_start) : NaN;
+    const end = latest.period_end ? Date.parse(latest.period_end) : NaN;
+    const weeks =
+      Number.isFinite(start) && Number.isFinite(end)
+        ? Math.max(1, Math.round((end - start) / (7 * 86400000)))
+        : null;
+    return weeks
+      ? `${formatMm(delta)} mm / ${weeks} wks`
+      : `${formatMm(delta)} mm`;
+  }
+
+  if (published.length >= 2 && latest) {
+    const first = published[0];
+    const firstDate = Date.parse(
+      first?.period_end ?? first?.published_at ?? "",
     );
-    return `Issue ${latest + 1} due ${formatShortDate(service.next_issue_due)}`;
+    const lastDate = Date.parse(latest.period_end ?? latest.published_at ?? "");
+    const years = (lastDate - firstDate) / (365.25 * 86400000);
+    if (years > 0) {
+      const velocity =
+        ((latest.cumulative_mm as number) -
+          (first?.cumulative_mm as number)) /
+        years;
+      return `${formatMm(velocity)} mm / yr`;
+    }
   }
 
-  return published[0]?.published_at
-    ? `Delivered ${formatShortDate(published[0].published_at)}`
-    : "In progress";
+  return null;
 }
+
+/* ------------------------------ Sparkline ------------------------------- */
+
+const CHART_STROKES: Record<string, string> = {
+  danger: "#E24B4A",
+  active: "#1D9E75",
+  muted: "#888780",
+};
+
+function chartStroke(service: Service, hasOpenAlert: boolean): string {
+  if (hasOpenAlert) return CHART_STROKES.danger as string;
+  if (service.status === "active") return CHART_STROKES.active as string;
+  return CHART_STROKES.muted as string;
+}
+
+function Sparkline({ series, stroke }: { series: number[]; stroke: string }) {
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const span = max - min || 1;
+  const points = series
+    .map((value, i) => {
+      const x = (i / (series.length - 1)) * 100;
+      const y = 10 + ((max - value) / span) * 50;
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    })
+    .join(" ");
+
+  return (
+    <svg
+      viewBox="0 0 100 70"
+      className={styles.chart}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <polyline
+        points={points}
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
+/* ------------------------------- The page ------------------------------- */
 
 export function WorkspacePage() {
-  const { profile } = useProfile();
   const {
     services,
     reports,
     alerts,
+    siteById,
     loading,
     error,
     refetch,
-    siteById,
-    serviceById,
     attention,
   } = usePortalData();
 
   const [searchParams] = useSearchParams();
+
+  usePortalCrumbs(useMemo(() => [{ label: "Overview" }], []));
+
+  const alertedServiceIds = useMemo(
+    () =>
+      new Set(
+        alerts.filter((a) => !a.acknowledged_at).map((a) => a.service_id),
+      ),
+    [alerts],
+  );
+  const overdueServiceIds = useMemo(
+    () => new Set(attention.overdueServices.map((s) => s.id)),
+    [attention.overdueServices],
+  );
+
+  const events = useMemo(
+    () => buildActivity(services, reports, alerts, siteById).slice(0, FEED_CAP),
+    [services, reports, alerts, siteById],
+  );
 
   // Redirect legacy tab URLs to their new homes.
   const legacyTab = searchParams.get("tab");
@@ -100,201 +247,279 @@ export function WorkspacePage() {
   }
 
   if (loading) {
-    return <LoadingState label="Loading your workspace…" />;
+    return <LoadingState label="Loading your overview…" />;
   }
 
-  const attentionCount = attention.count;
+  const reportsFor = (serviceId: string) =>
+    reports.filter((r) => r.service_id === serviceId);
 
-  const siteNameForService = (service: Service | undefined) =>
-    service ? (siteById.get(service.site_id)?.name ?? "—") : "—";
+  /** Urgency order inside a section: alerts, overdue, running, request
+      stage, then the rest. */
+  const urgency = (s: Service): number => {
+    if (alertedServiceIds.has(s.id)) return 0;
+    if (overdueServiceIds.has(s.id)) return 1;
+    if (s.status === "active") return 2;
+    if (s.status === "scoping" || s.status === "quoted") return 3;
+    return 4;
+  };
+  const bySectionOrder = (a: Service, b: Service) => urgency(a) - urgency(b);
 
-  // ---------------------------- Latest reports ---------------------------
-  const latestReports = reports
-    .filter((r) => r.state === "published")
-    .slice(0, 5);
+  const monitoring = services
+    .filter((s) => s.kind === "monitoring")
+    .sort(bySectionOrder);
+  const screenings = services
+    .filter((s) => s.kind === "screening")
+    .sort(bySectionOrder);
 
-  // ----------------------------- Active work ------------------------------
-  const monitoringServices = services.filter((s) => s.kind === "monitoring");
-  const screeningServices = services.filter((s) => s.kind === "screening");
+  const isNewCustomer = services.length === 0;
 
-  const alertedServiceIds = new Set(
-    alerts.filter((a) => !a.acknowledged_at).map((a) => a.service_id),
-  );
-  const reportsForService = (serviceId: string) =>
-    reports
-      .filter((r) => r.service_id === serviceId)
-      .sort((a, b) => b.issue_number - a.issue_number);
+  /* ----------------------------- Card ---------------------------------- */
 
-  const displayName = profile?.full_name || profile?.email || "there";
+  const renderCard = (service: Service) => {
+    const site = siteById.get(service.site_id);
+    const serviceReports = reportsFor(service.id);
+    const hasOpenAlert = alertedServiceIds.has(service.id);
+    const isOverdue = overdueServiceIds.has(service.id);
+    const state = cardState(service, hasOpenAlert, isOverdue);
+    const inRequestStage =
+      service.status === "scoping" || service.status === "quoted";
+    const series = inRequestStage ? [] : chartSeries(service, serviceReports);
+    const figure = inRequestStage
+      ? null
+      : headlineFigure(service, serviceReports, hasOpenAlert);
+    const deliveredScreening =
+      service.kind === "screening" && service.status === "completed";
+    const latestPublished = serviceReports
+      .filter((r) => r.state === "published")
+      .sort((a, b) => b.issue_number - a.issue_number)[0];
+
+    /* Labelled facts, example-style: two small label/value pairs. */
+    let facts: { label: string; value: string; warning?: boolean }[];
+    if (inRequestStage) {
+      facts = [
+        {
+          label: "Stage",
+          value: service.status === "quoted" ? "Quoted" : "Requested",
+        },
+        { label: "Requested", value: formatShortDate(service.requested_at) },
+      ];
+    } else if (deliveredScreening) {
+      facts = [
+        { label: "Total motion", value: figure ?? "—" },
+        {
+          label: "Delivered",
+          value: formatShortDate(
+            latestPublished?.published_at ?? service.ended_on,
+          ),
+        },
+      ];
+    } else if (service.kind === "monitoring") {
+      facts = [
+        { label: "Motion", value: figure ?? "No data yet" },
+        isOverdue
+          ? {
+              label: "Next report",
+              value: `Due ${formatShortDate(service.next_issue_due)} · overdue`,
+              warning: true,
+            }
+          : {
+              label: "Next report",
+              value: service.next_issue_due
+                ? formatShortDate(service.next_issue_due)
+                : "—",
+            },
+      ];
+    } else {
+      facts = [
+        { label: "Motion", value: figure ?? "No data yet" },
+        { label: "Latest report", value: latestPublished ? "Published" : "Pending" },
+      ];
+    }
+
+    const action = deliveredScreening
+      ? "Read Report"
+      : inRequestStage
+        ? "View Request"
+        : service.kind === "monitoring"
+          ? "Open Monitoring"
+          : "Open Screening";
+
+    return (
+      <li key={service.id}>
+        <Link to={`/services/${service.id}`} className={styles.card}>
+          {/* Chart header: the card's visual, like the photo slot in the
+              reference — but showing real motion data. */}
+          <div className={styles.chartHead}>
+            {inRequestStage ? (
+              <span className={styles.chartNote}>
+                We're reviewing your request
+              </span>
+            ) : series.length >= 3 ? (
+              <Sparkline
+                series={series}
+                stroke={chartStroke(service, hasOpenAlert)}
+              />
+            ) : (
+              <svg
+                viewBox="0 0 100 70"
+                className={styles.chart}
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <line
+                  x1="6"
+                  y1="35"
+                  x2="94"
+                  y2="35"
+                  stroke="var(--color-border-strong)"
+                  strokeWidth="1.5"
+                  strokeDasharray="3 4"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            )}
+          </div>
+
+          <div className={styles.cardBody}>
+            <p className={styles.cardKicker}>
+              {service.kind === "monitoring"
+                ? "Quarterly monitoring"
+                : "Screening report"}
+            </p>
+            <h3 className={styles.cardName}>
+              {serviceDisplayName(service, site)}
+            </h3>
+            <p className={styles.cardLocation}>{shortLocation(site)}</p>
+
+            <span className={`${styles.pill} ${styles[`pill_${state.tone}`]}`}>
+              {state.word}
+            </span>
+
+            <dl className={styles.facts}>
+              {facts.map((fact) => (
+                <div key={fact.label} className={styles.fact}>
+                  <dt>{fact.label}</dt>
+                  <dd className={fact.warning ? styles.factWarning : undefined}>
+                    {fact.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <span className={styles.cardButton}>{action}</span>
+          </div>
+        </Link>
+      </li>
+    );
+  };
+
+  /* --------------------------- Section header --------------------------- */
+
+  const countParts = (list: Service[], kind: Service["kind"]): string => {
+    const parts: string[] = [];
+    const running = list.filter((s) => s.status === "active").length;
+    const delivered = list.filter((s) => s.status === "completed").length;
+    const scoped = list.filter(
+      (s) => s.status === "scoping" || s.status === "quoted",
+    ).length;
+    const paused = list.filter((s) => s.status === "paused").length;
+
+    if (kind === "monitoring") {
+      if (running > 0) parts.push(`${running} running`);
+      if (scoped > 0) parts.push(`${scoped} being scoped`);
+      if (paused > 0) parts.push(`${paused} paused`);
+    } else {
+      if (delivered > 0) parts.push(`${delivered} delivered`);
+      if (running > 0) parts.push(`${running} in progress`);
+      if (scoped > 0) parts.push(`${scoped} being scoped`);
+    }
+    return parts.join(" · ");
+  };
+
+  const renderSection = (
+    kind: Service["kind"],
+    list: Service[],
+    heading: string,
+    explainer: string,
+  ) => {
+    // Hide a section the customer has none of — except for a brand-new
+    // customer, where both sections teach the product model.
+    if (list.length === 0 && !isNewCustomer) return null;
+
+    return (
+      <section aria-label={heading} className={styles.section}>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>{heading}</h2>
+          {list.length > 0 ? (
+            <span className={styles.sectionCount}>
+              {countParts(list, kind)}
+            </span>
+          ) : null}
+        </div>
+        <p className={styles.sectionExplainer}>{explainer}</p>
+
+        {list.length > 0 ? (
+          <ul className={styles.cardGrid}>{list.map(renderCard)}</ul>
+        ) : (
+          <p className={styles.sectionEmpty}>
+            Nothing here yet —{" "}
+            <Link to={`/requests/new?product=${kind}`}>
+              start with a new request
+            </Link>
+            .
+          </p>
+        )}
+      </section>
+    );
+  };
 
   return (
     <div className={styles.page}>
-      <PortalPageHeader
-        crumbs={[{ label: "Workspace" }]}
-        title="Workspace"
-        lede={`Welcome back, ${displayName} — your screenings, monitoring subscriptions, and delivered reports.`}
-      />
-
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 
-      {/* ------------------------- Needs attention ---------------------- */}
-      <section aria-labelledby="attention-heading" className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 id="attention-heading" className={styles.sectionTitle}>
-            Needs attention
-          </h2>
-          {attentionCount > 0 ? (
-            <Link to="/attention" className={styles.inlineLink}>
-              View all →
-            </Link>
-          ) : null}
+      {/* 1. Does anything need me? Rendered only when the answer is yes. */}
+      {attention.count > 0 ? (
+        <Link to="/attention" className={styles.banner}>
+          <span className={styles.bannerIcon} aria-hidden="true">
+            <AppIcon name="warning" size={16} />
+          </span>
+          <span className={styles.bannerText}>
+            {attention.count} {attention.count === 1 ? "thing needs" : "things need"}{" "}
+            attention
+          </span>
+          <span className={styles.bannerAction}>Review →</span>
+        </Link>
+      ) : null}
+
+      {/* 2 + 3. Products on the left, activity on the right. */}
+      <div className={styles.columns}>
+        <div className={styles.main}>
+          {renderSection(
+            "monitoring",
+            monitoring,
+            "Monitoring",
+            "A new report every quarter, plus an alert if something moves.",
+          )}
+          {renderSection(
+            "screening",
+            screenings,
+            "Screenings",
+            "A one-off assessment. A single report, delivered once.",
+          )}
         </div>
 
-        <AttentionList />
-      </section>
-
-      {/* -------------------------- Latest reports ---------------------- */}
-      <section aria-labelledby="latest-heading" className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 id="latest-heading" className={styles.sectionTitle}>
-            Latest reports
-          </h2>
-          {reports.length > 0 ? (
-            <Link to="/reports" className={styles.inlineLink}>
-              All reports →
+        {events.length > 0 ? (
+          <aside aria-label="Recent activity" className={styles.aside}>
+            <div className={styles.sectionHead}>
+              <h2 className={styles.sectionTitle}>Recent activity</h2>
+            </div>
+            <ActivityFeed events={events} />
+            <Link to="/activity" className={styles.asideLink}>
+              All activity →
             </Link>
-          ) : null}
-        </div>
-
-        {latestReports.length === 0 ? (
-          <EmptyState
-            title="No published reports yet"
-            description="When a report issue is published for one of your services, it will appear here."
-          />
-        ) : (
-          <ul className={styles.reportGrid}>
-            {latestReports.map((report) => {
-              const service = serviceById.get(report.service_id);
-              return (
-                <li key={report.id}>
-                  <Link
-                    to={`/reports/${report.id}`}
-                    className={styles.reportCard}
-                  >
-                    <span className={styles.reportIcon} aria-hidden="true">
-                      <AppIcon name="file" size={20} />
-                    </span>
-                    <span className={styles.reportKicker}>
-                      {REPORT_KIND_LABELS[report.kind]}
-                    </span>
-                    <span className={styles.reportTitle}>
-                      {reportTitle(report)}
-                    </span>
-                    <span className={styles.reportMeta}>
-                      {siteNameForService(service)}
-                    </span>
-                    <span className={styles.reportFooter}>
-                      <span>{formatDate(report.published_at)}</span>
-                      <span className={styles.cardArrow} aria-hidden="true">
-                        →
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      {/* --------------------------- Active work ------------------------ */}
-      <section aria-labelledby="services-heading" className={styles.section}>
-        <h2 id="services-heading" className={styles.sectionTitle}>
-          Active work
-        </h2>
-
-        {services.length === 0 ? (
-          <EmptyState
-            title="Nothing under way yet"
-            description="Request a monitoring subscription or a screening and it will appear here from the moment you ask."
-            action={
-              <Link to="/requests/new" className={styles.newRequest}>
-                New Request
-              </Link>
-            }
-          />
-        ) : (
-          <ul className={styles.serviceGrid}>
-            {[...monitoringServices, ...screeningServices].map((service) => {
-              const site = siteById.get(service.site_id);
-              const serviceReports = reportsForService(service.id);
-              const inRequestStage =
-                service.status === "scoping" || service.status === "quoted";
-              const latestPublished = serviceReports.find(
-                (r) => r.state === "published",
-              );
-
-              return (
-                <li key={service.id}>
-                  <Link
-                    to={`/services/${service.id}`}
-                    className={styles.serviceCard}
-                  >
-                    {/* 1. Status dot and short state word. */}
-                    <span className={styles.serviceState}>
-                      <span
-                        className={`${styles.serviceDot} ${
-                          styles[
-                            `serviceDot_${cardDotTone(service, alertedServiceIds)}`
-                          ]
-                        }`}
-                        aria-hidden="true"
-                      />
-                      {SERVICE_STATUS_LABELS[service.status]}
-                    </span>
-
-                    {/* 2. The customer's own name — the headline. */}
-                    <h3
-                      className={styles.serviceTitle}
-                      title={serviceDisplayName(service, site)}
-                    >
-                      {serviceDisplayName(service, site)}
-                    </h3>
-
-                    {/* 3. "{cadence} {kind} · {location}, {country}" —
-                        never the technique, never location-first. */}
-                    <p className={styles.serviceKindLine}>
-                      {serviceKindLine(service, site)}
-                    </p>
-
-                    {/* 5. Latest published headline — or, in the request
-                        stage, an honest status line instead. */}
-                    {inRequestStage ? (
-                      <p className={styles.serviceStatusLine}>
-                        We're reviewing your request
-                      </p>
-                    ) : latestPublished?.headline ? (
-                      <p className={styles.serviceHeadline}>
-                        {latestPublished.headline}
-                      </p>
-                    ) : null}
-
-                    {/* 6. Next date. */}
-                    <span className={styles.serviceFooter}>
-                      <span className={styles.serviceNext}>
-                        {nextDateLine(service, serviceReports)}
-                      </span>
-                      <span className={styles.cardArrow} aria-hidden="true">
-                        →
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+          </aside>
+        ) : null}
+      </div>
     </div>
   );
 }

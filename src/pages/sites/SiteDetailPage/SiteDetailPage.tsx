@@ -81,7 +81,7 @@ export function SiteDetailPage() {
       <EmptyState
         title="Location not found"
         description="This location does not exist or you do not have access to it."
-        action={<Link to="/">Back to workspace</Link>}
+        action={<Link to="/">Back to overview</Link>}
       />
     );
   }
@@ -93,7 +93,7 @@ export function SiteDetailPage() {
     <div className={styles.page}>
       <PortalPageHeader
         crumbs={[
-          { label: "Workspace", to: "/" },
+          { label: "Overview", to: "/" },
           { label: site.name },
         ]}
         title={site.name}

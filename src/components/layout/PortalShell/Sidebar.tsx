@@ -133,7 +133,7 @@ export function Sidebar() {
             to="/"
             end
             icon="desktop"
-            label="Workspace"
+            label="Overview"
             collapsed={collapsed}
           />
           <NavRow

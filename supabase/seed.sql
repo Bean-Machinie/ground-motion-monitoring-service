@@ -157,53 +157,59 @@ begin
   -- -------------------------------------------------------------------
   insert into public.reports
     (id, service_id, org_id, kind, issue_number, period_start, period_end,
-     state, published_at, headline, summary, supersedes_report_id)
+     state, published_at, headline, summary, supersedes_report_id,
+     cumulative_mm, series_mm)
   values
     -- Esbjerg: three quarterly issues plus one off-cycle alert issue.
+    -- cumulative_mm tells the story: slow settlement, then the berth 7
+    -- jump (−5.4 → −19.4 = 14 mm over the ~5-week alert window).
     (rpt_esbjerg_1, svc_esbjerg, customer_id, 'periodic', 1,
      '2025-09-01', '2025-11-30', 'published', '2025-12-10T09:00:00Z',
      'Q4 2025 — Settlement within design envelope',
      'Average LOS velocities across the reclaimed quay remain below 4 mm/yr. Localized settlement at the eastern caisson matches the consolidation model.',
-     null),
+     null, -1.2, null),
     (rpt_esbjerg_2, svc_esbjerg, customer_id, 'periodic', 2,
      '2025-12-01', '2026-02-28', 'published', '2026-03-10T09:00:00Z',
      'Q1 2026 — Stable, minor seasonal signal',
      'Winter observations show a coherent seasonal signal of ±2 mm. No trend change at the terminal apron.',
-     null),
+     null, -2.1, null),
     (rpt_esbjerg_3, svc_esbjerg, customer_id, 'periodic', 3,
      '2026-03-01', '2026-05-31', 'published', '2026-06-10T09:00:00Z',
      'Q2 2026 — Accelerating subsidence at berth 7',
      'A 120 m section at berth 7 shows acceleration from 3 to 9 mm/yr LOS. Recommended: continue observation at increased attention level.',
-     null),
+     null, -5.4, null),
     (rpt_esbjerg_4, svc_esbjerg, customer_id, 'alert', 4,
      '2026-06-01', '2026-07-05', 'published', '2026-07-08T14:30:00Z',
      'Alert — Rapid movement at berth 7 crane rail',
      'Off-cycle issue triggered by automatic change detection: 14 mm displacement over five weeks along the berth 7 crane rail. Site inspection advised.',
-     null),
+     null, -19.4, null),
 
-    -- Metro screening: issue 1 was corrected; issue 2 supersedes it.
+    -- Metro screening: issue 1 was corrected; issue 2 supersedes it and
+    -- carries the downsampled three-year baseline curve.
     (rpt_metro_1, svc_metro, customer_id, 'screening', 1,
      '2023-01-01', '2026-01-31', 'superseded', '2026-02-20T10:00:00Z',
      'Baseline screening — Section C2 (superseded)',
      'Historical PS-InSAR screening over the alignment. Superseded by a corrected issue after a georeferencing fix in block 14.',
-     null),
+     null, -6.0, null),
     (rpt_metro_2, svc_metro, customer_id, 'screening', 2,
      '2023-01-01', '2026-01-31', 'published', '2026-03-02T10:00:00Z',
      'Baseline screening — Section C2 (corrected)',
      'Corrected issue: three-year deformation baseline along the tunnel alignment. Two blocks show pre-existing settlement above 5 mm/yr and are flagged for the construction-phase monitoring scope.',
-     rpt_metro_1),
+     rpt_metro_1, -6.2,
+     '[0,-0.4,-0.9,-1.6,-2.2,-2.7,-3.4,-4.1,-4.6,-5.2,-5.7,-6.2]'::jsonb),
 
     -- Grimsel: first issue failed in processing; second is under way.
+    -- No published data yet → the Overview shows an honest flat line.
     (rpt_dam_1, svc_dam, customer_id, 'periodic', 1,
      '2026-01-01', '2026-03-31', 'failed', null,
      'Q1 2026 — Processing failed',
      'Coherence over the abutment slopes was insufficient in the winter scenes; the run did not meet quality thresholds.',
-     null),
+     null, null, null),
     (rpt_dam_2, svc_dam, customer_id, 'periodic', 2,
      '2026-04-01', '2026-06-30', 'processing', null,
      null,
      null,
-     null);
+     null, null, null);
 
   -- -------------------------------------------------------------------
   -- Artifacts: files on the latest Esbjerg issues and the metro report.

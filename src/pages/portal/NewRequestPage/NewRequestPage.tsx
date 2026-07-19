@@ -9,7 +9,7 @@
 // and free-text scope notes. Admin-side transitions (scoping → quoted →
 // active) stay in Supabase; the portal only reads them.
 import { useMemo, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,9 +38,13 @@ export function NewRequestPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { sites, refetch } = usePortalData();
+  const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
-  const [kind, setKind] = useState<ServiceKind>("monitoring");
+  // The Overview's add tiles preselect the product (?product=screening).
+  const [kind, setKind] = useState<ServiceKind>(
+    searchParams.get("product") === "screening" ? "screening" : "monitoring",
+  );
   // "" = create a new location; otherwise an existing site id.
   const [siteId, setSiteId] = useState("");
   const [locationName, setLocationName] = useState("");
@@ -111,9 +115,9 @@ export function NewRequestPage() {
   return (
     <div className={styles.page}>
       <PortalPageHeader
-        crumbs={[{ label: "Workspace", to: "/" }, { label: "New request" }]}
+        crumbs={[{ label: "Overview", to: "/" }, { label: "New request" }]}
         title="New request"
-        lede="Tell us what you want to watch. We'll scope it and come back with a quote — the request appears in your workspace right away."
+        lede="Tell us what you want to watch. We'll scope it and come back with a quote — the request appears in your overview right away."
       />
 
       <form className={styles.form} onSubmit={handleSubmit}>

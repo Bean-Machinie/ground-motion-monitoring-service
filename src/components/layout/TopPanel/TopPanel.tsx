@@ -63,9 +63,9 @@ export function TopPanel() {
 
   // The top panel is marketing chrome only — the signed-in app uses the
   // sidebar shell. Signed-in visitors browsing marketing pages get one
-  // extra "Workspace" link back into the app.
+  // extra "Overview" link back into the app.
   const navItems: NavItem[] = user
-    ? [{ kind: "link", label: "Workspace", to: "/", end: true }, ...NAV_ITEMS]
+    ? [{ kind: "link", label: "Overview", to: "/", end: true }, ...NAV_ITEMS]
     : NAV_ITEMS;
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);

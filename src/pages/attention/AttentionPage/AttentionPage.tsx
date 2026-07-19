@@ -17,7 +17,7 @@ export function AttentionPage() {
   return (
     <div>
       <PortalPageHeader
-        crumbs={[{ label: "Workspace", to: "/" }, { label: "Needs attention" }]}
+        crumbs={[{ label: "Overview", to: "/" }, { label: "Needs attention" }]}
         title="Needs attention"
         lede={
           attention.count === 0

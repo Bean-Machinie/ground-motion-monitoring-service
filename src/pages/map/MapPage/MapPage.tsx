@@ -71,7 +71,7 @@ export function MapPage() {
   return (
     <div className={styles.page}>
       <PortalPageHeader
-        crumbs={[{ label: "Workspace", to: "/" }, { label: "Map view" }]}
+        crumbs={[{ label: "Overview", to: "/" }, { label: "Map view" }]}
         title="Map view"
         lede="All of your locations in one place. Select a marker to open the work there."
       />

@@ -44,7 +44,7 @@ export function ServiceEngagementPage() {
       <EmptyState
         title="Not found"
         description="This monitoring or screening does not exist or you do not have access to it."
-        action={<Link to="/">Back to workspace</Link>}
+        action={<Link to="/">Back to overview</Link>}
       />
     );
   }

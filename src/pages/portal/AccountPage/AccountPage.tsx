@@ -71,7 +71,7 @@ export function AccountPage() {
   return (
     <div className={styles.page}>
       <PortalPageHeader
-        crumbs={[{ label: "Workspace", to: "/" }, { label: "Settings" }]}
+        crumbs={[{ label: "Overview", to: "/" }, { label: "Settings" }]}
         title="Account settings"
         lede="Your profile and account details."
       />

@@ -1,360 +1,212 @@
+/* Overview: attention banner on top, then products (left) and the
+   activity feed (right) sharing the full content width. */
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 
-.pageHeader {
+/* --------------------------- Attention banner --------------------------- */
+
+.banner {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-}
-
-.pageHeader h1 {
-  margin-bottom: var(--space-2);
-}
-
-.lede {
-  margin: 0;
-  color: var(--color-text-muted);
-  max-width: 44rem;
-}
-
-/* Yellow CTA, matching the hero/log-in button styling. */
-.newRequest {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 16px;
-  border-radius: var(--radius-md);
-  background: #fcd900;
-  color: #111111;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.banner:hover {
+  text-decoration: none;
+  color: var(--color-danger);
+  filter: brightness(0.98);
+}
+
+.bannerIcon {
+  display: inline-flex;
+  flex: none;
+}
+
+.bannerText {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.bannerAction {
+  flex: none;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color 160ms ease, transform 160ms ease;
 }
 
-.newRequest:hover {
-  background: #ffe44d;
-  color: #111111;
-  text-decoration: none;
-  transform: scale(1.03);
+.banner:hover .bannerAction {
+  text-decoration: underline;
 }
+
+/* ---------------------------- Two columns ------------------------------- */
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: var(--space-7);
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.asideLink {
+  margin-top: var(--space-1);
+  padding-left: var(--space-5);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.asideLink:hover {
+  color: var(--color-primary-dark);
+}
+
+/* ------------------------------ Sections -------------------------------- */
 
 .section {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
-.sectionHeader {
+.sectionHead {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
   gap: var(--space-3);
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.inlineLink {
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-}
-
-.inlineLink:hover {
-  color: var(--color-primary-dark);
-}
-
-/* Shared hover arrow. */
-.cardArrow {
-  color: var(--color-text-subtle);
-  transition: transform 160ms var(--ease-nav), color 160ms ease;
-}
-
-/* ------------------------- Needs attention ---------------------------- */
-
-.allClear {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--color-success-soft);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  color: var(--color-success);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.attentionList {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-/* Severity-accented card: colored left cut + tinted icon chip. */
-.attentionCard {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-left-width: 4px;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  color: var(--color-text);
-  transition:
-    transform 180ms var(--ease-nav),
-    box-shadow 180ms ease,
-    border-color 180ms ease;
-}
-
-.attentionCard:hover {
-  text-decoration: none;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.attentionCard:hover .cardArrow {
-  transform: translateX(3px);
-  color: var(--color-text);
-}
-
-.attentionDanger {
-  border-left-color: var(--color-danger);
-}
-
-.attentionWarning {
-  border-left-color: var(--color-accent-amber);
-}
-
-.attentionIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: var(--radius-full);
-  background-color: var(--color-surface-muted);
-}
-
-.attentionDanger .attentionIcon {
-  background-color: var(--color-danger-soft);
-}
-
-.attentionWarning .attentionIcon {
-  background-color: var(--color-warning-soft);
-}
-
-.attentionBody {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.attentionTitle {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.attentionMeta {
+.sectionCount {
   color: var(--color-text-subtle);
   font-size: var(--font-size-sm);
 }
 
-/* -------------------------- Latest reports ---------------------------- */
+/* How a new customer learns what they bought. */
+.sectionExplainer {
+  margin: calc(-1 * var(--space-1)) 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
 
-.reportGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: var(--space-3);
+.sectionEmpty {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.reportCard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--space-4);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  color: var(--color-text);
-  transition:
-    transform 180ms var(--ease-nav),
-    box-shadow 180ms ease,
-    border-color 180ms ease;
-}
-
-.reportCard:hover {
-  text-decoration: none;
-  transform: translateY(-2px);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
-}
-
-.reportCard:hover .cardArrow {
-  transform: translateX(3px);
-  color: var(--color-text);
-}
-
-.reportIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  margin-bottom: var(--space-3);
-  border-radius: var(--radius-md);
-  background-color: rgba(252, 217, 0, 0.16);
-}
-
-.reportKicker {
-  margin-bottom: 2px;
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.reportTitle {
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.reportMeta {
-  margin-top: 2px;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
 
-.reportFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-3);
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-sm);
-}
+/* ------------------------------- Cards ---------------------------------- */
 
-/* --------------------------- Active work ------------------------------- */
-
-.serviceGrid {
+.cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* One card per service, field order fixed: state → name → kind line →
-   headline/status line → next date. No image, no technique. */
-.serviceCard {
+/* Portrait card in the style of the reference mocks: visual header,
+   kicker, name, location, status pill, labelled facts, action button. */
+.card {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--space-4) var(--space-5);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  overflow: hidden;
   color: var(--color-text);
+  box-shadow: var(--shadow-sm);
   transition:
     transform 180ms var(--ease-nav),
-    box-shadow 180ms ease,
-    border-color 180ms ease;
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.serviceCard:hover {
+.card:hover {
   text-decoration: none;
+  color: var(--color-text);
   transform: translateY(-2px);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-md);
 }
 
-.serviceCard:hover .cardArrow {
-  transform: translateX(3px);
-  color: var(--color-text);
+/* The visual slot: real motion data instead of a stock photo. */
+.chartHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+  padding: var(--space-3) var(--space-3) 0;
+  background-color: var(--color-bg);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
-/* 1. Status dot + short state word. */
-.serviceState {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
+.chart {
+  width: 100%;
+  height: 100%;
+}
+
+.chartNote {
   color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
+  font-size: 12px;
+  text-align: center;
+  padding-bottom: var(--space-3);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--space-4);
+}
+
+/* Uppercase kicker, like "SCREENING REPORT" in the reference. */
+.cardKicker {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-subtle);
+  font-size: 10px;
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
-.serviceDot {
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: var(--radius-full);
-}
-
-.serviceDot_success {
-  background-color: #3f9d63;
-}
-
-.serviceDot_danger {
-  background-color: var(--color-danger);
-}
-
-.serviceDot_neutral {
-  background-color: var(--color-border-strong);
-}
-
-/* 2. The customer's own name for the work — the headline. */
-.serviceTitle {
+.cardName {
   margin: 0 0 2px;
   font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-}
-
-/* 3. "Quarterly monitoring · Port of Esbjerg, Denmark". */
-.serviceKindLine {
-  margin: 0 0 var(--space-3);
-  color: var(--color-text-muted);
-  font-size: 12px;
-}
-
-/* 5. Latest published headline, clamped. */
-.serviceHeadline {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -362,30 +214,98 @@
   overflow: hidden;
 }
 
-/* Request stage: an honest status line in place of the headline. */
-.serviceStatusLine {
+.cardLocation {
   margin: 0 0 var(--space-3);
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-style: italic;
+  font-size: 12px;
 }
 
-/* 6. Next date. */
-.serviceFooter {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: auto;
+/* Status pill chip: soft tint + tone colour, like "Low Risk". */
+.pill {
+  align-self: flex-start;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid transparent;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.pill_success {
+  background-color: var(--color-success-soft);
+  border-color: rgba(46, 107, 69, 0.25);
+  color: var(--color-success);
+}
+
+.pill_danger {
+  background-color: var(--color-danger-soft);
+  border-color: rgba(179, 57, 47, 0.25);
+  color: var(--color-danger);
+}
+
+.pill_warning {
+  background-color: var(--color-warning-soft);
+  border-color: rgba(138, 97, 22, 0.25);
+  color: var(--color-warning);
+}
+
+.pill_neutral {
+  background-color: var(--color-neutral-soft);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+
+/* Labelled facts, two columns above the action. */
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
   padding-top: var(--space-3);
   border-top: var(--border-width) solid var(--color-border);
 }
 
-.serviceNext {
-  flex: 1;
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-sm);
+.fact {
+  min-width: 0;
 }
 
-.serviceFooter .cardArrow {
-  margin-left: auto;
+.fact dt {
+  color: var(--color-text-subtle);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+}
+
+.fact dd {
+  margin: 2px 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.factWarning {
+  color: var(--color-warning);
+}
+
+/* Dark full-width action, like "Open Operation". */
+.cardButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: #191613;
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: background-color 140ms ease;
+}
+
+/* Keep space between the facts and the button. */
+.facts + .cardButton {
+  margin-top: var(--space-4);
+}
+
+.card:hover .cardButton {
+  background-color: #2b2620;
 }

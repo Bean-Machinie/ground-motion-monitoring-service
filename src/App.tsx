@@ -25,6 +25,7 @@ import { SignInPage } from "@/pages/auth/SignInPage/SignInPage";
 import { SignUpPage } from "@/pages/auth/SignUpPage/SignUpPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage/ForgotPasswordPage";
 import { AttentionPage } from "@/pages/attention/AttentionPage/AttentionPage";
+import { ActivityPage } from "@/pages/activity/ActivityPage/ActivityPage";
 import { SiteDetailPage } from "@/pages/sites/SiteDetailPage/SiteDetailPage";
 import { MapPage } from "@/pages/map/MapPage/MapPage";
 import { ReportsLibraryPage } from "@/pages/reports/ReportsLibraryPage/ReportsLibraryPage";
@@ -74,6 +75,7 @@ export function App() {
       {/* Signed-in app: sidebar shell. Real places, not tabs. */}
       <Route element={<PortalShell />}>
         <Route path="attention" element={<AttentionPage />} />
+        <Route path="activity" element={<ActivityPage />} />
         {/* No sites index page — the workspace is the overview. Individual
             sites keep their detail pages. */}
         <Route path="sites" element={<Navigate to="/" replace />} />

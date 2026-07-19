@@ -162,6 +162,8 @@ export type Database = {
           summary: string | null;
           pdf_url: string | null;
           supersedes_report_id: string | null;
+          cumulative_mm: number | null;
+          series_mm: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -179,6 +181,8 @@ export type Database = {
           summary?: string | null;
           pdf_url?: string | null;
           supersedes_report_id?: string | null;
+          cumulative_mm?: number | null;
+          series_mm?: Json | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -196,6 +200,8 @@ export type Database = {
           summary?: string | null;
           pdf_url?: string | null;
           supersedes_report_id?: string | null;
+          cumulative_mm?: number | null;
+          series_mm?: Json | null;
           created_at?: string;
           updated_at?: string;
         };

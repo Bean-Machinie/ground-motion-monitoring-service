@@ -75,7 +75,7 @@ export function ReportsLibraryPage() {
   return (
     <div className={styles.page}>
       <PortalPageHeader
-        crumbs={[{ label: "Workspace", to: "/" }, { label: "Reports" }]}
+        crumbs={[{ label: "Overview", to: "/" }, { label: "Reports" }]}
         title="Reports"
         lede="Every screening report and monitoring issue delivered to your account, in one place."
       />
