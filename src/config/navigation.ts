@@ -8,6 +8,8 @@ export interface NavMenuEntry {
   /** Route (or route + hash) to navigate to. */
   to: string;
   icon?: IconName;
+  /** Override the default 22px icon render size (layout slot stays 22px). */
+  iconSize?: number;
   /** Draw a thin divider below this entry. */
   dividerBelow?: boolean;
 }
@@ -68,6 +70,9 @@ export const PORTAL_NAV_ITEMS: NavItem[] = [
         label: "Home",
         to: "/home",
         icon: "lighthouse",
+        // The lighthouse artwork is tall and narrow, so it needs a larger
+        // render size to read as big as the other (square-ish) icons.
+        iconSize: 30,
         dividerBelow: true,
       },
       {

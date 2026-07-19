@@ -316,7 +316,10 @@ export function TopPanel() {
                           >
                             {entry.icon ? (
                               <span className={styles.menuIcon} aria-hidden="true">
-                                <AppIcon name={entry.icon} size={22} />
+                                <AppIcon
+                                  name={entry.icon}
+                                  size={entry.iconSize ?? 22}
+                                />
                               </span>
                             ) : null}
                             <span>{entry.label}</span>

@@ -39,8 +39,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 0 18px;
+  min-height: 26px;
+  padding: 0 14px;
   border-radius: var(--radius-md);
   background: #fcd900;
   color: #111111;
@@ -245,8 +245,8 @@
 
 @media (max-width: 720px) {
   .loginButton {
-    min-height: 34px;
-    padding: 0 14px;
+    min-height: 24px;
+    padding: 0 10px;
   }
 
   /* Keep the narrow top bar clean: socials live in the footer on phones. */

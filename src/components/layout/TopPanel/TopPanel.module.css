@@ -14,7 +14,7 @@
 /* ---------------------------------------------------------------------- */
 
 .topBar {
-  padding: var(--space-2) 0;
+  padding: var(--space-1) 0;
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
@@ -57,7 +57,7 @@
 
 .brandLogo {
   display: block;
-  height: 3.5rem;
+  height: 4.25rem;
   width: auto;
   max-width: 100%;
   object-fit: contain;
@@ -229,10 +229,22 @@
   color: var(--color-text);
 }
 
+/* Fixed 22px layout slot: oversized icons (per-entry iconSize) overflow
+   evenly without shifting text alignment or row height. */
 .menuIcon {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
   opacity: 0.68;
   transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.menuIcon img {
+  flex: none;
+  max-width: none;
 }
 
 .menuEntry:hover .menuIcon,
@@ -262,7 +274,7 @@
   }
 
   .brandLogo {
-    height: 2.25rem;
+    height: 3rem;
   }
 
   /* Nav stays centered; becomes a horizontally scrollable strip only when
