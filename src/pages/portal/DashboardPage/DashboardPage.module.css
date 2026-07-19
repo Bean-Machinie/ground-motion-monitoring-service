@@ -1,28 +1,11 @@
-/* Dashboard-01-style layout: header + range control, metric cards,
-   recent-projects grid with a latest-results right rail. */
-
 .page {
-  /* Homepage brand accents: same yellow as the hero CTA and nav highlight. */
-  --yellow: #fcd900;
-  --yellow-tint: rgba(252, 217, 0, 0.13);
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-/* ---------- Header ---------- */
-
-.pageHeader {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.title {
-  margin-bottom: var(--space-1);
-  font-size: var(--font-size-2xl);
+.pageHeader h1 {
+  margin-bottom: var(--space-2);
 }
 
 .lede {
@@ -30,112 +13,33 @@
   color: var(--color-text-muted);
 }
 
-/* Segmented date-range control. */
-.rangeControl {
-  display: inline-flex;
-  padding: var(--space-1);
-  gap: var(--space-1);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: calc(var(--radius-md) + var(--space-1));
-}
-
-.rangeButton {
-  padding: var(--space-1) var(--space-3);
-  border: none;
-  border-radius: var(--radius-md);
-  background: none;
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-.rangeButton:hover {
-  color: var(--color-text);
-  background-color: var(--yellow-tint);
-}
-
-/* Active: yellow tint + yellow underline, echoing the homepage nav tabs. */
-.rangeButtonActive,
-.rangeButtonActive:hover {
-  background-color: var(--yellow-tint);
-  box-shadow: inset 0 -3px 0 0 var(--yellow);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  color: var(--color-text);
-  font-weight: var(--font-weight-nav);
-}
-
-.rangeLabelShort {
-  display: none;
-  text-transform: uppercase;
-}
-
-/* ---------- Metric cards ---------- */
-
-.metricsGrid {
+.statsGrid {
   display: grid;
   gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
 }
 
-.metricCard {
+.statCard {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
-.metricLabel {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.metricValue {
+.statValue {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
 }
 
-.metricDelta {
-  font-size: var(--font-size-xs);
-}
-
-.metricDeltaUp {
-  color: var(--color-success);
-  font-weight: var(--font-weight-semibold);
-}
-
-.metricDeltaFlat {
-  color: var(--color-text-subtle);
-}
-
-/* ---------- Content grid ---------- */
-
-.contentGrid {
-  display: grid;
-  gap: var(--space-6);
-  align-items: start;
+.statLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .section {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-4);
-  min-width: 0;
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
 }
 
 .sectionTitle {
@@ -143,129 +47,44 @@
   font-size: var(--font-size-xl);
 }
 
-/* Recent projects */
-
-.projectList {
+.recentList {
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: var(--space-4);
-}
-
-.projectCard {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  height: 100%;
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  color: var(--color-text);
-  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
-.projectCard:hover {
-  text-decoration: none;
-  border-color: var(--yellow);
-  box-shadow: var(--shadow-md);
-}
-
-.projectCardTop {
+.recentItem {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.projectName {
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-}
-
-.projectMeta {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.projectUpdated {
-  margin-top: auto;
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
-}
-
-/* Latest results rail */
-
-.rail {
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-4) var(--space-5);
-}
-
-.resultList {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.resultItem {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3) 0;
-  border-bottom: var(--border-width) solid var(--color-border);
-}
-
-.resultItem:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.resultTitle {
   color: var(--color-text);
+}
+
+.recentItem:hover {
+  text-decoration: none;
+  border-color: var(--color-primary);
+}
+
+.recentName {
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-tight);
 }
 
-a.resultTitle:hover {
-  color: var(--color-primary-dark);
-}
-
-.resultMeta {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-
-.resultDate {
+.recentMeta {
   color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
 }
-
-/* ---------- Responsive ---------- */
 
 @media (min-width: 48rem) {
-  .projectList {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 64rem) {
-  .contentGrid {
-    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
-  }
-}
-
-@media (max-width: 30rem) {
-  .rangeLabelLong {
-    display: none;
-  }
-
-  .rangeLabelShort {
-    display: inline;
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

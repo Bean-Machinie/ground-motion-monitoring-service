@@ -1,15 +1,13 @@
-// Marketing-site layout: TopPanel header for public pages. The full footer
-// (link columns + legal) renders on the marketing homepage only. Signed-in
-// views use the PortalLayout sidebar shell instead of this layout.
-// Renders children when given (RootPage), otherwise the route Outlet.
-import type { ReactNode } from "react";
+// Single site-wide layout: one TopPanel for every page. The full footer
+// (link columns + legal) renders on the marketing homepage only — signed-in
+// users see the dashboard at "/", which has no marketing footer.
 import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Footer } from "@/components/layout/Footer/Footer";
 import styles from "./AppLayout.module.css";
 
-export function AppLayout({ children }: { children?: ReactNode }) {
+export function AppLayout() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
   // Footer belongs to the marketing homepage: "/" when signed out, and
@@ -20,7 +18,9 @@ export function AppLayout({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.layout}>
       <TopPanel />
-      <main className={styles.main}>{children ?? <Outlet />}</main>
+      <main className={styles.main}>
+        <Outlet />
+      </main>
       {showFooter ? <Footer /> : null}
     </div>
   );

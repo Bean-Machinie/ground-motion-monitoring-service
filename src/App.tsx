@@ -1,6 +1,5 @@
-// Application routes. Public pages share the AppLayout (header + footer);
-// signed-in views ("/" when authenticated, and /portal/*) render inside the
-// PortalLayout sidebar app shell via RootPage / PortalShell.
+// Application routes. Every page shares one AppLayout (header + footer);
+// /portal routes add the auth guard via PortalShell.
 import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
 import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
@@ -27,19 +26,8 @@ import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 export function App() {
   return (
     <Routes>
-      {/* Root chooses its own layout: marketing chrome when signed out,
-          sidebar app shell when signed in. */}
-      <Route index element={<RootPage />} />
-
-      {/* Signed-in app: sidebar shell, no marketing header/footer. */}
-      <Route path="portal" element={<PortalShell />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="projects/:slug" element={<ProjectDetailPage />} />
-        <Route path="account" element={<AccountPage />} />
-      </Route>
-
       <Route element={<AppLayout />}>
+        <Route index element={<RootPage />} />
         {/* Marketing homepage stays reachable for signed-in users
             (Explore menu -> Home). */}
         <Route path="home" element={<HomePage />} />
@@ -66,6 +54,13 @@ export function App() {
           }
         />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
+
+        <Route path="portal" element={<PortalShell />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/:slug" element={<ProjectDetailPage />} />
+          <Route path="account" element={<AccountPage />} />
+        </Route>
 
         <Route
           path="admin"

@@ -1,15 +1,15 @@
-// Shell for /portal routes: applies the auth guard and the sidebar
-// app layout (no marketing header/footer for signed-in views).
+// Shell for /portal routes: applies the auth guard and the shared
+// content container. The header/footer come from the site-wide AppLayout.
 import { Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute";
-import { PortalLayout } from "@/components/layout/PortalLayout/PortalLayout";
+import styles from "./PortalShell.module.css";
 
 export function PortalShell() {
   return (
     <ProtectedRoute>
-      <PortalLayout>
+      <div className={`container ${styles.content}`}>
         <Outlet />
-      </PortalLayout>
+      </div>
     </ProtectedRoute>
   );
 }
