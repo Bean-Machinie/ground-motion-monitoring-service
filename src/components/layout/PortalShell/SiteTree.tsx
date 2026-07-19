@@ -97,6 +97,12 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
   const [filter, setFilter] = useState("");
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [flyoutOpen, setFlyoutOpen] = useState(false);
+  // Fixed-position anchor for the flyout so it escapes the sidebar's
+  // overflow clipping.
+  const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
   const rowRefs = useRef(new Map<string, HTMLAnchorElement>());
   const flyoutRef = useRef<HTMLDivElement | null>(null);
@@ -257,7 +263,14 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
           title="Your sites"
           aria-haspopup="menu"
           aria-expanded={flyoutOpen}
-          onClick={() => setFlyoutOpen((o) => !o)}
+          onClick={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            setFlyoutPos({ top: rect.top, left: rect.right + 10 });
+            setFlyoutOpen((o) => !o);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setFlyoutOpen(false);
+          }}
         >
           <span className={styles.rowIcon} aria-hidden="true">
             <AppIcon name="push-pin" size={18} />
@@ -265,11 +278,25 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
         </button>
 
         {flyoutOpen ? (
-          <div className={styles.flyout} role="menu" aria-label="Your sites">
+          <div
+            className={styles.flyout}
+            role="menu"
+            aria-label="Your sites"
+            style={{
+              top: flyoutPos.top,
+              left: flyoutPos.left,
+              maxHeight: `calc(100vh - ${flyoutPos.top}px - 16px)`,
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setFlyoutOpen(false);
+            }}
+          >
             <p className={styles.menuSectionLabel}>Your sites</p>
             {sites.length === 0 ? (
               <Link to="/requests/new" className={styles.menuEntry} role="menuitem">
-                No sites yet — new request
+                <span className={styles.menuEntryLabel}>
+                  No sites yet — new request
+                </span>
               </Link>
             ) : (
               sites.map((site) => (
@@ -278,8 +305,9 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
                     to={`/sites/${site.slug}`}
                     className={styles.menuEntry}
                     role="menuitem"
+                    title={site.name}
                   >
-                    {site.name}
+                    <span className={styles.menuEntryLabel}>{site.name}</span>
                   </Link>
                   {(servicesBySite.get(site.id) ?? []).map((service) => (
                     <Link
@@ -296,7 +324,9 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
                         }`}
                         aria-hidden="true"
                       />
-                      {SERVICE_KIND_LABELS[service.kind]}
+                      <span className={styles.menuEntryLabel}>
+                        {SERVICE_KIND_LABELS[service.kind]}
+                      </span>
                     </Link>
                   ))}
                 </div>
