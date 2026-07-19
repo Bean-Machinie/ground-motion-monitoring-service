@@ -22,7 +22,14 @@ import {
 } from "@/types/domain";
 import { formatShortDate } from "@/lib/dates";
 import { buildActivity } from "@/lib/activity";
+import card1 from "@/assets/images/card-1.png";
+import card2 from "@/assets/images/card-2.png";
+import card3 from "@/assets/images/card-3.jpg";
 import styles from "./WorkspacePage.module.css";
+
+/** Placeholder card images, cycled 1 → 2 → 3 → 1 within each section.
+    Custom per-service images come later. */
+const CARD_IMAGES = [card1, card2, card3];
 
 /** Legacy ?tab=… URLs map onto the new routes. */
 const LEGACY_TAB_ROUTES: Record<string, string> = {
@@ -31,7 +38,6 @@ const LEGACY_TAB_ROUTES: Record<string, string> = {
   reports: "/reports",
 };
 
-const MAX_CHART_POINTS = 15;
 const FEED_CAP = 8;
 
 /* ------------------------------ Card state ------------------------------ */
@@ -66,40 +72,7 @@ function cardState(
   return { word: "Ended", tone: "neutral" };
 }
 
-/* ------------------------------ Chart data ------------------------------ */
-
-/** Cumulative-displacement series: one point per published issue for
-    monitoring, the published report's per-epoch curve for a screening. */
-function chartSeries(service: Service, serviceReports: Report[]): number[] {
-  const published = serviceReports
-    .filter((r) => r.state === "published")
-    .sort((a, b) => a.issue_number - b.issue_number);
-
-  if (service.kind === "screening") {
-    const latest = published[published.length - 1];
-    if (latest?.series_mm && Array.isArray(latest.series_mm)) {
-      const series = latest.series_mm.filter(
-        (v): v is number => typeof v === "number",
-      );
-      if (series.length > 0) return downsample(series);
-    }
-  }
-
-  return downsample(
-    published
-      .map((r) => r.cumulative_mm)
-      .filter((v): v is number => v !== null),
-  );
-}
-
-function downsample(series: number[]): number[] {
-  if (series.length <= MAX_CHART_POINTS) return series;
-  const step = (series.length - 1) / (MAX_CHART_POINTS - 1);
-  return Array.from(
-    { length: MAX_CHART_POINTS },
-    (_, i) => series[Math.round(i * step)] as number,
-  );
-}
+/* ---------------------------- Motion figures ---------------------------- */
 
 /** −14 → "−14", −0.42 → "−0.4". Unicode minus, like the reports. */
 function formatMm(value: number): string {
@@ -115,8 +88,12 @@ function headlineFigure(
   serviceReports: Report[],
   hasOpenAlert: boolean,
 ): string | null {
+  // typeof check, not != null: rows from before migration 006 have no
+  // cumulative_mm property at all, and undefined arithmetic yields NaN.
   const published = serviceReports
-    .filter((r) => r.state === "published" && r.cumulative_mm !== null)
+    .filter(
+      (r) => r.state === "published" && typeof r.cumulative_mm === "number",
+    )
     .sort((a, b) => a.issue_number - b.issue_number);
   const latest = published[published.length - 1];
 
@@ -157,52 +134,6 @@ function headlineFigure(
   }
 
   return null;
-}
-
-/* ------------------------------ Sparkline ------------------------------- */
-
-const CHART_STROKES: Record<string, string> = {
-  danger: "#E24B4A",
-  active: "#1D9E75",
-  muted: "#888780",
-};
-
-function chartStroke(service: Service, hasOpenAlert: boolean): string {
-  if (hasOpenAlert) return CHART_STROKES.danger as string;
-  if (service.status === "active") return CHART_STROKES.active as string;
-  return CHART_STROKES.muted as string;
-}
-
-function Sparkline({ series, stroke }: { series: number[]; stroke: string }) {
-  const min = Math.min(...series);
-  const max = Math.max(...series);
-  const span = max - min || 1;
-  const points = series
-    .map((value, i) => {
-      const x = (i / (series.length - 1)) * 100;
-      const y = 10 + ((max - value) / span) * 50;
-      return `${x.toFixed(2)},${y.toFixed(2)}`;
-    })
-    .join(" ");
-
-  return (
-    <svg
-      viewBox="0 0 100 70"
-      className={styles.chart}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <polyline
-        points={points}
-        fill="none"
-        stroke={stroke}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
 }
 
 /* ------------------------------- The page ------------------------------- */
@@ -275,7 +206,7 @@ export function WorkspacePage() {
 
   /* ----------------------------- Card ---------------------------------- */
 
-  const renderCard = (service: Service) => {
+  const renderCard = (service: Service, index: number) => {
     const site = siteById.get(service.site_id);
     const serviceReports = reportsFor(service.id);
     const hasOpenAlert = alertedServiceIds.has(service.id);
@@ -283,7 +214,6 @@ export function WorkspacePage() {
     const state = cardState(service, hasOpenAlert, isOverdue);
     const inRequestStage =
       service.status === "scoping" || service.status === "quoted";
-    const series = inRequestStage ? [] : chartSeries(service, serviceReports);
     const figure = inRequestStage
       ? null
       : headlineFigure(service, serviceReports, hasOpenAlert);
@@ -336,48 +266,22 @@ export function WorkspacePage() {
       ];
     }
 
-    const action = deliveredScreening
-      ? "Read Report"
-      : inRequestStage
-        ? "View Request"
-        : service.kind === "monitoring"
-          ? "Open Monitoring"
-          : "Open Screening";
-
     return (
       <li key={service.id}>
+        {/* No action button: the whole card is the link. */}
         <Link to={`/services/${service.id}`} className={styles.card}>
-          {/* Chart header: the card's visual, like the photo slot in the
-              reference — but showing real motion data. */}
-          <div className={styles.chartHead}>
-            {inRequestStage ? (
-              <span className={styles.chartNote}>
-                We're reviewing your request
-              </span>
-            ) : series.length >= 3 ? (
-              <Sparkline
-                series={series}
-                stroke={chartStroke(service, hasOpenAlert)}
-              />
-            ) : (
-              <svg
-                viewBox="0 0 100 70"
-                className={styles.chart}
-                preserveAspectRatio="none"
-                aria-hidden="true"
-              >
-                <line
-                  x1="6"
-                  y1="35"
-                  x2="94"
-                  y2="35"
-                  stroke="var(--color-border-strong)"
-                  strokeWidth="1.5"
-                  strokeDasharray="3 4"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </svg>
-            )}
+          {/* Placeholder image, cycled 1-3; custom images come later.
+              The status pill sits on the image, top-left. */}
+          <div className={styles.imageHead}>
+            <img
+              src={CARD_IMAGES[index % CARD_IMAGES.length]}
+              alt=""
+              className={styles.cardImage}
+              loading="lazy"
+            />
+            <span className={`${styles.pill} ${styles[`pill_${state.tone}`]}`}>
+              {state.word}
+            </span>
           </div>
 
           <div className={styles.cardBody}>
@@ -391,10 +295,6 @@ export function WorkspacePage() {
             </h3>
             <p className={styles.cardLocation}>{shortLocation(site)}</p>
 
-            <span className={`${styles.pill} ${styles[`pill_${state.tone}`]}`}>
-              {state.word}
-            </span>
-
             <dl className={styles.facts}>
               {facts.map((fact) => (
                 <div key={fact.label} className={styles.fact}>
@@ -405,8 +305,6 @@ export function WorkspacePage() {
                 </div>
               ))}
             </dl>
-
-            <span className={styles.cardButton}>{action}</span>
           </div>
         </Link>
       </li>

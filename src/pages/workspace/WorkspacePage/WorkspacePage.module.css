@@ -130,60 +130,65 @@
 
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Portrait card in the style of the reference mocks: visual header,
-   kicker, name, location, status pill, labelled facts, action button. */
+/* Portrait card in the style of the reference mocks: image header with
+   the status pill on it, kicker, name, location, labelled facts.
+   Radius follows the app's scale: cards use --radius-lg. */
 .card {
   display: flex;
   flex-direction: column;
   height: 100%;
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   color: var(--color-text);
   box-shadow: var(--shadow-sm);
   transition:
-    transform 180ms var(--ease-nav),
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
 
+/* No card movement on hover — the only motion is the image scale. */
 .card:hover {
   text-decoration: none;
   color: var(--color-text);
-  transform: translateY(-2px);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-md);
 }
 
-/* The visual slot: real motion data instead of a stock photo. */
-.chartHead {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 96px;
-  padding: var(--space-3) var(--space-3) 0;
-  background-color: var(--color-bg);
+/* Image header (placeholder for now, custom per-service later): a
+   bigger share of the card, with the status pill overlaid top-left. */
+.imageHead {
+  position: relative;
+  height: 156px;
+  overflow: hidden;
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
-.chart {
+/* GPU-composited scale only: transform stays active from frame one
+   (scale(1) base), will-change keeps the image on its own layer, and a
+   long ease-out makes the zoom glide instead of morphing. */
+.cardImage {
+  display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  transform-origin: center;
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.chartNote {
-  color: var(--color-text-subtle);
-  font-size: 12px;
-  text-align: center;
-  padding-bottom: var(--space-3);
+.card:hover .cardImage {
+  transform: scale(1.06);
 }
 
 .cardBody {
@@ -220,14 +225,19 @@
   font-size: 12px;
 }
 
-/* Status pill chip: soft tint + tone colour, like "Low Risk". */
+/* Status pill chip pinned to the image, top-left. Chips take the micro
+   radius per the app's scale. */
 .pill {
-  align-self: flex-start;
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
   padding: 2px var(--space-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   border: var(--border-width) solid transparent;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
 }
 
 .pill_success {
@@ -254,12 +264,13 @@
   color: var(--color-text-muted);
 }
 
-/* Labelled facts, two columns above the action. */
+/* Labelled facts, two columns pinned to the bottom of the body. */
 .facts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
   margin: var(--space-4) 0 0;
+  margin-top: auto;
   padding-top: var(--space-3);
   border-top: var(--border-width) solid var(--color-border);
 }
@@ -284,28 +295,4 @@
 
 .factWarning {
   color: var(--color-warning);
-}
-
-/* Dark full-width action, like "Open Operation". */
-.cardButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  background-color: #191613;
-  color: var(--color-text-inverse);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  transition: background-color 140ms ease;
-}
-
-/* Keep space between the facts and the button. */
-.facts + .cardButton {
-  margin-top: var(--space-4);
-}
-
-.card:hover .cardButton {
-  background-color: #2b2620;
 }
