@@ -1,0 +1,285 @@
+/* Expert-assisted request: centered hero above a light glassmorphism
+   form card laid out as a two-column grid, styled in the site's classic
+   yellow (same --yellow convention as the home sections). Full-width
+   rows (message, error, success, submit) span both columns. The
+   third-party phone input is restyled via :global() to match. */
+
+.page {
+  --yellow: #fcd900;
+  --yellow-hover: #ffe44d;
+  --yellow-soft: rgba(252, 217, 0, 0.14);
+  --yellow-ring: 0 0 0 3px rgba(252, 217, 0, 0.42);
+  --yellow-text: #8a6116;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+}
+
+/* ------------------------------- Hero ---------------------------------- */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  max-width: 40rem;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+}
+
+.lede {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+/* ------------------------------- Form ----------------------------------- */
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4) var(--space-5);
+  width: 100%;
+  max-width: 44rem;
+  padding: var(--space-6);
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 40rem) {
+  .form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.messageField,
+.fullWidth,
+.success,
+.submit {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.required {
+  color: var(--yellow-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.input {
+  width: 100%;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: var(--yellow-ring);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 7rem;
+  line-height: var(--line-height-base);
+}
+
+/* --------------------------- Phone input -------------------------------- */
+/* react-phone-number-input renders its own country select + input; the
+   :global overrides give them the same height, border, and focus ring as
+   the rest of the form. */
+
+.phoneInput :global(.PhoneInput) {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+}
+
+.phoneInput :global(.PhoneInput--focus) {
+  border-color: var(--yellow);
+  box-shadow: var(--yellow-ring);
+}
+
+.phoneInput :global(.PhoneInputCountry) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding-right: var(--space-2);
+  border-right: var(--border-width) solid var(--color-border);
+}
+
+.phoneInput :global(.PhoneInputCountryIcon) {
+  width: 1.4rem;
+  height: 1rem;
+  box-shadow: none;
+  background: none;
+}
+
+.phoneInput :global(.PhoneInputInput) {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+}
+
+.phoneInput :global(.PhoneInputInput:focus) {
+  outline: none;
+}
+
+/* -------------------------- Support topic ------------------------------- */
+
+.topicMenuRoot {
+  position: relative;
+}
+
+.topicToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.topicToggle:focus-visible {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: var(--yellow-ring);
+}
+
+.topicPlaceholder {
+  color: var(--color-text-subtle);
+}
+
+.topicCaret {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid var(--color-text-subtle);
+  border-bottom: 2px solid var(--color-text-subtle);
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.topicMenu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-1);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-dropdown);
+}
+
+.topicItem {
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.topicItem:hover {
+  background-color: var(--yellow-soft);
+}
+
+.topicItemActive {
+  background-color: var(--yellow-soft);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---------------------------- Feedback ---------------------------------- */
+
+.success {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-success-soft);
+  border-radius: var(--radius-md);
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--yellow);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.submit:hover:not(:disabled) {
+  background-color: var(--yellow-hover);
+}
+
+.submit:focus-visible {
+  outline: none;
+  box-shadow: var(--yellow-ring);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

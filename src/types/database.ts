@@ -433,6 +433,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      expert_assisted_requests: {
+        Row: {
+          id: string;
+          created_at: string;
+          requested_by: string | null;
+          name: string;
+          email: string;
+          organization: string;
+          project_area_description: string;
+          project_objective: string;
+          preferred_output_format: string;
+          comments: string | null;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          requested_by?: string | null;
+          name: string;
+          email: string;
+          organization?: string;
+          project_area_description: string;
+          project_objective: string;
+          preferred_output_format?: string;
+          comments?: string | null;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          requested_by?: string | null;
+          name?: string;
+          email?: string;
+          organization?: string;
+          project_area_description?: string;
+          project_objective?: string;
+          preferred_output_format?: string;
+          comments?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {

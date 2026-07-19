@@ -50,6 +50,10 @@
 /* ----------------------------- Content column -------------------------- */
 
 .contentCol {
+  /* Positioning context for full-column decorative backdrops (e.g. the
+     new-request flow's globe), so they can reach the column's true
+     edges instead of stopping at the centered content box. */
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;

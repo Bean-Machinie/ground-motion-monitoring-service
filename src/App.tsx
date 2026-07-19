@@ -30,6 +30,9 @@ import { SiteDetailPage } from "@/pages/sites/SiteDetailPage/SiteDetailPage";
 import { MapPage } from "@/pages/map/MapPage/MapPage";
 import { ReportsLibraryPage } from "@/pages/reports/ReportsLibraryPage/ReportsLibraryPage";
 import { ReportViewerPage } from "@/pages/reports/ReportViewerPage/ReportViewerPage";
+import { RequestFlowLayout } from "@/pages/portal/RequestFlowLayout/RequestFlowLayout";
+import { RequestStartPage } from "@/pages/portal/RequestStartPage/RequestStartPage";
+import { ExpertRequestPage } from "@/pages/portal/ExpertRequestPage/ExpertRequestPage";
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
 import { AdminPlaceholderPage } from "@/pages/admin/AdminPlaceholderPage/AdminPlaceholderPage";
@@ -83,7 +86,16 @@ export function App() {
         <Route path="map" element={<MapPage />} />
         <Route path="reports" element={<ReportsLibraryPage />} />
         <Route path="reports/:id" element={<ReportViewerPage />} />
-        <Route path="requests/new" element={<NewRequestPage />} />
+        {/* New request: chooser first, then the chosen path. Both live
+            inside RequestFlowLayout so the decorative globe stays mounted
+            and can slide between corners on navigation. The self-service
+            form stays routed but unlinked until its card's button is
+            switched on. */}
+        <Route element={<RequestFlowLayout />}>
+          <Route path="requests/new" element={<RequestStartPage />} />
+          <Route path="requests/new/expert" element={<ExpertRequestPage />} />
+        </Route>
+        <Route path="requests/new/self-service" element={<NewRequestPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route
           path="admin"
