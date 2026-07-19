@@ -57,17 +57,24 @@
   overflow: hidden;
 }
 
-/* Fixed context line under the top panel: never scrolls with content. */
+/* Fixed context line under the top panel: never scrolls with content.
+   Kept deliberately slim and quiet — tight vertical padding, faint
+   divider. */
 .crumbBar {
   flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  min-height: 2.4rem;
-  padding: 0 var(--space-6);
-  border-bottom: var(--border-width) solid var(--color-border);
+  padding: var(--space-1) var(--space-6);
+  border-bottom: var(--border-width) solid rgba(231, 224, 214, 0.55);
   background-color: var(--color-bg);
+}
+
+/* The breadcrumb component's in-page bottom margin doesn't apply here —
+   the bar's own padding sets the height. */
+.crumbBar nav {
+  margin-bottom: 0;
 }
 
 /* Right-hand slot for future fixed controls. */
