@@ -2,9 +2,7 @@
 // sibling issues, and its artifacts, then renders the unified viewer.
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
-import { useReports } from "@/hooks/useReports";
+import { usePortalData } from "@/context/PortalDataContext";
 import { useReportArtifacts } from "@/hooks/useReportArtifacts";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
@@ -16,16 +14,15 @@ import styles from "./ReportViewerPage.module.css";
 
 export function ReportViewerPage() {
   const { id } = useParams<{ id: string }>();
-  const { sites, loading: sitesLoading } = useSites();
-  const { services, loading: servicesLoading } = useServices();
-  const { reports, loading, error, refetch } = useReports();
+  const { sites, services, reports, loading, error, refetch } =
+    usePortalData();
   const report = reports.find((r) => r.id === id);
   const {
     artifacts,
     loading: artifactsLoading,
   } = useReportArtifacts(report?.id);
 
-  if (loading || sitesLoading || servicesLoading || artifactsLoading) {
+  if (loading || artifactsLoading) {
     return <LoadingState label="Loading report…" />;
   }
 
@@ -55,7 +52,7 @@ export function ReportViewerPage() {
     <div className={styles.page}>
       <Breadcrumbs
         items={[
-          { label: "Workspace", to: "/" },
+          { label: "Sites", to: "/sites" },
           ...(site ? [{ label: site.name, to: `/sites/${site.slug}` }] : []),
           ...(service
             ? [

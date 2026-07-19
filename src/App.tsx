@@ -1,6 +1,9 @@
-// Application routes. Every page shares one AppLayout (header + footer);
-// signed-in areas are guarded by PortalShell (auth + content container).
-// Legacy /portal* and ?tab=… URLs redirect to the new structure.
+// Application routes.
+// Public/marketing pages share AppLayout (top panel + footer); every
+// signed-in page lives inside PortalShell (sidebar + content column) and
+// renders content only — pages never carry their own navigation.
+// "/" and "/services/:slug" are auth-aware dispatchers between the two
+// worlds. Legacy /portal* and ?tab=… URLs redirect to the new structure.
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
 import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
@@ -21,8 +24,10 @@ import { CaseStudiesPage } from "@/pages/case-studies/CaseStudiesPage/CaseStudie
 import { SignInPage } from "@/pages/auth/SignInPage/SignInPage";
 import { SignUpPage } from "@/pages/auth/SignUpPage/SignUpPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage/ForgotPasswordPage";
+import { AttentionPage } from "@/pages/attention/AttentionPage/AttentionPage";
 import { SitesPage } from "@/pages/sites/SitesPage/SitesPage";
 import { SiteDetailPage } from "@/pages/sites/SiteDetailPage/SiteDetailPage";
+import { MapPage } from "@/pages/map/MapPage/MapPage";
 import { ReportsLibraryPage } from "@/pages/reports/ReportsLibraryPage/ReportsLibraryPage";
 import { ReportViewerPage } from "@/pages/reports/ReportViewerPage/ReportViewerPage";
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
@@ -33,14 +38,16 @@ import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 export function App() {
   return (
     <Routes>
+      {/* Auth-aware dispatchers between the marketing and app shells. */}
+      <Route path="/" element={<RootPage />} />
+      <Route path="services/:slug" element={<ServiceRoute />} />
+
+      {/* Public/marketing pages: top-bar layout. */}
       <Route element={<AppLayout />}>
-        <Route index element={<RootPage />} />
         {/* Marketing homepage stays reachable for signed-in users
-            (Explore menu -> Home). */}
+            (account menu -> Explore -> Home). */}
         <Route path="home" element={<HomePage />} />
         <Route path="services" element={<ServicesPage />} />
-        {/* Marketing slug or engagement UUID — the dispatcher decides. */}
-        <Route path="services/:slug" element={<ServiceRoute />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="technology" element={<TechnologyPage />} />
         <Route path="industries" element={<IndustriesPage />} />
@@ -62,36 +69,19 @@ export function App() {
           }
         />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
 
-        {/* Signed-in areas: real places, not tabs. */}
-        <Route element={<PortalShell />}>
-          <Route path="sites" element={<SitesPage />} />
-          <Route path="sites/:slug" element={<SiteDetailPage />} />
-          <Route path="reports" element={<ReportsLibraryPage />} />
-          <Route path="reports/:id" element={<ReportViewerPage />} />
-          <Route path="requests/new" element={<NewRequestPage />} />
-          <Route path="account" element={<AccountPage />} />
-        </Route>
-
-        {/* Legacy URLs from the projects/results era. */}
-        <Route path="portal" element={<LegacyPortalRedirect />} />
-        <Route
-          path="portal/projects"
-          element={<Navigate to="/sites" replace />}
-        />
-        <Route
-          path="portal/projects/:slug"
-          element={<LegacyProjectRedirect />}
-        />
-        <Route
-          path="portal/requests/new"
-          element={<Navigate to="/requests/new" replace />}
-        />
-        <Route
-          path="portal/account"
-          element={<Navigate to="/account" replace />}
-        />
-
+      {/* Signed-in app: sidebar shell. Real places, not tabs. */}
+      <Route element={<PortalShell />}>
+        <Route path="attention" element={<AttentionPage />} />
+        <Route path="sites" element={<SitesPage />} />
+        <Route path="sites/:slug" element={<SiteDetailPage />} />
+        <Route path="map" element={<MapPage />} />
+        <Route path="reports" element={<ReportsLibraryPage />} />
+        <Route path="reports/:id" element={<ReportViewerPage />} />
+        <Route path="requests/new" element={<NewRequestPage />} />
+        <Route path="account" element={<AccountPage />} />
         <Route
           path="admin"
           element={
@@ -100,9 +90,20 @@ export function App() {
             </AdminRoute>
           }
         />
-
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
+
+      {/* Legacy URLs from the projects/results era. */}
+      <Route path="portal" element={<LegacyPortalRedirect />} />
+      <Route path="portal/projects" element={<Navigate to="/sites" replace />} />
+      <Route path="portal/projects/:slug" element={<LegacyProjectRedirect />} />
+      <Route
+        path="portal/requests/new"
+        element={<Navigate to="/requests/new" replace />}
+      />
+      <Route
+        path="portal/account"
+        element={<Navigate to="/account" replace />}
+      />
     </Routes>
   );
 }

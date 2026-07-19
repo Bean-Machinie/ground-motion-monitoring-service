@@ -56,37 +56,13 @@ export const NAV_ITEMS: NavItem[] = [
   { kind: "link", label: "Contact", to: "/#contact" },
 ];
 
-/** Nav for signed-in users: portal-first, with the public site collected
-    under a single Explore menu (GitHub-style app view). */
-export const PORTAL_NAV_ITEMS: NavItem[] = [
-  { kind: "link", label: "Workspace", to: "/", end: true },
-  { kind: "link", label: "Sites", to: "/sites" },
-  { kind: "link", label: "Reports", to: "/reports" },
-  { kind: "link", label: "New Request", to: "/requests/new" },
-  {
-    kind: "menu",
-    id: "explore",
-    label: "Explore",
-    items: [
-      {
-        label: "Home",
-        to: "/home",
-        icon: "lighthouse",
-        // The lighthouse artwork is tall and narrow, so it needs a larger
-        // render size to read as big as the other (square-ish) icons.
-        iconSize: 30,
-        dividerBelow: true,
-      },
-      {
-        label: "View Services",
-        to: "/services",
-        icon: "box",
-        dividerBelow: true,
-      },
-      { label: "InSAR Technology", to: "/technology", icon: "satellite" },
-      { label: "Industries", to: "/industries", icon: "globe" },
-      { label: "Case Studies", to: "/case-studies", icon: "push-pin" },
-      { label: "About", to: "/about", icon: "user-group" },
-    ],
-  },
+/** Explore/marketing links for signed-in users. These no longer live in
+    app navigation — the sidebar's account menu holds them. */
+export const EXPLORE_MENU_ENTRIES: NavMenuEntry[] = [
+  { label: "Home", to: "/home", icon: "lighthouse" },
+  { label: "View Services", to: "/services", icon: "box" },
+  { label: "InSAR Technology", to: "/technology", icon: "satellite" },
+  { label: "Industries", to: "/industries", icon: "globe" },
+  { label: "Case Studies", to: "/case-studies", icon: "push-pin" },
+  { label: "About", to: "/about", icon: "user-group" },
 ];

@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
 import { useProfile } from "@/hooks/useProfile";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { Card } from "@/components/ui/Card/Card";
 import { Button } from "@/components/ui/Button/Button";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -69,10 +70,11 @@ export function AccountPage() {
 
   return (
     <div className={styles.page}>
-      <header>
-        <h1>Account</h1>
-        <p className={styles.lede}>Your profile and account details.</p>
-      </header>
+      <PortalPageHeader
+        crumbs={[{ label: "Workspace", to: "/" }, { label: "Settings" }]}
+        title="Account settings"
+        lede="Your profile and account details."
+      />
 
       <Card>
         <form className={styles.form} onSubmit={(e) => void handleSubmit(e)}>

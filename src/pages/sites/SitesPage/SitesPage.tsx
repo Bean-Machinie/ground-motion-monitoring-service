@@ -1,8 +1,8 @@
 // Sites index: image cards for every physical area of interest, with
 // the engagements running on each.
 import { Link } from "react-router-dom";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
+import { usePortalData } from "@/context/PortalDataContext";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -17,22 +17,19 @@ import styles from "./SitesPage.module.css";
 const SITE_IMAGES = [siteImageA, siteImageB, siteImageC];
 
 export function SitesPage() {
-  const { sites, loading, error, refetch } = useSites();
-  const { services, loading: servicesLoading } = useServices();
+  const { sites, services, loading, error, refetch } = usePortalData();
 
-  if (loading || servicesLoading) {
+  if (loading) {
     return <LoadingState label="Loading your sites…" />;
   }
 
   return (
     <div className={styles.page}>
-      <header>
-        <h1>Sites</h1>
-        <p className={styles.lede}>
-          The physical areas of interest covered by your screenings and
-          monitoring subscriptions.
-        </p>
-      </header>
+      <PortalPageHeader
+        crumbs={[{ label: "Workspace", to: "/" }, { label: "Sites" }]}
+        title="Sites"
+        lede="The physical areas of interest covered by your screenings and monitoring subscriptions."
+      />
 
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 

@@ -3,11 +3,8 @@
 // with the alert history alongside. Screening: redirects to its single
 // report when there is exactly one.
 import { Link, Navigate, useParams } from "react-router-dom";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
-import { useReports } from "@/hooks/useReports";
-import { useAlerts } from "@/hooks/useAlerts";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs/Breadcrumbs";
+import { usePortalData } from "@/context/PortalDataContext";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { Card } from "@/components/ui/Card/Card";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
@@ -28,12 +25,9 @@ export function ServiceEngagementPage() {
   // engagement UUID arrives as either param name.
   const params = useParams<{ id?: string; slug?: string }>();
   const id = params.id ?? params.slug;
-  const { sites, loading: sitesLoading } = useSites();
-  const { services, loading: servicesLoading } = useServices();
-  const { reports, loading: reportsLoading } = useReports();
-  const { alerts, loading: alertsLoading } = useAlerts();
+  const { sites, services, reports, alerts, loading } = usePortalData();
 
-  if (sitesLoading || servicesLoading || reportsLoading || alertsLoading) {
+  if (loading) {
     return <LoadingState label="Loading engagement…" />;
   }
 
@@ -61,32 +55,23 @@ export function ServiceEngagementPage() {
 
   return (
     <div className={styles.page}>
-      <Breadcrumbs
-        items={[
-          { label: "Workspace", to: "/" },
+      <PortalPageHeader
+        crumbs={[
+          { label: "Sites", to: "/sites" },
           ...(site ? [{ label: site.name, to: `/sites/${site.slug}` }] : []),
           { label: SERVICE_KIND_LABELS[service.kind] },
         ]}
+        title={`${SERVICE_KIND_LABELS[service.kind]}${site ? ` — ${site.name}` : ""}`}
+        pill={{
+          status: service.status,
+          label: SERVICE_STATUS_LABELS[service.status],
+        }}
+        lede={`${TECHNIQUE_LABELS[service.technique]}${
+          service.kind === "monitoring" && service.cadence
+            ? " · Quarterly issues"
+            : ""
+        }`}
       />
-
-      <header className={styles.header}>
-        <div>
-          <h1>
-            {SERVICE_KIND_LABELS[service.kind]}
-            {site ? ` — ${site.name}` : ""}
-          </h1>
-          <p className={styles.lede}>
-            {TECHNIQUE_LABELS[service.technique]}
-            {service.kind === "monitoring" && service.cadence
-              ? " · Quarterly issues"
-              : ""}
-          </p>
-        </div>
-        <StatusBadge
-          status={service.status}
-          label={SERVICE_STATUS_LABELS[service.status]}
-        />
-      </header>
 
       <Card className={styles.metaCard}>
         <dl className={styles.meta}>

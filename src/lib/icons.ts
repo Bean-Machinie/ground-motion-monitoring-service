@@ -15,8 +15,16 @@ import box from "@/assets/icons/box.svg";
 import desktop from "@/assets/icons/desktop.svg";
 import pushPin from "@/assets/icons/push-pin.svg";
 import lighthouse from "@/assets/icons/lighthouse.svg";
+import add from "@/assets/icons/add.svg";
+import warning from "@/assets/icons/warning.svg";
+import cross from "@/assets/icons/cross.svg";
+import arrow from "@/assets/icons/arrow.svg";
 
 export const ICONS = {
+  add,
+  warning,
+  cross,
+  arrow,
   satellite,
   graph,
   profile,

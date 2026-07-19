@@ -1,13 +1,12 @@
 // Signed-in workspace, ordered by what needs attention rather than by
 // table: needs-attention items, latest published reports, and the org's
 // services grouped by product format — all as clean clickable cards.
-import { useMemo } from "react";
+// Data comes from the shell-level portal context (fetched once).
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
-import { useReports } from "@/hooks/useReports";
-import { useAlerts } from "@/hooks/useAlerts";
+import { usePortalData } from "@/context/PortalDataContext";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
+import { AttentionList } from "@/components/portal/AttentionList/AttentionList";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
@@ -47,26 +46,18 @@ function reportTitle(report: Report): string {
 
 export function WorkspacePage() {
   const { profile } = useProfile();
-  const { sites, loading: sitesLoading } = useSites();
   const {
     services,
-    loading: servicesLoading,
-    error: servicesError,
-    refetch: refetchServices,
-  } = useServices();
-  const { reports, loading: reportsLoading } = useReports();
-  const { alerts, loading: alertsLoading } = useAlerts();
+    reports,
+    loading,
+    error,
+    refetch,
+    siteById,
+    serviceById,
+    attention,
+  } = usePortalData();
 
   const [searchParams] = useSearchParams();
-
-  const siteById = useMemo(
-    () => new Map(sites.map((s) => [s.id, s])),
-    [sites],
-  );
-  const serviceById = useMemo(
-    () => new Map(services.map((s) => [s.id, s])),
-    [services],
-  );
 
   // Redirect legacy tab URLs to their new homes.
   const legacyTab = searchParams.get("tab");
@@ -74,26 +65,14 @@ export function WorkspacePage() {
     return <Navigate to={LEGACY_TAB_ROUTES[legacyTab] ?? "/"} replace />;
   }
 
-  if (sitesLoading || servicesLoading || reportsLoading || alertsLoading) {
+  if (loading) {
     return <LoadingState label="Loading your workspace…" />;
   }
 
+  const attentionCount = attention.count;
+
   const siteNameForService = (service: Service | undefined) =>
     service ? (siteById.get(service.site_id)?.name ?? "—") : "—";
-
-  // --------------------------- Needs attention ---------------------------
-  const today = new Date().toISOString().slice(0, 10);
-  const unacknowledgedAlerts = alerts.filter((a) => !a.acknowledged_at);
-  const failedReports = reports.filter((r) => r.state === "failed");
-  const overdueServices = services.filter(
-    (s) =>
-      s.kind === "monitoring" &&
-      s.status === "active" &&
-      s.next_issue_due !== null &&
-      s.next_issue_due < today,
-  );
-  const attentionCount =
-    unacknowledgedAlerts.length + failedReports.length + overdueServices.length;
 
   // ---------------------------- Latest reports ---------------------------
   const latestReports = reports
@@ -108,119 +87,27 @@ export function WorkspacePage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.pageHeader}>
-        <div>
-          <h1>Workspace</h1>
-          <p className={styles.lede}>
-            Welcome back, {displayName} — your screenings, monitoring
-            subscriptions, and delivered reports.
-          </p>
-        </div>
-        <Link to="/requests/new" className={styles.newRequest}>
-          New Request
-        </Link>
-      </header>
+      <PortalPageHeader
+        title="Workspace"
+        lede={`Welcome back, ${displayName} — your screenings, monitoring subscriptions, and delivered reports.`}
+      />
 
-      {servicesError ? (
-        <ErrorMessage message={servicesError} onRetry={refetchServices} />
-      ) : null}
+      {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 
       {/* ------------------------- Needs attention ---------------------- */}
       <section aria-labelledby="attention-heading" className={styles.section}>
-        <h2 id="attention-heading" className={styles.sectionTitle}>
-          Needs attention
-        </h2>
+        <div className={styles.sectionHeader}>
+          <h2 id="attention-heading" className={styles.sectionTitle}>
+            Needs attention
+          </h2>
+          {attentionCount > 0 ? (
+            <Link to="/attention" className={styles.inlineLink}>
+              View all →
+            </Link>
+          ) : null}
+        </div>
 
-        {attentionCount === 0 ? (
-          <p className={styles.allClear}>
-            All clear — nothing needs your attention.
-          </p>
-        ) : (
-          <ul className={styles.attentionList}>
-            {unacknowledgedAlerts.map((alert) => {
-              const service = serviceById.get(alert.service_id);
-              return (
-                <li key={alert.id}>
-                  <Link
-                    to={`/services/${alert.service_id}`}
-                    className={`${styles.attentionCard} ${
-                      alert.severity === "critical"
-                        ? styles.attentionDanger
-                        : styles.attentionWarning
-                    }`}
-                  >
-                    <span className={styles.attentionIcon} aria-hidden="true">
-                      <AppIcon name="bell" size={20} />
-                    </span>
-                    <span className={styles.attentionBody}>
-                      <span className={styles.attentionTitle}>
-                        {alert.summary ?? "Change detected"}
-                      </span>
-                      <span className={styles.attentionMeta}>
-                        {siteNameForService(service)} ·{" "}
-                        {formatDate(alert.detected_at)}
-                      </span>
-                    </span>
-                    <span className={styles.cardArrow} aria-hidden="true">
-                      →
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-            {failedReports.map((report) => {
-              const service = serviceById.get(report.service_id);
-              return (
-                <li key={report.id}>
-                  <Link
-                    to={`/reports/${report.id}`}
-                    className={`${styles.attentionCard} ${styles.attentionDanger}`}
-                  >
-                    <span className={styles.attentionIcon} aria-hidden="true">
-                      <AppIcon name="file" size={20} />
-                    </span>
-                    <span className={styles.attentionBody}>
-                      <span className={styles.attentionTitle}>
-                        Report failed — {reportTitle(report)}
-                      </span>
-                      <span className={styles.attentionMeta}>
-                        {siteNameForService(service)} ·{" "}
-                        {formatDate(report.updated_at)}
-                      </span>
-                    </span>
-                    <span className={styles.cardArrow} aria-hidden="true">
-                      →
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-            {overdueServices.map((service) => (
-              <li key={service.id}>
-                <Link
-                  to={`/services/${service.id}`}
-                  className={`${styles.attentionCard} ${styles.attentionWarning}`}
-                >
-                  <span className={styles.attentionIcon} aria-hidden="true">
-                    <AppIcon name="desktop" size={20} />
-                  </span>
-                  <span className={styles.attentionBody}>
-                    <span className={styles.attentionTitle}>
-                      Next issue overdue
-                    </span>
-                    <span className={styles.attentionMeta}>
-                      {siteNameForService(service)} · Due{" "}
-                      {formatDate(service.next_issue_due)}
-                    </span>
-                  </span>
-                  <span className={styles.cardArrow} aria-hidden="true">
-                    →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        <AttentionList />
       </section>
 
       {/* -------------------------- Latest reports ---------------------- */}

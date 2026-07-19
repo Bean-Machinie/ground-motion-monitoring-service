@@ -2,20 +2,18 @@
 // guidance via the contact block. Self-service requests come later.
 import { Link } from "react-router-dom";
 import { site } from "@/config/site";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import styles from "./NewRequestPage.module.css";
 
 export function NewRequestPage() {
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <p className={styles.kicker}>New Request</p>
-        <h1>How would you like to start?</h1>
-        <p className={styles.lede}>
-          Talk to our team to find the right ground motion service for your
-          project.
-        </p>
-      </header>
+      <PortalPageHeader
+        crumbs={[{ label: "Workspace", to: "/" }, { label: "New request" }]}
+        title="How would you like to start?"
+        lede="Talk to our team to find the right ground motion service for your project."
+      />
 
       <article className={styles.card}>
         <span className={styles.cardIcon} aria-hidden="true">

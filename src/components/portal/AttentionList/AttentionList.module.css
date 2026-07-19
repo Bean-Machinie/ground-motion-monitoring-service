@@ -1,0 +1,98 @@
+.allClear {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-success-soft);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.attentionList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Severity-accented card: colored left cut + tinted icon chip. */
+.attentionCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  transition:
+    transform 180ms var(--ease-nav),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.attentionCard:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.attentionCard:hover .cardArrow {
+  transform: translateX(3px);
+  color: var(--color-text);
+}
+
+.attentionDanger {
+  border-left-color: var(--color-danger);
+}
+
+.attentionWarning {
+  border-left-color: var(--color-accent-amber);
+}
+
+.attentionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-muted);
+}
+
+.attentionDanger .attentionIcon {
+  background-color: var(--color-danger-soft);
+}
+
+.attentionWarning .attentionIcon {
+  background-color: var(--color-warning-soft);
+}
+
+.attentionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.attentionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.attentionMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.cardArrow {
+  color: var(--color-text-subtle);
+  transition: transform 160ms var(--ease-nav), color 160ms ease;
+}

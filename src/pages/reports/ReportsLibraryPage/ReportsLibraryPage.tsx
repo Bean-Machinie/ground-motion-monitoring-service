@@ -1,10 +1,9 @@
 // Report library: every issue across all services as clean clickable
 // cards, filterable by site, service kind, report kind, and period.
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
-import { useReports } from "@/hooks/useReports";
+import { usePortalData } from "@/context/PortalDataContext";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -39,20 +38,13 @@ function periodCutoff(period: string): string | null {
 }
 
 export function ReportsLibraryPage() {
-  const { sites, loading: sitesLoading } = useSites();
-  const { services, loading: servicesLoading } = useServices();
-  const { reports, loading, error, refetch } = useReports();
+  const { sites, reports, loading, error, refetch, siteById, serviceById } =
+    usePortalData();
 
   const [siteFilter, setSiteFilter] = useState<string>(ALL);
   const [serviceKindFilter, setServiceKindFilter] = useState<string>(ALL);
   const [reportKindFilter, setReportKindFilter] = useState<string>(ALL);
   const [period, setPeriod] = useState<string>(ALL);
-
-  const serviceById = useMemo(
-    () => new Map(services.map((s) => [s.id, s])),
-    [services],
-  );
-  const siteById = useMemo(() => new Map(sites.map((s) => [s.id, s])), [sites]);
 
   const cutoff = periodCutoff(period);
   const filtered = reports.filter((report) => {
@@ -76,19 +68,17 @@ export function ReportsLibraryPage() {
     return true;
   });
 
-  if (loading || sitesLoading || servicesLoading) {
+  if (loading) {
     return <LoadingState label="Loading your reports…" />;
   }
 
   return (
     <div className={styles.page}>
-      <header>
-        <h1>Reports</h1>
-        <p className={styles.lede}>
-          Every screening report and monitoring issue delivered to your
-          account, in one place.
-        </p>
-      </header>
+      <PortalPageHeader
+        crumbs={[{ label: "Workspace", to: "/" }, { label: "Reports" }]}
+        title="Reports"
+        lede="Every screening report and monitoring issue delivered to your account, in one place."
+      />
 
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 

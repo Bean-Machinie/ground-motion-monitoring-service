@@ -12,7 +12,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { site } from "@/config/site";
 import {
   NAV_ITEMS,
-  PORTAL_NAV_ITEMS,
+  type NavItem,
   type NavMenuEntry,
 } from "@/config/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -61,8 +61,12 @@ export function TopPanel() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Signed-in users get the portal-first nav (GitHub-style app view).
-  const navItems = user ? PORTAL_NAV_ITEMS : NAV_ITEMS;
+  // The top panel is marketing chrome only — the signed-in app uses the
+  // sidebar shell. Signed-in visitors browsing marketing pages get one
+  // extra "Workspace" link back into the app.
+  const navItems: NavItem[] = user
+    ? [{ kind: "link", label: "Workspace", to: "/", end: true }, ...NAV_ITEMS]
+    : NAV_ITEMS;
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -123,11 +127,15 @@ export function TopPanel() {
     [],
   );
 
-  // While a menu is open the highlight sticks under its trigger.
+  // While a menu is open the highlight sticks under its trigger. When the
+  // menu closes and the pointer is no longer over the nav (e.g. it was
+  // dismissed by clicking elsewhere), the highlight hides again.
   useEffect(() => {
     if (isMobile) return;
     if (openMenuId) {
       moveHighlightTo(triggerRefs.current.get(openMenuId));
+    } else if (!navListRef.current?.matches(":hover")) {
+      setHighlight((h) => ({ ...h, visible: false }));
     }
   }, [openMenuId, isMobile, moveHighlightTo]);
 

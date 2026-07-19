@@ -1,11 +1,12 @@
 // Auth-aware root route ("/"), GitHub-style: signed-out visitors get the
-// marketing homepage; signed-in users get their portal dashboard directly.
-// The /portal URLs keep working unchanged.
+// marketing homepage in the top-bar layout; signed-in users get their
+// workspace inside the sidebar shell.
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
+import { AppLayout } from "@/components/layout/AppLayout/AppLayout";
+import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 import { HomePage } from "@/pages/home/HomePage";
 import { WorkspacePage } from "@/pages/workspace/WorkspacePage/WorkspacePage";
-import portalStyles from "@/components/layout/PortalShell/PortalShell.module.css";
 
 export function RootPage() {
   const { user, loading } = useAuth();
@@ -16,11 +17,15 @@ export function RootPage() {
 
   if (user) {
     return (
-      <div className={`container ${portalStyles.content}`}>
+      <PortalShell>
         <WorkspacePage />
-      </div>
+      </PortalShell>
     );
   }
 
-  return <HomePage />;
+  return (
+    <AppLayout>
+      <HomePage />
+    </AppLayout>
+  );
 }

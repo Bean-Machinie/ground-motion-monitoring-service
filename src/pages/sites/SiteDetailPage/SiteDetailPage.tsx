@@ -2,10 +2,8 @@
 // and a chronological timeline of every service and report issue on it.
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useSites } from "@/hooks/useSites";
-import { useServices } from "@/hooks/useServices";
-import { useReports } from "@/hooks/useReports";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs/Breadcrumbs";
+import { usePortalData } from "@/context/PortalDataContext";
+import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { Card } from "@/components/ui/Card/Card";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -33,9 +31,7 @@ interface TimelineEvent {
 
 export function SiteDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { sites, loading, error, refetch } = useSites();
-  const { services, loading: servicesLoading } = useServices();
-  const { reports, loading: reportsLoading } = useReports();
+  const { sites, services, reports, loading, error, refetch } = usePortalData();
 
   const site = sites.find((s) => s.slug === slug);
 
@@ -70,7 +66,7 @@ export function SiteDetailPage() {
     );
   }, [site, services, reports]);
 
-  if (loading || servicesLoading || reportsLoading) {
+  if (loading) {
     return <LoadingState label="Loading site…" />;
   }
 
@@ -93,21 +89,17 @@ export function SiteDetailPage() {
 
   return (
     <div className={styles.page}>
-      <Breadcrumbs
-        items={[
+      <PortalPageHeader
+        crumbs={[
           { label: "Workspace", to: "/" },
           { label: "Sites", to: "/sites" },
           { label: site.name },
         ]}
+        title={site.name}
+        lede={`${site.country ?? "Location not specified"}${
+          site.description ? ` — ${site.description}` : ""
+        }`}
       />
-
-      <header>
-        <h1>{site.name}</h1>
-        <p className={styles.lede}>
-          {site.country ?? "Location not specified"}
-          {site.description ? ` — ${site.description}` : ""}
-        </p>
-      </header>
 
       <div className={styles.detailGrid}>
         <Card className={styles.locationCard}>
