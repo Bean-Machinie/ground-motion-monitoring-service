@@ -1,14 +1,15 @@
-// Report library: every issue across all services, filterable by site,
-// service kind, report kind, and date range. The page that makes an
-// ongoing subscription feel like it accumulates value.
+// Report library: every issue across all services as clean clickable
+// cards, filterable by site, service kind, report kind, and period.
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSites } from "@/hooks/useSites";
 import { useServices } from "@/hooks/useServices";
 import { useReports } from "@/hooks/useReports";
+import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
+import { Select } from "@/components/ui/Select/Select";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
 import {
   REPORT_KIND_LABELS,
@@ -22,6 +23,21 @@ import styles from "./ReportsLibraryPage.module.css";
 
 const ALL = "all";
 
+const PERIOD_OPTIONS = [
+  { value: ALL, label: "Any time" },
+  { value: "30", label: "Last 30 days" },
+  { value: "90", label: "Last quarter" },
+  { value: "365", label: "Last 12 months" },
+] as const;
+
+function periodCutoff(period: string): string | null {
+  if (period === ALL) return null;
+  const days = Number(period);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return cutoff.toISOString();
+}
+
 export function ReportsLibraryPage() {
   const { sites, loading: sitesLoading } = useSites();
   const { services, loading: servicesLoading } = useServices();
@@ -30,8 +46,7 @@ export function ReportsLibraryPage() {
   const [siteFilter, setSiteFilter] = useState<string>(ALL);
   const [serviceKindFilter, setServiceKindFilter] = useState<string>(ALL);
   const [reportKindFilter, setReportKindFilter] = useState<string>(ALL);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [period, setPeriod] = useState<string>(ALL);
 
   const serviceById = useMemo(
     () => new Map(services.map((s) => [s.id, s])),
@@ -39,6 +54,7 @@ export function ReportsLibraryPage() {
   );
   const siteById = useMemo(() => new Map(sites.map((s) => [s.id, s])), [sites]);
 
+  const cutoff = periodCutoff(period);
   const filtered = reports.filter((report) => {
     const service = serviceById.get(report.service_id);
     if (siteFilter !== ALL && service?.site_id !== siteFilter) return false;
@@ -54,9 +70,9 @@ export function ReportsLibraryPage() {
     ) {
       return false;
     }
-    const date = report.published_at ?? report.created_at;
-    if (fromDate && date.slice(0, 10) < fromDate) return false;
-    if (toDate && date.slice(0, 10) > toDate) return false;
+    if (cutoff && (report.published_at ?? report.created_at) < cutoff) {
+      return false;
+    }
     return true;
   });
 
@@ -77,68 +93,47 @@ export function ReportsLibraryPage() {
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 
       <div className={styles.filterBar}>
-        <label className={styles.filter}>
-          <span>Site</span>
-          <select
-            value={siteFilter}
-            onChange={(e) => setSiteFilter(e.target.value)}
-          >
-            <option value={ALL}>All sites</option>
-            {sites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.filter}>
-          <span>Service</span>
-          <select
-            value={serviceKindFilter}
-            onChange={(e) => setServiceKindFilter(e.target.value)}
-          >
-            <option value={ALL}>All services</option>
-            {(Object.keys(SERVICE_KIND_LABELS) as ServiceKind[]).map((k) => (
-              <option key={k} value={k}>
-                {SERVICE_KIND_LABELS[k]}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.filter}>
-          <span>Report kind</span>
-          <select
-            value={reportKindFilter}
-            onChange={(e) => setReportKindFilter(e.target.value)}
-          >
-            <option value={ALL}>All kinds</option>
-            {(Object.keys(REPORT_KIND_LABELS) as ReportKind[]).map((k) => (
-              <option key={k} value={k}>
-                {REPORT_KIND_LABELS[k]}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.filter}>
-          <span>From</span>
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-          />
-        </label>
-
-        <label className={styles.filter}>
-          <span>To</span>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-          />
-        </label>
+        <Select
+          label="Site"
+          value={siteFilter}
+          onChange={setSiteFilter}
+          options={[
+            { value: ALL, label: "All sites" },
+            ...sites.map((site) => ({ value: site.id, label: site.name })),
+          ]}
+        />
+        <Select
+          label="Service"
+          value={serviceKindFilter}
+          onChange={setServiceKindFilter}
+          options={[
+            { value: ALL, label: "All services" },
+            ...(Object.keys(SERVICE_KIND_LABELS) as ServiceKind[]).map(
+              (k) => ({ value: k, label: SERVICE_KIND_LABELS[k] }),
+            ),
+          ]}
+        />
+        <Select
+          label="Report kind"
+          value={reportKindFilter}
+          onChange={setReportKindFilter}
+          options={[
+            { value: ALL, label: "All kinds" },
+            ...(Object.keys(REPORT_KIND_LABELS) as ReportKind[]).map((k) => ({
+              value: k,
+              label: REPORT_KIND_LABELS[k],
+            })),
+          ]}
+        />
+        <Select
+          label="Period"
+          value={period}
+          onChange={setPeriod}
+          options={[...PERIOD_OPTIONS]}
+        />
+        <span className={styles.filterCount}>
+          {filtered.length} of {reports.length}
+        </span>
       </div>
 
       {reports.length === 0 ? (
@@ -149,35 +144,46 @@ export function ReportsLibraryPage() {
       ) : filtered.length === 0 ? (
         <EmptyState
           title="No reports match these filters"
-          description="Try widening the site, kind, or date range filters."
+          description="Try widening the site, kind, or period filters."
         />
       ) : (
-        <ul className={styles.list}>
+        <ul className={styles.cardGrid}>
           {filtered.map((report) => {
             const service = serviceById.get(report.service_id);
             const site = service ? siteById.get(service.site_id) : undefined;
             return (
               <li key={report.id}>
-                <Link to={`/reports/${report.id}`} className={styles.item}>
-                  <div className={styles.itemMain}>
-                    <span className={styles.itemTitle}>
-                      {report.headline ??
-                        `${REPORT_KIND_LABELS[report.kind]} #${report.issue_number}`}
+                <Link to={`/reports/${report.id}`} className={styles.card}>
+                  <div className={styles.cardTop}>
+                    <span className={styles.iconChip} aria-hidden="true">
+                      <AppIcon name="file" size={22} />
                     </span>
-                    <span className={styles.itemMeta}>
-                      {site?.name ?? "—"} ·{" "}
-                      {service ? SERVICE_KIND_LABELS[service.kind] : "—"} ·{" "}
-                      {REPORT_KIND_LABELS[report.kind]} · Issue{" "}
-                      {report.issue_number}
+                    <StatusBadge
+                      status={report.state}
+                      label={REPORT_STATE_LABELS[report.state]}
+                    />
+                  </div>
+
+                  <p className={styles.kicker}>
+                    {REPORT_KIND_LABELS[report.kind]} · Issue{" "}
+                    {report.issue_number}
+                  </p>
+                  <h3 className={styles.cardTitle}>
+                    {report.headline ??
+                      `${REPORT_KIND_LABELS[report.kind]} #${report.issue_number}`}
+                  </h3>
+                  <p className={styles.cardSite}>{site?.name ?? "—"}</p>
+
+                  <div className={styles.cardFooter}>
+                    <span className={styles.cardDate}>
+                      {report.published_at
+                        ? formatDate(report.published_at)
+                        : "Not yet published"}
+                    </span>
+                    <span className={styles.cardArrow} aria-hidden="true">
+                      →
                     </span>
                   </div>
-                  <span className={styles.itemDate}>
-                    {formatDate(report.published_at)}
-                  </span>
-                  <StatusBadge
-                    status={report.state}
-                    label={REPORT_STATE_LABELS[report.state]}
-                  />
                 </Link>
               </li>
             );

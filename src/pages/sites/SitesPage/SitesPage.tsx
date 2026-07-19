@@ -1,13 +1,20 @@
-// Sites index: every physical area of interest the org has, with a count
-// of engagements on each.
+// Sites index: image cards for every physical area of interest, with
+// the engagements running on each.
 import { Link } from "react-router-dom";
 import { useSites } from "@/hooks/useSites";
 import { useServices } from "@/hooks/useServices";
+import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
 import { SERVICE_KIND_LABELS } from "@/types/domain";
+import siteImageA from "@/assets/images/offering-deformation.jpg";
+import siteImageB from "@/assets/images/offering-risk.jpg";
+import siteImageC from "@/assets/images/offering-research.jpg";
 import styles from "./SitesPage.module.css";
+
+/* Generic site visuals, assigned deterministically per card. */
+const SITE_IMAGES = [siteImageA, siteImageB, siteImageC];
 
 export function SitesPage() {
   const { sites, loading, error, refetch } = useSites();
@@ -37,25 +44,45 @@ export function SitesPage() {
       ) : null}
 
       {sites.length > 0 ? (
-        <ul className={styles.list}>
-          {sites.map((site) => {
+        <ul className={styles.cardGrid}>
+          {sites.map((site, index) => {
             const siteServices = services.filter((s) => s.site_id === site.id);
             return (
               <li key={site.id}>
-                <Link to={`/sites/${site.slug}`} className={styles.item}>
-                  <div className={styles.itemMain}>
-                    <span className={styles.itemName}>{site.name}</span>
-                    <span className={styles.itemMeta}>
-                      {site.country ?? "—"}
-                    </span>
+                <Link to={`/sites/${site.slug}`} className={styles.card}>
+                  <div className={styles.cardMedia}>
+                    <img
+                      src={SITE_IMAGES[index % SITE_IMAGES.length]}
+                      alt=""
+                      className={styles.cardImage}
+                      loading="lazy"
+                    />
                   </div>
-                  <span className={styles.itemServices}>
-                    {siteServices.length === 0
-                      ? "No services"
-                      : siteServices
-                          .map((s) => SERVICE_KIND_LABELS[s.kind])
-                          .join(" · ")}
-                  </span>
+
+                  <div className={styles.cardBody}>
+                    <p className={styles.kicker}>
+                      <AppIcon name="globe" size={14} />
+                      {site.country ?? "Location not specified"}
+                    </p>
+                    <h3 className={styles.cardTitle}>{site.name}</h3>
+
+                    <div className={styles.cardFooter}>
+                      <span className={styles.chips}>
+                        {siteServices.length === 0 ? (
+                          <span className={styles.chipMuted}>No services</span>
+                        ) : (
+                          siteServices.map((s) => (
+                            <span key={s.id} className={styles.chip}>
+                              {SERVICE_KIND_LABELS[s.kind]}
+                            </span>
+                          ))
+                        )}
+                      </span>
+                      <span className={styles.cardArrow} aria-hidden="true">
+                        →
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               </li>
             );

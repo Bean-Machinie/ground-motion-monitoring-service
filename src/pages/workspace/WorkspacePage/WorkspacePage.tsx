@@ -1,6 +1,6 @@
 // Signed-in workspace, ordered by what needs attention rather than by
 // table: needs-attention items, latest published reports, and the org's
-// services grouped by product format.
+// services grouped by product format — all as clean clickable cards.
 import { useMemo } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
@@ -8,12 +8,12 @@ import { useSites } from "@/hooks/useSites";
 import { useServices } from "@/hooks/useServices";
 import { useReports } from "@/hooks/useReports";
 import { useAlerts } from "@/hooks/useAlerts";
+import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
 import {
-  ALERT_SEVERITY_LABELS,
   REPORT_KIND_LABELS,
   SERVICE_KIND_LABELS,
   SERVICE_STATUS_LABELS,
@@ -22,6 +22,8 @@ import {
   type Service,
 } from "@/types/domain";
 import { formatDate } from "@/lib/dates";
+import monitoringImage from "@/assets/images/offering-deformation.jpg";
+import screeningImage from "@/assets/images/offering-risk.jpg";
 import styles from "./WorkspacePage.module.css";
 
 /** Legacy ?tab=… URLs map onto the new routes. */
@@ -29,6 +31,11 @@ const LEGACY_TAB_ROUTES: Record<string, string> = {
   overview: "/",
   monitoring: "/",
   reports: "/reports",
+};
+
+const SERVICE_IMAGES: Record<Service["kind"], string> = {
+  monitoring: monitoringImage,
+  screening: screeningImage,
 };
 
 function reportTitle(report: Report): string {
@@ -136,18 +143,26 @@ export function WorkspacePage() {
                 <li key={alert.id}>
                   <Link
                     to={`/services/${alert.service_id}`}
-                    className={styles.attentionItem}
+                    className={`${styles.attentionCard} ${
+                      alert.severity === "critical"
+                        ? styles.attentionDanger
+                        : styles.attentionWarning
+                    }`}
                   >
-                    <StatusBadge
-                      status={alert.severity}
-                      label={ALERT_SEVERITY_LABELS[alert.severity]}
-                    />
-                    <span className={styles.attentionText}>
-                      {alert.summary ?? "Change detected"} —{" "}
-                      {siteNameForService(service)}
+                    <span className={styles.attentionIcon} aria-hidden="true">
+                      <AppIcon name="bell" size={20} />
                     </span>
-                    <span className={styles.attentionMeta}>
-                      {formatDate(alert.detected_at)}
+                    <span className={styles.attentionBody}>
+                      <span className={styles.attentionTitle}>
+                        {alert.summary ?? "Change detected"}
+                      </span>
+                      <span className={styles.attentionMeta}>
+                        {siteNameForService(service)} ·{" "}
+                        {formatDate(alert.detected_at)}
+                      </span>
+                    </span>
+                    <span className={styles.cardArrow} aria-hidden="true">
+                      →
                     </span>
                   </Link>
                 </li>
@@ -159,14 +174,22 @@ export function WorkspacePage() {
                 <li key={report.id}>
                   <Link
                     to={`/reports/${report.id}`}
-                    className={styles.attentionItem}
+                    className={`${styles.attentionCard} ${styles.attentionDanger}`}
                   >
-                    <StatusBadge status="failed" label="Failed" />
-                    <span className={styles.attentionText}>
-                      {reportTitle(report)} — {siteNameForService(service)}
+                    <span className={styles.attentionIcon} aria-hidden="true">
+                      <AppIcon name="file" size={20} />
                     </span>
-                    <span className={styles.attentionMeta}>
-                      {formatDate(report.updated_at)}
+                    <span className={styles.attentionBody}>
+                      <span className={styles.attentionTitle}>
+                        Report failed — {reportTitle(report)}
+                      </span>
+                      <span className={styles.attentionMeta}>
+                        {siteNameForService(service)} ·{" "}
+                        {formatDate(report.updated_at)}
+                      </span>
+                    </span>
+                    <span className={styles.cardArrow} aria-hidden="true">
+                      →
                     </span>
                   </Link>
                 </li>
@@ -176,14 +199,22 @@ export function WorkspacePage() {
               <li key={service.id}>
                 <Link
                   to={`/services/${service.id}`}
-                  className={styles.attentionItem}
+                  className={`${styles.attentionCard} ${styles.attentionWarning}`}
                 >
-                  <StatusBadge status="warning" label="Overdue" />
-                  <span className={styles.attentionText}>
-                    Next issue overdue — {siteNameForService(service)}
+                  <span className={styles.attentionIcon} aria-hidden="true">
+                    <AppIcon name="desktop" size={20} />
                   </span>
-                  <span className={styles.attentionMeta}>
-                    Due {formatDate(service.next_issue_due)}
+                  <span className={styles.attentionBody}>
+                    <span className={styles.attentionTitle}>
+                      Next issue overdue
+                    </span>
+                    <span className={styles.attentionMeta}>
+                      {siteNameForService(service)} · Due{" "}
+                      {formatDate(service.next_issue_due)}
+                    </span>
+                  </span>
+                  <span className={styles.cardArrow} aria-hidden="true">
+                    →
                   </span>
                 </Link>
               </li>
@@ -194,9 +225,16 @@ export function WorkspacePage() {
 
       {/* -------------------------- Latest reports ---------------------- */}
       <section aria-labelledby="latest-heading" className={styles.section}>
-        <h2 id="latest-heading" className={styles.sectionTitle}>
-          Latest reports
-        </h2>
+        <div className={styles.sectionHeader}>
+          <h2 id="latest-heading" className={styles.sectionTitle}>
+            Latest reports
+          </h2>
+          {reports.length > 0 ? (
+            <Link to="/reports" className={styles.inlineLink}>
+              All reports →
+            </Link>
+          ) : null}
+        </div>
 
         {latestReports.length === 0 ? (
           <EmptyState
@@ -204,26 +242,32 @@ export function WorkspacePage() {
             description="When a report issue is published for one of your services, it will appear here."
           />
         ) : (
-          <ul className={styles.reportList}>
+          <ul className={styles.reportGrid}>
             {latestReports.map((report) => {
               const service = serviceById.get(report.service_id);
               return (
                 <li key={report.id}>
                   <Link
                     to={`/reports/${report.id}`}
-                    className={styles.reportItem}
+                    className={styles.reportCard}
                   >
-                    <div className={styles.reportItemMain}>
-                      <span className={styles.reportName}>
-                        {reportTitle(report)}
+                    <span className={styles.reportIcon} aria-hidden="true">
+                      <AppIcon name="file" size={20} />
+                    </span>
+                    <span className={styles.reportKicker}>
+                      {REPORT_KIND_LABELS[report.kind]}
+                    </span>
+                    <span className={styles.reportTitle}>
+                      {reportTitle(report)}
+                    </span>
+                    <span className={styles.reportMeta}>
+                      {siteNameForService(service)}
+                    </span>
+                    <span className={styles.reportFooter}>
+                      <span>{formatDate(report.published_at)}</span>
+                      <span className={styles.cardArrow} aria-hidden="true">
+                        →
                       </span>
-                      <span className={styles.reportMeta}>
-                        {siteNameForService(service)} ·{" "}
-                        {REPORT_KIND_LABELS[report.kind]}
-                      </span>
-                    </div>
-                    <span className={styles.reportDate}>
-                      {formatDate(report.published_at)}
                     </span>
                   </Link>
                 </li>
@@ -231,12 +275,6 @@ export function WorkspacePage() {
             })}
           </ul>
         )}
-
-        {reports.length > 0 ? (
-          <Link to="/reports" className={styles.inlineLink}>
-            All reports →
-          </Link>
-        ) : null}
       </section>
 
       {/* -------------------------- Your services ----------------------- */}
@@ -256,44 +294,50 @@ export function WorkspacePage() {
             }
           />
         ) : (
-          [
-            { kind: "monitoring" as const, list: monitoringServices },
-            { kind: "screening" as const, list: screeningServices },
-          ].map(({ kind, list }) =>
-            list.length > 0 ? (
-              <div key={kind} className={styles.serviceGroup}>
-                <h3 className={styles.serviceGroupTitle}>
-                  {SERVICE_KIND_LABELS[kind]}
-                </h3>
-                <ul className={styles.serviceList}>
-                  {list.map((service) => (
-                    <li key={service.id}>
-                      <Link
-                        to={`/services/${service.id}`}
-                        className={styles.serviceItem}
-                      >
-                        <span className={styles.serviceName}>
-                          {siteById.get(service.site_id)?.name ?? "—"}
+          <ul className={styles.serviceGrid}>
+            {[...monitoringServices, ...screeningServices].map((service) => (
+              <li key={service.id}>
+                <Link
+                  to={`/services/${service.id}`}
+                  className={styles.serviceCard}
+                >
+                  <div className={styles.serviceMedia}>
+                    <img
+                      src={SERVICE_IMAGES[service.kind]}
+                      alt=""
+                      className={styles.serviceImage}
+                      loading="lazy"
+                    />
+                    <span className={styles.serviceKindChip}>
+                      {SERVICE_KIND_LABELS[service.kind]}
+                    </span>
+                  </div>
+                  <div className={styles.serviceBody}>
+                    <p className={styles.serviceKicker}>
+                      {TECHNIQUE_LABELS[service.technique]}
+                    </p>
+                    <h3 className={styles.serviceTitle}>
+                      {siteById.get(service.site_id)?.name ?? "—"}
+                    </h3>
+                    <div className={styles.serviceFooter}>
+                      <StatusBadge
+                        status={service.status}
+                        label={SERVICE_STATUS_LABELS[service.status]}
+                      />
+                      {service.kind === "monitoring" ? (
+                        <span className={styles.serviceNext}>
+                          Next issue {formatDate(service.next_issue_due)}
                         </span>
-                        <span className={styles.serviceMeta}>
-                          {TECHNIQUE_LABELS[service.technique]}
-                        </span>
-                        <StatusBadge
-                          status={service.status}
-                          label={SERVICE_STATUS_LABELS[service.status]}
-                        />
-                        {service.kind === "monitoring" ? (
-                          <span className={styles.serviceMeta}>
-                            Next issue: {formatDate(service.next_issue_due)}
-                          </span>
-                        ) : null}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null,
-          )
+                      ) : null}
+                      <span className={styles.cardArrow} aria-hidden="true">
+                        →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>

@@ -9,91 +9,124 @@
   color: var(--color-text-muted);
 }
 
-/* Filter bar: labelled selects and date inputs on one wrapping row. */
+/* Filter bar: custom selects on one wrapping row, count on the right. */
 .filterBar {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
 }
 
-.filter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-size: var(--font-size-xs);
+.filterCount {
+  margin-left: auto;
+  padding-bottom: var(--space-2);
   color: var(--color-text-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.filter select,
-.filter input {
-  padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: inherit;
   font-size: var(--font-size-sm);
-  text-transform: none;
-  letter-spacing: normal;
+  white-space: nowrap;
 }
 
-.filter select:focus-visible,
-.filter input:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
+/* ------------------------------ Cards -------------------------------- */
 
-.list {
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
 }
 
-.item {
+.card {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-4) var(--space-5) var(--space-4);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  color: var(--color-text);
-}
-
-.item:hover {
-  text-decoration: none;
-  border-color: var(--color-primary);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  transition:
+    transform 180ms var(--ease-nav),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
 }
 
-.itemMain {
-  flex: 1;
-  min-width: 14rem;
+.card:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.cardTop {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
-.itemTitle {
-  font-weight: var(--font-weight-medium);
+.iconChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background-color: rgba(252, 217, 0, 0.16);
 }
 
-.itemMeta {
+.kicker {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cardTitle {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardSite {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.cardDate {
   color: var(--color-text-subtle);
   font-size: var(--font-size-sm);
 }
 
-.itemDate {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+.cardArrow {
+  color: var(--color-text-subtle);
+  transition: transform 160ms var(--ease-nav), color 160ms ease;
+}
+
+.card:hover .cardArrow {
+  transform: translateX(3px);
+  color: var(--color-text);
 }
