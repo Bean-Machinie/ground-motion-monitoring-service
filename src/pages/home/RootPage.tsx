@@ -4,7 +4,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
 import { HomePage } from "@/pages/home/HomePage";
-import { DashboardPage } from "@/pages/portal/DashboardPage/DashboardPage";
+import { WorkspacePage } from "@/pages/workspace/WorkspacePage/WorkspacePage";
 import portalStyles from "@/components/layout/PortalShell/PortalShell.module.css";
 
 export function RootPage() {
@@ -17,7 +17,7 @@ export function RootPage() {
   if (user) {
     return (
       <div className={`container ${portalStyles.content}`}>
-        <DashboardPage />
+        <WorkspacePage />
       </div>
     );
   }

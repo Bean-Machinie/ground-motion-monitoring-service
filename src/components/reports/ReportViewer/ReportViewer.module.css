@@ -1,0 +1,180 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Monitoring-only chrome: previous/next issue navigation. */
+.issueNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+}
+
+.issueNavLink {
+  font-weight: var(--font-weight-medium);
+}
+
+.issueNavDisabled {
+  color: var(--color-text-subtle);
+}
+
+.issueNavCurrent {
+  color: var(--color-text-muted);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.headline {
+  margin: 0;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.metaText {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.supersedes {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-warning-soft);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-warning);
+  font-size: var(--font-size-sm);
+}
+
+.summary {
+  margin: 0;
+  max-width: 48rem;
+  color: var(--color-text-muted);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.artifactList {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.artifactItem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.artifactKind {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.artifactPath {
+  flex: 1;
+  min-width: 12rem;
+  color: var(--color-text-subtle);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  overflow-wrap: anywhere;
+}
+
+.artifactMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.deltaCard {
+  width: 100%;
+}
+
+.deltaText {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.exportRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-5);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.exportButton:hover:not(:disabled) {
+  background-color: rgba(252, 217, 0, 0.13);
+  border-color: #fcd900;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.exportButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.exportNote {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}

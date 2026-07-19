@@ -1,0 +1,227 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.pageHeader h1 {
+  margin-bottom: var(--space-2);
+}
+
+.lede {
+  margin: 0;
+  color: var(--color-text-muted);
+  max-width: 44rem;
+}
+
+/* Yellow CTA, matching the hero/log-in button styling. */
+.newRequest {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  background: #fcd900;
+  color: #111111;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.newRequest:hover {
+  background: #ffe44d;
+  color: #111111;
+  text-decoration: none;
+  transform: scale(1.03);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.inlineLink {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.inlineLink:hover {
+  color: var(--color-primary-dark);
+}
+
+/* ------------------------- Needs attention ---------------------------- */
+
+.allClear {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  width: 100%;
+  background-color: var(--color-success-soft);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.attentionList {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.attentionItem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+}
+
+.attentionItem:hover {
+  text-decoration: none;
+  border-color: var(--color-primary);
+}
+
+.attentionText {
+  flex: 1;
+  min-width: 12rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.attentionMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+/* -------------------------- Latest reports ---------------------------- */
+
+.reportList {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.reportItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+}
+
+.reportItem:hover {
+  text-decoration: none;
+  border-color: var(--color-primary);
+}
+
+.reportItemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reportName {
+  font-weight: var(--font-weight-medium);
+}
+
+.reportMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.reportDate {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* -------------------------- Your services ----------------------------- */
+
+.serviceGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.serviceGroupTitle {
+  margin: 0;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.serviceList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.serviceItem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+}
+
+.serviceItem:hover {
+  text-decoration: none;
+  border-color: var(--color-primary);
+}
+
+.serviceName {
+  flex: 1;
+  min-width: 10rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.serviceMeta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

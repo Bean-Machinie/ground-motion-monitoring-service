@@ -59,8 +59,10 @@ export const NAV_ITEMS: NavItem[] = [
 /** Nav for signed-in users: portal-first, with the public site collected
     under a single Explore menu (GitHub-style app view). */
 export const PORTAL_NAV_ITEMS: NavItem[] = [
-  { kind: "link", label: "Dashboard", to: "/", end: true },
-  { kind: "link", label: "Projects", to: "/?tab=monitoring" },
+  { kind: "link", label: "Workspace", to: "/", end: true },
+  { kind: "link", label: "Sites", to: "/sites" },
+  { kind: "link", label: "Reports", to: "/reports" },
+  { kind: "link", label: "New Request", to: "/requests/new" },
   {
     kind: "menu",
     id: "explore",

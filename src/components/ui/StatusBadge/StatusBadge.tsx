@@ -4,20 +4,29 @@ import styles from "./StatusBadge.module.css";
 type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
 const STATUS_TONES: Record<string, Tone> = {
-  // Project statuses
+  // Service (engagement) statuses
   draft: "neutral",
+  scoping: "info",
   active: "success",
-  processing: "info",
+  paused: "warning",
   completed: "success",
-  archived: "neutral",
-  // Result statuses
+  cancelled: "danger",
+  // Report states
+  pending: "neutral",
+  processing: "info",
+  in_review: "info",
   published: "success",
   failed: "danger",
-  // Order statuses
+  superseded: "neutral",
+  // Alert severities
+  info: "info",
+  warning: "warning",
+  critical: "danger",
+  // Legacy statuses (kept while old records may still surface)
+  archived: "neutral",
   requested: "info",
   confirmed: "info",
   in_progress: "info",
-  cancelled: "danger",
 };
 
 interface StatusBadgeProps {

@@ -1,5 +1,6 @@
 // New request start page. For now a single guided option — expert
 // guidance via the contact block. Self-service requests come later.
+import { Link } from "react-router-dom";
 import { site } from "@/config/site";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import styles from "./NewRequestPage.module.css";
@@ -34,9 +35,21 @@ export function NewRequestPage() {
           <li>Get help choosing the right service type</li>
           <li>Define suitable outputs, delivery format, and next steps</li>
         </ul>
-        <a className={styles.cta} href="#contact">
+        <Link
+          className={styles.cta}
+          to="/home#contact"
+          onClick={() => {
+            // The contact block lives in the marketing footer; scroll to it
+            // once the route has rendered.
+            window.setTimeout(() => {
+              document
+                .getElementById("contact")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }, 0);
+          }}
+        >
           Talk to Our Team
-        </a>
+        </Link>
         <p className={styles.footnote}>
           Best when you want support before starting the formal request.
         </p>

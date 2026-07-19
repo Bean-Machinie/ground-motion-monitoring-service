@@ -169,7 +169,7 @@ export function ProfileMenu() {
             className={styles.menuEntry}
             onClick={() => {
               setOpen(false);
-              navigate("/portal/account");
+              navigate("/account");
             }}
           >
             <span className={styles.menuIcon}>
