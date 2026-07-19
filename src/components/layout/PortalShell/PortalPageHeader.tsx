@@ -1,21 +1,23 @@
-// Contextual header for portal pages: breadcrumb reflecting the real
-// hierarchy, page title with an optional status pill, and page-level
-// actions on the right. This replaces per-page ad-hoc headers — the top
-// of the content column is no longer navigation.
+// Contextual header for portal pages: page title with an optional status
+// pill and page-level actions on the right. The breadcrumb trail is NOT
+// rendered here — it goes into the shell's fixed context bar under the
+// top panel (via usePortalCrumbs), so it stays put while content scrolls.
 import type { ReactNode } from "react";
-import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs/Breadcrumbs";
+import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
+import type { Crumb } from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
 import styles from "./PortalPageHeader.module.css";
 
 interface PortalPageHeaderProps {
-  /** Trail INCLUDING the current page as the last entry. */
+  /** Trail INCLUDING the current page as the last entry. Shown in the
+      shell's fixed context bar, not inside the scrolling content. */
   crumbs?: Crumb[];
   title: string;
   /** Status pill next to the title, when the entity has one. */
   pill?: { status: string; label: string };
   lede?: string;
   /** Page-level actions, right-aligned. Only the page's primary action —
-      the global New request lives in the sidebar footer. */
+      the global New request lives in the sidebar. */
   actions?: ReactNode;
 }
 
@@ -26,9 +28,10 @@ export function PortalPageHeader({
   lede,
   actions,
 }: PortalPageHeaderProps) {
+  usePortalCrumbs(crumbs ?? []);
+
   return (
     <header className={styles.header}>
-      {crumbs && crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
       <div className={styles.titleRow}>
         <h1 className={styles.title}>{title}</h1>
         {pill ? <StatusBadge status={pill.status} label={pill.label} /> : null}

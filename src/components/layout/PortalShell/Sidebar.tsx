@@ -1,23 +1,17 @@
-// Persistent portal sidebar: brand, primary nav (Workspace / Needs
-// attention), the site tree, library lenses, and a footer block with the
-// primary action, settings, the account menu, and the collapse toggle.
-// Collapses to a 56px icon rail on wide viewports; becomes an off-canvas
-// drawer below 1024px.
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+// Persistent portal sidebar. Top to bottom: New request (separated by a
+// hairline), primary nav (Workspace / Needs attention), the site tree in
+// its own scroll area (like a chat list — it scrolls, the rest stays
+// put), Library, and a footer with just the collapse toggle. No brand
+// (top panel has it), no profile (top panel has it), no Settings (the
+// profile menu has it).
+//
+// Collapse: the width animates while every icon keeps its exact
+// position — labels only fade. Nothing shifts, scales, or re-centers.
+import { NavLink } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
 import { usePortalChrome } from "@/components/layout/PortalShell/PortalShell";
 import { SiteTree } from "@/components/layout/PortalShell/SiteTree";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
-import { site as siteConfig } from "@/config/site";
-import { EXPLORE_MENU_ENTRIES } from "@/config/navigation";
 import type { IconName } from "@/lib/icons";
 import styles from "./Sidebar.module.css";
 
@@ -29,12 +23,10 @@ interface NavRowProps {
   icon: IconName;
   label: string;
   badge?: number;
-  /** Gold treatment: reserved for the shell's primary action. */
-  primary?: boolean;
   collapsed: boolean;
 }
 
-function NavRow({ to, end, icon, label, badge, primary, collapsed }: NavRowProps) {
+function NavRow({ to, end, icon, label, badge, collapsed }: NavRowProps) {
   return (
     <li>
       <NavLink
@@ -42,13 +34,7 @@ function NavRow({ to, end, icon, label, badge, primary, collapsed }: NavRowProps
         end={end}
         title={collapsed ? label : undefined}
         className={({ isActive }) =>
-          [
-            styles.row,
-            primary ? styles.rowPrimary : "",
-            isActive && !primary ? styles.rowActive : "",
-          ]
-            .filter(Boolean)
-            .join(" ")
+          `${styles.row}${isActive ? ` ${styles.rowActive}` : ""}`
         }
       >
         <span className={styles.rowIcon} aria-hidden="true">
@@ -65,122 +51,33 @@ function NavRow({ to, end, icon, label, badge, primary, collapsed }: NavRowProps
   );
 }
 
-/* ---------------------------- Account menu ----------------------------- */
+/* -------------------------- Collapse toggle icon ------------------------ */
 
-function getInitials(name: string | null | undefined, email: string): string {
-  const source = name?.trim();
-  if (source) {
-    const parts = source.split(/\s+/);
-    const first = parts[0]?.[0] ?? "";
-    const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
-    return (first + last).toUpperCase();
-  }
-  return (email[0] ?? "?").toUpperCase();
-}
-
-/** Footer account row: opens an upward popover holding the account
-    actions and the Explore/marketing links moved out of the main nav. */
-function AccountMenu({ collapsed }: { collapsed: boolean }) {
-  const { user, signOut } = useAuth();
-  const { profile } = useProfile();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      const root = rootRef.current;
-      if (root && event.target instanceof Node && !root.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
-
-  if (!user) return null;
-
-  const email = profile?.email ?? user.email ?? "";
-  const displayName = profile?.full_name || email;
-  const initials = getInitials(profile?.full_name, email);
-
-  function entry(label: string, icon: IconName, onSelect: () => void): ReactNode {
-    return (
-      <button
-        type="button"
-        role="menuitem"
-        className={styles.menuEntry}
-        onClick={() => {
-          setOpen(false);
-          onSelect();
-        }}
-      >
-        <span className={styles.menuIcon} aria-hidden="true">
-          <AppIcon name={icon} size={18} />
-        </span>
-        {label}
-      </button>
-    );
-  }
-
+/** Standard panel-left icon (lucide-style): a panel with an arrow that
+    points the way the sidebar will move. */
+function PanelToggleIcon({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={styles.accountRoot} ref={rootRef}>
-      <button
-        type="button"
-        className={styles.accountTrigger}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        title={collapsed ? displayName : undefined}
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") setOpen(false);
-        }}
-      >
-        <span className={styles.avatar} aria-hidden="true">
-          {initials}
-        </span>
-        <span className={styles.accountName}>{displayName}</span>
-      </button>
-
-      {open ? (
-        <div
-          className={styles.menu}
-          role="menu"
-          aria-label="Account"
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setOpen(false);
-          }}
-        >
-          <div className={styles.menuHeader}>
-            <span className={styles.menuName}>{displayName}</span>
-            <span className={styles.menuEmail}>{email}</span>
-          </div>
-
-          {entry("Account settings", "settings", () => navigate("/account"))}
-          {profile?.role === "admin"
-            ? entry("Administration", "shield-lock", () => navigate("/admin"))
-            : null}
-
-          <div className={styles.menuDivider} role="separator" />
-          <p className={styles.menuSectionLabel}>Explore {siteConfig.companyName}</p>
-          {EXPLORE_MENU_ENTRIES.map((item) =>
-            entry(item.label, item.icon ?? "globe", () => navigate(item.to)),
-          )}
-
-          <div className={styles.menuDivider} role="separator" />
-          {entry("Sign out", "logout", () => {
-            void signOut().then(() => navigate("/", { replace: true }));
-          })}
-        </div>
-      ) : null}
-    </div>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <line x1="9" y1="4" x2="9" y2="20" />
+      {collapsed ? (
+        /* PanelLeftOpen: arrow pointing right */
+        <path d="m14 9 3 3-3 3" />
+      ) : (
+        /* PanelLeftClose: arrow pointing left */
+        <path d="m17 9-3 3 3 3" />
+      )}
+    </svg>
   );
 }
 
@@ -218,7 +115,19 @@ export function Sidebar() {
         </div>
       ) : null}
 
-      <nav className={styles.scrollArea} aria-label="Primary">
+      <nav className={styles.body} aria-label="Primary">
+        {/* Primary action first, cleanly separated from the places below. */}
+        <ul className={styles.section}>
+          <NavRow
+            to="/requests/new"
+            icon="add"
+            label="New request"
+            collapsed={collapsed}
+          />
+        </ul>
+
+        <div className={styles.divider} role="separator" />
+
         <ul className={styles.section}>
           <NavRow
             to="/"
@@ -236,14 +145,7 @@ export function Sidebar() {
           />
         </ul>
 
-        {!collapsed ? (
-          <p className={styles.sectionLabel} id="sidebar-sites-label">
-            Your sites
-          </p>
-        ) : null}
-        <SiteTree collapsed={collapsed} labelledBy="sidebar-sites-label" />
-
-        {!collapsed ? <p className={styles.sectionLabel}>Library</p> : null}
+        <p className={styles.sectionLabel}>Library</p>
         <ul className={styles.section}>
           <NavRow
             to="/reports"
@@ -253,28 +155,20 @@ export function Sidebar() {
           />
           <NavRow to="/map" icon="globe" label="Map view" collapsed={collapsed} />
         </ul>
+
+        <p className={styles.sectionLabel} id="sidebar-sites-label">
+          Your sites
+        </p>
+
+        {/* The tree scrolls on its own (chat-list style); everything else
+            in the sidebar stays anchored. */}
+        <div className={styles.treeScroll}>
+          <SiteTree collapsed={collapsed} labelledBy="sidebar-sites-label" />
+        </div>
       </nav>
 
-      <div className={styles.footer}>
-        <ul className={styles.section}>
-          <NavRow
-            to="/requests/new"
-            icon="add"
-            label="New request"
-            primary
-            collapsed={collapsed}
-          />
-          <NavRow
-            to="/account"
-            icon="settings"
-            label="Settings"
-            collapsed={collapsed}
-          />
-        </ul>
-
-        <AccountMenu collapsed={collapsed} />
-
-        {!isNarrow ? (
+      {!isNarrow ? (
+        <div className={styles.footer}>
           <button
             type="button"
             className={styles.collapseToggle}
@@ -282,16 +176,12 @@ export function Sidebar() {
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <span
-              className={`${styles.collapseChevron} ${
-                collapsed ? styles.collapseChevronFlipped : ""
-              }`}
-              aria-hidden="true"
-            />
-            <span className={styles.rowLabel}>Collapse</span>
+            <span className={styles.rowIcon} aria-hidden="true">
+              <PanelToggleIcon collapsed={collapsed} />
+            </span>
           </button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </aside>
   );
 }

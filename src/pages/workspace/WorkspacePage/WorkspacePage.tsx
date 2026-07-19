@@ -88,6 +88,7 @@ export function WorkspacePage() {
   return (
     <div className={styles.page}>
       <PortalPageHeader
+        crumbs={[{ label: "Workspace" }]}
         title="Workspace"
         lede={`Welcome back, ${displayName} — your screenings, monitoring subscriptions, and delivered reports.`}
       />

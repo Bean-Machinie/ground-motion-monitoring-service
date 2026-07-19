@@ -17,6 +17,10 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute"
 import { PortalDataProvider } from "@/context/PortalDataContext";
 import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Sidebar } from "@/components/layout/PortalShell/Sidebar";
+import {
+  Breadcrumbs,
+  type Crumb,
+} from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import styles from "./PortalShell.module.css";
 
 /* ------------------------- Shell chrome context ------------------------ */
@@ -29,6 +33,8 @@ interface PortalChrome {
   isNarrow: boolean;
   drawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
+  /** Breadcrumb trail shown in the fixed bar under the top panel. */
+  setCrumbs: (crumbs: Crumb[]) => void;
 }
 
 const PortalChromeContext = createContext<PortalChrome | null>(null);
@@ -39,6 +45,19 @@ export function usePortalChrome(): PortalChrome {
     throw new Error("usePortalChrome must be used inside PortalShell");
   }
   return ctx;
+}
+
+/** Pages call this to put their breadcrumb trail into the fixed bar
+    under the top panel (it stays put while the content scrolls). */
+export function usePortalCrumbs(crumbs: Crumb[]) {
+  const { setCrumbs } = usePortalChrome();
+  // Content-keyed dependency: crumb arrays are rebuilt every render.
+  const key = JSON.stringify(crumbs);
+  useEffect(() => {
+    setCrumbs(crumbs);
+    return () => setCrumbs([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, setCrumbs]);
 }
 
 const COLLAPSED_KEY = "heliosyn.sidebar.collapsed";
@@ -59,6 +78,7 @@ export function PortalShell({ children }: { children?: ReactNode }) {
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [isNarrow, setIsNarrow] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [crumbs, setCrumbs] = useState<Crumb[]>([]);
 
   // Track the 1024px breakpoint: below it the sidebar is a drawer.
   useEffect(() => {
@@ -92,6 +112,7 @@ export function PortalShell({ children }: { children?: ReactNode }) {
     isNarrow,
     drawerOpen,
     setDrawerOpen,
+    setCrumbs,
   };
 
   return (
@@ -136,6 +157,14 @@ export function PortalShell({ children }: { children?: ReactNode }) {
                     <span aria-hidden="true" />
                   </button>
                   <span className={styles.mobileBarLabel}>Menu</span>
+                </div>
+
+                {/* Fixed context line under the top panel: breadcrumb on
+                    the left, a slot on the right for future fixed
+                    controls. Stays put while the content scrolls. */}
+                <div className={styles.crumbBar}>
+                  {crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : <span />}
+                  <div className={styles.crumbBarEnd} />
                 </div>
 
                 <main id="portal-main" className={styles.main} tabIndex={-1}>

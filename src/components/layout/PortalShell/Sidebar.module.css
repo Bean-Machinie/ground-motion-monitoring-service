@@ -1,5 +1,10 @@
 /* Portal sidebar: quiet chrome. The yellow accent appears ONLY on the
-   active row and the primary action — nowhere else. */
+   active row — nowhere else.
+
+   Collapse mechanics (Supabase-style): only the aside width animates.
+   Rows keep identical padding and icon position in both states, so icons
+   never move — labels and badges simply fade while the shrinking width
+   clips them. Nothing re-centers, nothing scales. */
 
 .sidebar {
   display: flex;
@@ -9,7 +14,8 @@
   height: 100%;
   background-color: var(--color-surface);
   border-right: var(--border-width) solid var(--color-border);
-  transition: width 200ms var(--ease-nav);
+  overflow: hidden;
+  transition: width 220ms var(--ease-nav);
 }
 
 .collapsed {
@@ -78,24 +84,15 @@
   opacity: 1;
 }
 
-/* ---------------------------- Scroll / sections ------------------------ */
+/* -------------------------------- Body --------------------------------- */
 
-.scrollArea {
+.body {
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2);
   overflow-x: hidden;
-  padding: var(--space-3) var(--space-2);
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border-strong) transparent;
-}
-
-.scrollArea::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollArea::-webkit-scrollbar-thumb {
-  background-color: var(--color-border-strong);
-  border-radius: var(--radius-full);
 }
 
 .section {
@@ -105,9 +102,19 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: none;
+}
+
+/* Clean hairline separating the primary action from the places below. */
+.divider {
+  height: 0;
+  flex: none;
+  margin: var(--space-2) var(--space-1);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .sectionLabel {
+  flex: none;
   margin: var(--space-4) 0 var(--space-1);
   padding: 0 var(--space-2);
   color: var(--color-text-subtle);
@@ -115,10 +122,19 @@
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 160ms ease;
+}
+
+.collapsed .sectionLabel {
+  opacity: 0;
 }
 
 /* -------------------------------- Rows --------------------------------- */
 
+/* Fixed geometry in both states: same padding, same icon slot. The icon
+   slot's center lines up with the center of the collapsed rail. */
 .row {
   position: relative;
   display: flex;
@@ -136,6 +152,7 @@
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .row:hover {
@@ -144,8 +161,7 @@
   text-decoration: none;
 }
 
-/* Active row: the one place (besides the primary action) the accent
-   yellow is allowed. */
+/* Active row: the one place the accent yellow is allowed. */
 .rowActive {
   background-color: rgba(252, 217, 0, 0.16);
   box-shadow: inset 3px 0 0 0 #fcd900;
@@ -160,19 +176,6 @@
 .rowAncestor:not(.rowActive) {
   background-color: rgba(252, 217, 0, 0.06);
   font-weight: var(--font-weight-semibold);
-}
-
-/* Primary action: yellow CTA treatment, matching the site's hero buttons. */
-.rowPrimary {
-  background-color: #fcd900;
-  color: #111111;
-  font-weight: var(--font-weight-semibold);
-  justify-content: flex-start;
-}
-
-.rowPrimary:hover {
-  background-color: #ffe44d;
-  color: #111111;
 }
 
 .rowIcon {
@@ -190,17 +193,11 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: opacity 140ms ease;
 }
 
-.collapsed .rowLabel,
-.collapsed .badge,
-.collapsed .accountName {
-  display: none;
-}
-
-.collapsed .row {
-  justify-content: center;
-  padding: 0;
+.collapsed .rowLabel {
+  opacity: 0;
 }
 
 .badge {
@@ -213,9 +210,47 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-align: center;
+  transition: opacity 140ms ease;
+}
+
+.collapsed .badge {
+  opacity: 0;
 }
 
 /* ------------------------------ Site tree ------------------------------ */
+
+/* Chat-list style scroll region: the tree scrolls on its own when it
+   outgrows the space; everything else in the sidebar stays anchored. */
+.treeScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.treeScroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.treeScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.treeScroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.treeScroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-subtle);
+}
+
+/* Collapsed rail: the flyout must escape the scroll container. */
+.collapsed .treeScroll {
+  overflow: visible;
+}
 
 .treeRoot {
   display: flex;
@@ -247,32 +282,16 @@
   gap: 2px;
 }
 
-.treeRow {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.treeRow .row {
-  flex: 1;
-  min-width: 0;
-}
-
-.chevronButton {
+/* Disclosure caret inside the row: purely visual — the whole row is one
+   big button that navigates and toggles. */
+.disclosure {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 28px;
+  width: 18px;
+  height: 22px;
   flex: none;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: none;
-  cursor: pointer;
-}
-
-.chevronButton:hover {
-  background-color: var(--color-surface-muted);
+  margin-left: -2px;
 }
 
 .chevron {
@@ -284,13 +303,13 @@
   transition: transform 160ms ease;
 }
 
-.chevronOpen .chevron {
+.disclosureOpen .chevron {
   transform: rotate(45deg);
 }
 
 .treeChildren {
   margin: 0;
-  padding: 0 0 0 calc(20px + var(--space-2));
+  padding: 0 0 0 calc(18px + var(--space-2));
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -357,7 +376,7 @@
 .flyout {
   position: absolute;
   top: 0;
-  left: calc(100% + var(--space-2));
+  left: calc(100% + var(--space-3));
   z-index: 300;
   min-width: 14rem;
   max-height: 60vh;
@@ -376,108 +395,6 @@
 
 .flyoutChild {
   padding-left: var(--space-5);
-}
-
-/* ------------------------------- Footer -------------------------------- */
-
-.footer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-top: var(--border-width) solid var(--color-border);
-}
-
-.accountRoot {
-  position: relative;
-}
-
-.accountTrigger {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  min-height: 38px;
-  padding: var(--space-1) var(--space-2);
-  border: none;
-  border-radius: var(--radius-md);
-  background: none;
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  text-align: left;
-}
-
-.accountTrigger:hover {
-  background-color: var(--color-surface-muted);
-}
-
-.collapsed .accountTrigger {
-  justify-content: center;
-  padding: var(--space-1) 0;
-}
-
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border-radius: var(--radius-full);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary-dark);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-}
-
-.accountName {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: var(--font-weight-medium);
-}
-
-/* Account popover: opens upward from the footer. */
-.menu {
-  position: absolute;
-  bottom: calc(100% + var(--space-2));
-  left: 0;
-  z-index: 300;
-  min-width: 14.5rem;
-  padding: var(--space-1);
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: calc(var(--radius-md) + var(--space-1));
-  box-shadow: var(--shadow-dropdown);
-}
-
-.collapsed .menu {
-  left: calc(100% + var(--space-2));
-  bottom: 0;
-}
-
-.menuHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: var(--space-2) var(--space-3);
-  border-bottom: var(--border-width) solid var(--color-border);
-  margin-bottom: var(--space-1);
-}
-
-.menuName {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.menuEmail {
-  color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .menuSectionLabel {
@@ -514,57 +431,31 @@
   text-decoration: none;
 }
 
-.menuIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
+/* ------------------------------- Footer -------------------------------- */
+
+.footer {
   flex: none;
-  opacity: 0.7;
+  padding: var(--space-2);
+  border-top: var(--border-width) solid var(--color-border);
 }
 
-.menuDivider {
-  height: 0;
-  margin: var(--space-1) 0;
-  border-bottom: var(--border-width) solid var(--color-border);
-}
-
-/* Collapse toggle at the very bottom. */
+/* Icon-only toggle in the same geometry as every row: the icon sits in
+   the identical slot, so it does not move when the sidebar collapses. */
 .collapseToggle {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   width: 100%;
-  min-height: 30px;
+  min-height: 32px;
   padding: 0 var(--space-2);
   border: none;
   border-radius: var(--radius-md);
   background: none;
   color: var(--color-text-subtle);
-  font-size: var(--font-size-xs);
   cursor: pointer;
 }
 
 .collapseToggle:hover {
   background-color: var(--color-surface-muted);
   color: var(--color-text);
-}
-
-.collapsed .collapseToggle {
-  justify-content: center;
-  padding: 0;
-}
-
-.collapseChevron {
-  width: 7px;
-  height: 7px;
-  border-left: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg);
-  transition: transform 200ms ease;
-}
-
-.collapseChevronFlipped {
-  transform: rotate(225deg);
 }

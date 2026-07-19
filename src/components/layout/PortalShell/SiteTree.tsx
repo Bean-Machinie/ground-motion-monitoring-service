@@ -158,6 +158,7 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
     });
   }
 
+
   const filteredSites = useMemo(() => {
     const query = filter.trim().toLowerCase();
     if (!query) return sites;
@@ -350,44 +351,44 @@ export function SiteTree({ collapsed, labelledBy }: SiteTreeProps) {
 
           return (
             <li key={site.id} role="none">
-              <div className={styles.treeRow}>
-                <button
-                  type="button"
-                  className={`${styles.chevronButton} ${
-                    isExpanded ? styles.chevronOpen : ""
+              {/* One whole-row click target: clicking navigates to the
+                  site AND toggles its services open/closed. The chevron
+                  is purely visual. (Navigating to a site from elsewhere
+                  always ends expanded — the auto-expand effect wins.) */}
+              <NavLink
+                to={`/sites/${site.slug}`}
+                role="treeitem"
+                aria-expanded={siteServices.length > 0 ? isExpanded : undefined}
+                ref={registerRow(siteNodeId)}
+                tabIndex={
+                  focusedId === siteNodeId ||
+                  (focusedId === null && siteNodeId === firstVisibleId)
+                    ? 0
+                    : -1
+                }
+                onFocus={() => setFocusedId(siteNodeId)}
+                onClick={() => toggleSite(site.id)}
+                className={({ isActive }) =>
+                  [
+                    styles.row,
+                    styles.siteRow,
+                    isActive ? styles.rowActive : "",
+                    isAncestor ? styles.rowAncestor : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")
+                }
+              >
+                <span
+                  className={`${styles.disclosure} ${
+                    isExpanded ? styles.disclosureOpen : ""
                   }`}
                   aria-hidden="true"
-                  tabIndex={-1}
-                  onClick={() => toggleSite(site.id)}
                 >
                   <span className={styles.chevron} />
-                </button>
-                <NavLink
-                  to={`/sites/${site.slug}`}
-                  role="treeitem"
-                  aria-expanded={siteServices.length > 0 ? isExpanded : undefined}
-                  ref={registerRow(siteNodeId)}
-                  tabIndex={
-                    focusedId === siteNodeId ||
-                    (focusedId === null && siteNodeId === firstVisibleId)
-                      ? 0
-                      : -1
-                  }
-                  onFocus={() => setFocusedId(siteNodeId)}
-                  className={({ isActive }) =>
-                    [
-                      styles.row,
-                      styles.siteRow,
-                      isActive ? styles.rowActive : "",
-                      isAncestor ? styles.rowAncestor : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")
-                  }
-                >
-                  <span className={styles.rowLabel}>{site.name}</span>
-                </NavLink>
-              </div>
+                </span>
+                <span className={styles.rowLabel}>{site.name}</span>
+              </NavLink>
 
               {isExpanded && siteServices.length > 0 ? (
                 <ul role="group" className={styles.treeChildren}>
