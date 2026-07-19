@@ -1,4 +1,4 @@
-/* Sticky two-row top panel: top bar (brand | profile) + nav bar. */
+/* Sticky single-row top panel: brand (left) | nav (center) | profile (right). */
 
 .topPanel {
   position: sticky;
@@ -9,38 +9,33 @@
   box-shadow: var(--shadow-header);
 }
 
-/* ---------------------------------------------------------------------- */
-/* Top bar row: 3-column grid keeps the brand perfectly centered.          */
-/* ---------------------------------------------------------------------- */
-
-.topBar {
-  padding: var(--space-1) 0;
-  border-bottom: var(--border-width) solid var(--color-border);
-}
-
-/* Inner row shares the page .container, so left/right edges line up with
-   the content margin of every page. */
-.topBarInner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+/* Inner row: brand flush left, then nav + profile pushed flush right
+   (brand's margin-right: auto eats all the free space). Items stretch so
+   the nav highlight can sit flush on the panel's bottom border. */
+.inner {
+  display: flex;
+  align-items: stretch;
   gap: var(--space-4);
-  min-height: 4.5rem;
-}
-
-.topBarSpacer {
-  justify-self: start;
+  padding: 0 var(--space-4);
+  min-height: 3.75rem;
 }
 
 .topBarMeta {
-  justify-self: end;
+  align-self: center;
   min-width: 0;
 }
 
 /* Brand logo: strict, clean scale on hover — transform only, no filters,
    so the company logo never blurs or morphs. */
+/* The logo can't be selected, dragged, or right-click-saved (context menu
+   and dragstart are also blocked in the markup). */
 .brand {
-  justify-self: center;
+  margin-right: auto;
+  align-self: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -57,22 +52,24 @@
 
 .brandLogo {
   display: block;
-  height: 4.25rem;
+  height: 3rem;
   width: auto;
   max-width: 100%;
   object-fit: contain;
 }
 
 /* ---------------------------------------------------------------------- */
-/* Nav bar row                                                             */
+/* Nav (center column)                                                     */
 /* ---------------------------------------------------------------------- */
 
-/* No bottom padding: nav items sit flush on the panel's bottom border so
-   the highlight can meet the horizontal line. */
+/* Full panel height: nav items sit flush on the panel's bottom border so
+   the highlight can meet the horizontal line. Sits right-aligned, just
+   before the profile cluster. */
 .navBar {
   display: flex;
-  justify-content: center;
-  padding: 0 var(--space-4);
+  justify-content: flex-end;
+  align-self: stretch;
+  min-width: 0;
 }
 
 .navList {
@@ -96,7 +93,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 40px;
+  height: 100%;
   padding: 0 var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
@@ -264,24 +261,32 @@
 /* ---------------------------------------------------------------------- */
 
 @media (max-width: 720px) {
-  .topBar {
-    padding: var(--space-1) 0;
-  }
-
-  .topBarInner {
-    min-height: 3.25rem;
-    gap: var(--space-2);
+  /* Single row doesn't fit: wrap to brand + profile on top, nav below —
+     still one seamless panel, no divider. The <picture> in the markup
+     swaps the wordmark for the square icon at this same breakpoint. */
+  .inner {
+    flex-wrap: wrap;
+    min-height: 0;
+    gap: 0 var(--space-2);
+    padding: var(--space-1) var(--space-2) 0;
   }
 
   .brandLogo {
-    height: 3rem;
+    height: 2.5rem;
   }
 
-  /* Nav stays centered; becomes a horizontally scrollable strip only when
-     it overflows (scrollbar hidden). */
+  /* Nav wraps to its own full-width line below; centered scroll strip so
+     overflowing items stay reachable (scrollbar hidden). */
   .navBar {
+    order: 3;
+    width: 100%;
     justify-content: center;
-    padding: 0 var(--space-2);
+    align-self: auto;
+  }
+
+  .navButton {
+    height: auto;
+    min-height: 40px;
   }
 
   .navList {

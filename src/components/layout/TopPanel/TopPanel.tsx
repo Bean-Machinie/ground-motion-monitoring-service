@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProfileMenu } from "@/components/layout/TopPanel/ProfileMenu";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import logoLong from "@/assets/logo/Black/HELIOSYN_Long_Black.png";
+import logoIcon from "@/assets/logo/Black/HELIOSYN_Icon_Black.png";
 import styles from "./TopPanel.module.css";
 
 interface HighlightState {
@@ -193,32 +194,34 @@ export function TopPanel() {
 
   return (
     <header className={styles.topPanel} ref={headerRef}>
-      {/* Top bar row: (spacer) | brand | profile — the empty first cell
-          keeps the brand perfectly centered in the 3-column grid. */}
-      <div className={styles.topBar}>
-        {/* Same .container as page content, so the right-side cluster
-            aligns with the page content margin. */}
-        <div className={`container ${styles.topBarInner}`}>
-          <div className={styles.topBarSpacer} aria-hidden="true" />
-          <Link to="/" className={styles.brand} aria-label={site.name}>
+      {/* Single-row panel: brand flush left | nav + profile flush right.
+          Full-width (no .container) so the edges hug the viewport. */}
+      <div className={styles.inner}>
+        <Link
+          to="/"
+          className={styles.brand}
+          aria-label={site.name}
+          onContextMenu={(e) => e.preventDefault()}
+          onDragStart={(e) => e.preventDefault()}
+        >
+          {/* Narrow screens get the compact square icon instead of the
+              full wordmark (same breakpoint as the nav wrap). */}
+          <picture>
+            <source media="(max-width: 720px)" srcSet={logoIcon} />
             <img
               src={logoLong}
               alt={`${site.companyName} — ${site.name}`}
               className={styles.brandLogo}
+              draggable={false}
             />
-          </Link>
-          <div className={styles.topBarMeta}>
-            <ProfileMenu />
-          </div>
-        </div>
-      </div>
+          </picture>
+        </Link>
 
-      {/* Nav bar row */}
-      <nav
-        className={styles.navBar}
-        aria-label="Main navigation"
-        ref={navBarRef}
-      >
+        <nav
+          className={styles.navBar}
+          aria-label="Main navigation"
+          ref={navBarRef}
+        >
         <ul
           className={styles.navList}
           ref={navListRef}
@@ -335,7 +338,12 @@ export function TopPanel() {
             ),
           )}
         </ul>
-      </nav>
+        </nav>
+
+        <div className={styles.topBarMeta}>
+          <ProfileMenu />
+        </div>
+      </div>
     </header>
   );
 }
