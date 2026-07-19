@@ -22,8 +22,8 @@ export const SERVICE_KIND_LABELS: Record<ServiceKind, string> = {
 };
 
 export const SERVICE_STATUS_LABELS: Record<ServiceStatus, string> = {
-  draft: "Draft",
   scoping: "Scoping",
+  quoted: "Quoted",
   active: "Active",
   paused: "Paused",
   completed: "Completed",
@@ -34,6 +34,35 @@ export const TECHNIQUE_LABELS: Record<AnalysisTechnique, string> = {
   insar_sbas: "InSAR (SBAS)",
   insar_ps: "InSAR (PS)",
 };
+
+/** The customer's own name for the work — the display name everywhere.
+    Rows created before migration 005 ran may not have one yet, so fall
+    back to the location name rather than rendering an empty row. */
+export function serviceDisplayName(
+  service: Service,
+  site: Site | undefined,
+): string {
+  return service.name || site?.name || SERVICE_KIND_LABELS[service.kind];
+}
+
+/** The one-line context under a service name, everywhere a service is
+    displayed: "{cadence} {kind} · {location}, {country}" — e.g.
+    "Quarterly monitoring · Port of Esbjerg, Denmark". Never leads with
+    the location, never mentions the technique. */
+export function serviceKindLine(
+  service: Service,
+  site: Site | undefined,
+): string {
+  const kind =
+    service.kind === "monitoring"
+      ? service.cadence === "quarterly"
+        ? "Quarterly monitoring"
+        : "Monitoring"
+      : "Screening";
+  if (!site) return kind;
+  const where = site.country ? `${site.name}, ${site.country}` : site.name;
+  return `${kind} · ${where}`;
+}
 
 export const REPORT_KIND_LABELS: Record<ReportKind, string> = {
   screening: "Screening report",

@@ -250,22 +250,27 @@
 .treeRoot {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
-.treeFilter {
-  width: 100%;
-  padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
+/* Static group heading (MONITORING / SCREENINGS): an 11px muted label,
+   non-interactive and non-collapsible — never a tree node. Scrolls with
+   the tree. */
+.treeGroupLabel {
+  margin: var(--space-3) 0 var(--space-1);
+  padding: 0 var(--space-2);
+  color: var(--color-text-subtle);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.treeFilter:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
+/* Clear breathing room between the nav rows above and the first group. */
+.treeRoot > div:first-child .treeGroupLabel {
+  margin-top: var(--space-4);
 }
 
 .tree {
@@ -309,10 +314,9 @@
 
 /* ---------------------- Tree connector guide lines --------------------- */
 
-/* Children hang off a guide line that descends from the parent's chevron,
-   with a soft curved elbow branching into every row — the same connected
-   look used by polished PM dashboards. Works at any nesting depth, since
-   each group draws its own lines. */
+/* Leaves hang off a guide line that descends from the parent's chevron,
+   with a soft curved elbow branching into EVERY row — each child
+   visibly connects to the trunk. Corner radius matches the app's cards. */
 .treeChildren {
   margin: 0;
   /* Indent past the guide line (which sits under the chevron center). */
@@ -328,18 +332,20 @@
 }
 
 /* Curved elbow: drops from the guide line and bends into the row,
-   ending at the row's vertical center. */
+   ending at the row's vertical center. The horizontal run reaches the
+   row edge, and the whole thing stays subtle. */
 .treeChildren > li::before {
   content: "";
   position: absolute;
-  left: -11px;
+  left: -12px;
   top: -2px;
-  width: 9px;
+  width: 12px;
   height: calc(50% + 2px);
   border-left: 2px solid var(--color-border-strong);
   border-bottom: 2px solid var(--color-border-strong);
   /* Same radius scale as the cards — a crisp corner, not a swoop. */
   border-bottom-left-radius: var(--radius-lg);
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -348,16 +354,59 @@
 .treeChildren > li:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: -11px;
+  left: -12px;
   top: -2px;
   bottom: -2px;
   width: 2px;
   background-color: var(--color-border-strong);
+  opacity: 0.55;
   pointer-events: none;
 }
 
-.serviceRow {
+/* Branch row: chevron slot, status dot, name. */
+.branchRow {
   min-height: 30px;
+}
+
+/* Leaf row: 12px secondary text linking to a report issue. */
+.leafRow {
+  min-height: 26px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: var(--font-weight-normal);
+}
+
+.leafIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  opacity: 0.75;
+}
+
+.leafIconDanger {
+  color: var(--color-danger);
+  opacity: 1;
+}
+
+/* "All N issues →": same quiet register as the leaves. */
+.allIssuesRow {
+  color: var(--color-text-subtle);
+}
+
+.allIssuesRow:hover {
+  color: var(--color-text);
+}
+
+/* Muted status word on the right of a scoping/quoted branch. */
+.statusWord {
+  flex: none;
+  margin-left: auto;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
 }
 
 /* Service status dot. */

@@ -50,7 +50,14 @@ function placeSites(sites: Site[]): PlacedSite[] {
 }
 
 export function MapPage() {
-  const { sites, loading, error, refetch } = usePortalData();
+  const { sites, services, loading, error, refetch } = usePortalData();
+
+  // Service-first: a marker opens the most recent service at the
+  // location (the location page itself is reached from service pages).
+  const primaryTarget = (site: Site): string => {
+    const service = services.find((s) => s.site_id === site.id);
+    return service ? `/services/${service.id}` : `/sites/${site.slug}`;
+  };
 
   const placed = useMemo(() => placeSites(sites), [sites]);
   const unmapped = sites.filter(
@@ -66,29 +73,33 @@ export function MapPage() {
       <PortalPageHeader
         crumbs={[{ label: "Workspace", to: "/" }, { label: "Map view" }]}
         title="Map view"
-        lede="All of your sites in one place. Select a marker to open the site."
+        lede="All of your locations in one place. Select a marker to open the work there."
       />
 
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 
       {sites.length === 0 ? (
         <EmptyState
-          title="No sites yet"
+          title="No locations yet"
           description="When an area of interest is set up for your account, it will appear on this map."
           action={<Link to="/requests/new">Start with a new request →</Link>}
         />
       ) : placed.length === 0 ? (
         <EmptyState
-          title="No site geometry yet"
-          description="None of your sites has a captured centroid yet. Once geometry is on file, they will appear here."
+          title="No geometry yet"
+          description="None of your locations has a captured centroid yet. Once geometry is on file, they will appear here."
         />
       ) : (
-        <div className={styles.plot} role="img" aria-label="Map of your sites">
+        <div
+          className={styles.plot}
+          role="img"
+          aria-label="Map of your locations"
+        >
           <div className={styles.plotGrid} aria-hidden="true" />
           {placed.map(({ site, x, y }) => (
             <Link
               key={site.id}
-              to={`/sites/${site.slug}`}
+              to={primaryTarget(site)}
               className={styles.marker}
               style={{ left: `${x}%`, top: `${y}%` }}
             >
@@ -105,7 +116,7 @@ export function MapPage() {
           <ul className={styles.unmappedList}>
             {unmapped.map((site) => (
               <li key={site.id}>
-                <Link to={`/sites/${site.slug}`} className={styles.unmappedLink}>
+                <Link to={primaryTarget(site)} className={styles.unmappedLink}>
                   <AppIcon name="globe" size={14} />
                   {site.name}
                   <span className={styles.unmappedNote}>

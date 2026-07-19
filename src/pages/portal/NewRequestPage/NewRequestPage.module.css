@@ -1,132 +1,179 @@
 .page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-6);
-  text-align: center;
+  gap: var(--space-5);
 }
 
-.header {
+/* ------------------------------- Form ---------------------------------- */
+
+.form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.header h1 {
-  margin: 0;
-}
-
-.kicker {
-  margin: 0;
-  color: var(--color-text);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-.lede {
-  margin: 0;
-  color: var(--color-text-muted);
-  max-width: 38rem;
-}
-
-/* Single option card, centered. */
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  gap: var(--space-5);
   width: 100%;
-  max-width: 34rem;
+  max-width: 38rem;
   padding: var(--space-6);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  text-align: left;
 }
 
-.cardIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  margin-bottom: var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: rgba(252, 217, 0, 0.18);
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
-.cardTitle {
-  margin: 0 0 var(--space-2);
-  font-size: var(--font-size-2xl);
-}
-
-.cardSubtitle {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
-.cardBody {
-  margin: 0 0 var(--space-4);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.cardList {
-  margin: 0 0 var(--space-5);
+.fieldset {
+  margin: 0;
   padding: 0;
-  list-style: none;
+  border: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.cardList li {
-  position: relative;
-  padding-left: var(--space-4);
+.label {
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* Amber dot bullets, like the marketing pages. */
-.cardList li::before {
-  content: "";
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+  line-height: var(--line-height-base);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+}
+
+/* Product choice: two radio cards. */
+.kindGrid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 40rem) {
+  .kindGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.kindCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.kindCard:hover {
+  border-color: var(--color-border-strong);
+}
+
+.kindCardActive,
+.kindCardActive:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+/* Keep the native radio for a11y; visually the card is the control. */
+.kindRadio {
   position: absolute;
-  left: 0;
-  top: 0.45em;
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-full);
-  background-color: #fcd900;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-/* Outlined action, per the request mock-up. */
-.cta {
+.kindCard:has(.kindRadio:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.kindTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.kindBody {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+
+/* New-location fields, side by side where space allows. */
+.locationRow {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 40rem) {
+  .locationRow {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* ------------------------------ Actions -------------------------------- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-2) var(--space-5);
-  border: var(--border-width) solid var(--color-border-strong);
+  border: none;
   border-radius: var(--radius-md);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-  transition: background-color 160ms ease, border-color 160ms ease;
+  cursor: pointer;
+  transition: background-color 160ms ease;
 }
 
-.cta:hover {
-  background-color: rgba(252, 217, 0, 0.13);
-  border-color: #fcd900;
-  color: var(--color-text);
-  text-decoration: none;
+.submit:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .footnote {
-  margin: var(--space-3) 0 0;
+  margin: 0;
   color: var(--color-text-subtle);
   font-size: var(--font-size-xs);
 }

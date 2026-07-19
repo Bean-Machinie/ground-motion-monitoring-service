@@ -263,26 +263,28 @@
   font-size: var(--font-size-sm);
 }
 
-/* -------------------------- Your services ----------------------------- */
+/* --------------------------- Active work ------------------------------- */
 
 .serviceGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
-  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* One card per service, field order fixed: state → name → kind line →
+   headline/status line → next date. No image, no technique. */
 .serviceCard {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: var(--space-4) var(--space-5);
   background-color: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
   color: var(--color-text);
   transition:
     transform 180ms var(--ease-nav),
@@ -292,9 +294,9 @@
 
 .serviceCard:hover {
   text-decoration: none;
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .serviceCard:hover .cardArrow {
@@ -302,46 +304,12 @@
   color: var(--color-text);
 }
 
-.serviceMedia {
-  position: relative;
-  height: 8.5rem;
-  overflow: hidden;
-}
-
-.serviceImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 400ms var(--ease-nav);
-}
-
-.serviceCard:hover .serviceImage {
-  transform: scale(1.05);
-}
-
-/* Product-format chip pinned on the image. */
-.serviceKindChip {
-  position: absolute;
-  top: var(--space-2);
-  left: var(--space-2);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-full);
-  background-color: #fcd900;
-  color: #111111;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-}
-
-.serviceBody {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: var(--space-4) var(--space-5) var(--space-4);
-}
-
-.serviceKicker {
-  margin: 0 0 var(--space-1);
+/* 1. Status dot + short state word. */
+.serviceState {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
   color: var(--color-text-subtle);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -349,12 +317,60 @@
   letter-spacing: 0.08em;
 }
 
+.serviceDot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: var(--radius-full);
+}
+
+.serviceDot_success {
+  background-color: #3f9d63;
+}
+
+.serviceDot_danger {
+  background-color: var(--color-danger);
+}
+
+.serviceDot_neutral {
+  background-color: var(--color-border-strong);
+}
+
+/* 2. The customer's own name for the work — the headline. */
 .serviceTitle {
-  margin: 0 0 var(--space-3);
-  font-size: var(--font-size-lg);
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
 }
 
+/* 3. "Quarterly monitoring · Port of Esbjerg, Denmark". */
+.serviceKindLine {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* 5. Latest published headline, clamped. */
+.serviceHeadline {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Request stage: an honest status line in place of the headline. */
+.serviceStatusLine {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+/* 6. Next date. */
 .serviceFooter {
   display: flex;
   align-items: center;

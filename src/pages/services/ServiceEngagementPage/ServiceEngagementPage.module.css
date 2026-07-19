@@ -45,6 +45,38 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* Full-width entry (e.g. scope notes) in the meta grid. */
+.metaWide {
+  grid-column: 1 / -1;
+}
+
+.metaWide dd {
+  font-weight: var(--font-weight-normal);
+}
+
+/* Honest request-stage footer inside the meta card. */
+.reviewNote {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The single quiet entry point to the location page. */
+.siteLine {
+  margin: 0;
+}
+
+.siteLink {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.siteLink:hover {
+  color: var(--color-text);
+}
+
 .columns {
   display: grid;
   gap: var(--space-6);

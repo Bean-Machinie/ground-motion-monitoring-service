@@ -23,7 +23,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
             <li key={`${crumb.label}-${index}`} className={styles.item}>
               {isLast || !crumb.to ? (
                 <span
-                  className={styles.current}
+                  className={isLast ? styles.current : styles.ancestor}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {crumb.label}

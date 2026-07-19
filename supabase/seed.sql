@@ -11,28 +11,32 @@
 -- example) before inserting.
 --
 -- What this demonstrates:
---   Port of Esbjerg  — active monitoring: three published quarterly issues,
---                      one off-cycle alert issue, an UNACKNOWLEDGED critical
---                      alert, and artifacts on the latest issues.
---   Copenhagen Metro — completed screening whose first report was corrected:
+--   Esbjerg quay expansion — active monitoring: three published quarterly
+--                      issues, one off-cycle alert issue, an UNACKNOWLEDGED
+--                      critical alert, and artifacts on the latest issues.
+--   Metro C2 baseline — completed screening whose first report was corrected:
 --                      issue 1 is superseded by issue 2 (supersedes_report_id).
---   Grimsel Reservoir— monitoring where issue 1 FAILED in processing and the
+--   Grimsel dam      — monitoring where issue 1 FAILED in processing and the
 --                      next issue is OVERDUE → both surface under
 --                      "Needs attention" on the workspace.
+--   Thyborøn coastal — a freshly submitted request: a service in 'scoping'
+--                      with no reports yet.
 
 do $$
 declare
   customer_id uuid := '89f8ade2-1416-477e-a7c5-bfbd5755c534';  -- <-- your auth user id
 
-  -- Sites
+  -- Sites (reference records: pure locations, no lifecycle)
   site_esbjerg uuid := 'aaaaaaaa-0000-4000-8000-000000000001';
   site_metro   uuid := 'bbbbbbbb-0000-4000-8000-000000000001';
   site_dam     uuid := 'cccccccc-0000-4000-8000-000000000001';
+  site_coast   uuid := 'dddddddd-0000-4000-8000-000000000001';
 
-  -- Services
+  -- Services (the spine: what the customer asked for and pays for)
   svc_esbjerg uuid := 'aaaaaaaa-0000-4000-8000-000000000002';
   svc_metro   uuid := 'bbbbbbbb-0000-4000-8000-000000000002';
   svc_dam     uuid := 'cccccccc-0000-4000-8000-000000000002';
+  svc_coast   uuid := 'dddddddd-0000-4000-8000-000000000002';
 
   -- Reports
   rpt_esbjerg_1 uuid := 'aaaaaaaa-0000-4000-8000-000000000011';
@@ -52,8 +56,12 @@ begin
   where slug in (
     'riverside-embankment-monitoring',
     'port-of-esbjerg-quay-expansion',
+    'port-of-esbjerg',
     'copenhagen-metro-extension',
-    'grimsel-reservoir-dam'
+    'copenhagen-metro-section-c2',
+    'grimsel-reservoir-dam',
+    'grimsel-reservoir',
+    'thyboron-coast'
   );
   delete from public.projects
   where slug = 'riverside-embankment-monitoring';
@@ -66,7 +74,7 @@ begin
   where id = customer_id;
 
   -- -------------------------------------------------------------------
-  -- Sites: stable physical areas of interest.
+  -- Sites: reference records — pure locations, no lifecycle.
   -- -------------------------------------------------------------------
   insert into public.sites
     (id, org_id, name, slug, country, description,
@@ -74,8 +82,8 @@ begin
   values
     (
       site_esbjerg, customer_id,
-      'Port of Esbjerg Quay Expansion',
-      'port-of-esbjerg-quay-expansion',
+      'Port of Esbjerg',
+      'port-of-esbjerg',
       'Denmark',
       'Reclaimed quay area and heavy-lift terminal under staged expansion.',
       55.46410, 8.42214,
@@ -83,8 +91,8 @@ begin
     ),
     (
       site_metro, customer_id,
-      'Copenhagen Metro Extension — Section C2',
-      'copenhagen-metro-extension',
+      'Copenhagen Metro Section C2',
+      'copenhagen-metro-section-c2',
       'Denmark',
       'Twin-bore tunnel alignment beneath mixed residential blocks.',
       55.66910, 12.55280,
@@ -92,31 +100,57 @@ begin
     ),
     (
       site_dam, customer_id,
-      'Grimsel Reservoir Dam',
-      'grimsel-reservoir-dam',
+      'Grimsel Reservoir',
+      'grimsel-reservoir',
       'Switzerland',
       'Concrete gravity dam and abutment slopes above the reservoir.',
       46.57180, 8.33320,
-      null  -- no AOI polygon captured yet: the site page shows this honestly
+      null  -- no AOI polygon captured yet: the location page shows this honestly
+    ),
+    (
+      site_coast, customer_id,
+      'Thyborøn Coast',
+      'thyboron-coast',
+      'Denmark',
+      'Harbour town and coastal defence works on the Limfjord inlet.',
+      56.69860, 8.21170,
+      null
     );
 
   -- -------------------------------------------------------------------
-  -- Services: the commercial engagements.
+  -- Services: the spine. `name` is the customer's own name for the work
+  -- and the display name everywhere.
   -- -------------------------------------------------------------------
   insert into public.services
-    (id, site_id, org_id, kind, technique, status,
+    (id, site_id, org_id, name, kind, technique, status,
+     requested_at, requested_by, scope_notes,
      started_on, ended_on, cadence, next_issue_due)
   values
     -- Ongoing quarterly monitoring subscription.
-    (svc_esbjerg, site_esbjerg, customer_id, 'monitoring', 'insar_sbas',
-     'active', '2025-09-01', null, 'quarterly', '2026-09-10'),
+    (svc_esbjerg, site_esbjerg, customer_id,
+     'Esbjerg quay expansion', 'monitoring', 'insar_sbas', 'active',
+     '2025-08-14T09:20:00Z', customer_id,
+     'Staged quay expansion on reclaimed ground; settlement is the design risk.',
+     '2025-09-01', null, 'quarterly', '2026-09-10'),
     -- One-off screening, delivered and closed.
-    (svc_metro, site_metro, customer_id, 'screening', 'insar_ps',
-     'completed', '2026-01-12', '2026-03-02', null, null),
+    (svc_metro, site_metro, customer_id,
+     'Metro C2 baseline', 'screening', 'insar_ps', 'completed',
+     '2025-12-18T11:05:00Z', customer_id,
+     'Pre-construction deformation baseline along the C2 alignment.',
+     '2026-01-12', '2026-03-02', null, null),
     -- Monitoring subscription with a failed first issue and an OVERDUE
     -- next issue (due before today) → workspace "Needs attention".
-    (svc_dam, site_dam, customer_id, 'monitoring', 'insar_sbas',
-     'active', '2026-01-01', null, 'quarterly', '2026-07-01');
+    (svc_dam, site_dam, customer_id,
+     'Grimsel dam', 'monitoring', 'insar_sbas', 'active',
+     '2025-11-30T15:40:00Z', customer_id,
+     'Dam crest and abutment slopes; interest in seasonal reservoir loading.',
+     '2026-01-01', null, 'quarterly', '2026-07-01'),
+    -- Freshly submitted request: exists from the moment it was asked for.
+    (svc_coast, site_coast, customer_id,
+     'Thyborøn coastal defence', 'monitoring', 'insar_sbas', 'scoping',
+     '2026-07-16T08:12:00Z', customer_id,
+     'Coastal defence works and harbour quarter; storm-season movement is the concern.',
+     null, null, null, null);
 
   -- -------------------------------------------------------------------
   -- Reports: immutable issues.

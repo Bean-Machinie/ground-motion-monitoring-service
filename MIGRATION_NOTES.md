@@ -99,3 +99,22 @@ of truth.
 4. ~~`supabase/seed.sql` still seeds the old tables~~ — done: the seed now
    targets sites/services/reports, removes the old Riverside example, and
    is safe to re-run.
+
+## 005: Service becomes the primary object (site demoted to reference data)
+
+`supabase/migrations/005_service_first.sql` inverts the hierarchy: nobody
+buys a location — they buy a monitoring subscription or a screening that
+happens to be performed at one.
+
+- `services` gains `name` (customer-supplied display name, required;
+  backfilled from the site name), `requested_at`, `requested_by`, and
+  `scope_notes`.
+- `service_status` is recreated as `scoping → quoted → active → paused →
+  completed → cancelled`. `draft` is gone — a service exists from the
+  moment a customer asks for it. Existing `draft` rows became `scoping`.
+- There is no `requests` table: submitting `/requests/new` inserts a
+  `services` row in `scoping` (plus a `sites` row for a new area of
+  interest), enabled by the two new customer-insert RLS policies.
+- `sites` is unchanged structurally and remains lifecycle-free; the app
+  now treats it purely as reference data. `/sites` (list) is gone and
+  `/sites/:slug` is reached only from a service page.

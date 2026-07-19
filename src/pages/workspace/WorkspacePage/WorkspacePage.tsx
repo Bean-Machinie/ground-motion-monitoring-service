@@ -1,7 +1,7 @@
 // Signed-in workspace, ordered by what needs attention rather than by
-// table: needs-attention items, latest published reports, and the org's
-// services grouped by product format — all as clean clickable cards.
-// Data comes from the shell-level portal context (fetched once).
+// table: needs-attention items, latest published reports, and Active
+// work — one card per service, headlined by the customer's own name for
+// it. Data comes from the shell-level portal context (fetched once).
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { usePortalData } from "@/context/PortalDataContext";
@@ -11,18 +11,15 @@ import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
-import { StatusBadge } from "@/components/ui/StatusBadge/StatusBadge";
 import {
   REPORT_KIND_LABELS,
-  SERVICE_KIND_LABELS,
   SERVICE_STATUS_LABELS,
-  TECHNIQUE_LABELS,
+  serviceDisplayName,
+  serviceKindLine,
   type Report,
   type Service,
 } from "@/types/domain";
-import { formatDate } from "@/lib/dates";
-import monitoringImage from "@/assets/images/offering-deformation.jpg";
-import screeningImage from "@/assets/images/offering-risk.jpg";
+import { formatDate, formatShortDate } from "@/lib/dates";
 import styles from "./WorkspacePage.module.css";
 
 /** Legacy ?tab=… URLs map onto the new routes. */
@@ -32,11 +29,6 @@ const LEGACY_TAB_ROUTES: Record<string, string> = {
   reports: "/reports",
 };
 
-const SERVICE_IMAGES: Record<Service["kind"], string> = {
-  monitoring: monitoringImage,
-  screening: screeningImage,
-};
-
 function reportTitle(report: Report): string {
   return (
     report.headline ??
@@ -44,11 +36,53 @@ function reportTitle(report: Report): string {
   );
 }
 
+/** Card status dot: red for an unacknowledged alert, green for active,
+    neutral otherwise (scoping and quoted stay deliberately calm). */
+function cardDotTone(
+  service: Service,
+  alertedServiceIds: Set<string>,
+): "danger" | "success" | "neutral" {
+  if (alertedServiceIds.has(service.id)) return "danger";
+  if (service.status === "active") return "success";
+  return "neutral";
+}
+
+/** The card footer: always a date-shaped fact, never a vague promise.
+    "Issue 5 due 10 Sep", "Delivered 2 Mar", "Scoping in progress". */
+function nextDateLine(service: Service, serviceReports: Report[]): string {
+  if (service.status === "scoping") return "Scoping in progress";
+  if (service.status === "quoted") return "Quote ready";
+  if (service.status === "paused") return "Paused";
+  if (service.status === "cancelled") return "Cancelled";
+
+  const published = serviceReports.filter((r) => r.state === "published");
+
+  if (service.status === "completed") {
+    const delivered =
+      published[0]?.published_at ?? service.ended_on ?? service.updated_at;
+    return `Delivered ${formatShortDate(delivered)}`;
+  }
+
+  // Active monitoring: the next issue number is one past the latest.
+  if (service.kind === "monitoring" && service.next_issue_due) {
+    const latest = serviceReports.reduce(
+      (max, r) => Math.max(max, r.issue_number),
+      0,
+    );
+    return `Issue ${latest + 1} due ${formatShortDate(service.next_issue_due)}`;
+  }
+
+  return published[0]?.published_at
+    ? `Delivered ${formatShortDate(published[0].published_at)}`
+    : "In progress";
+}
+
 export function WorkspacePage() {
   const { profile } = useProfile();
   const {
     services,
     reports,
+    alerts,
     loading,
     error,
     refetch,
@@ -79,9 +113,17 @@ export function WorkspacePage() {
     .filter((r) => r.state === "published")
     .slice(0, 5);
 
-  // ---------------------------- Your services ----------------------------
+  // ----------------------------- Active work ------------------------------
   const monitoringServices = services.filter((s) => s.kind === "monitoring");
   const screeningServices = services.filter((s) => s.kind === "screening");
+
+  const alertedServiceIds = new Set(
+    alerts.filter((a) => !a.acknowledged_at).map((a) => a.service_id),
+  );
+  const reportsForService = (serviceId: string) =>
+    reports
+      .filter((r) => r.service_id === serviceId)
+      .sort((a, b) => b.issue_number - a.issue_number);
 
   const displayName = profile?.full_name || profile?.email || "there";
 
@@ -165,16 +207,16 @@ export function WorkspacePage() {
         )}
       </section>
 
-      {/* -------------------------- Your services ----------------------- */}
+      {/* --------------------------- Active work ------------------------ */}
       <section aria-labelledby="services-heading" className={styles.section}>
         <h2 id="services-heading" className={styles.sectionTitle}>
-          Your services
+          Active work
         </h2>
 
         {services.length === 0 ? (
           <EmptyState
-            title="No services yet"
-            description="When a screening or monitoring engagement is set up for your account, it will appear here."
+            title="Nothing under way yet"
+            description="Request a monitoring subscription or a screening and it will appear here from the moment you ask."
             action={
               <Link to="/requests/new" className={styles.newRequest}>
                 New Request
@@ -183,48 +225,73 @@ export function WorkspacePage() {
           />
         ) : (
           <ul className={styles.serviceGrid}>
-            {[...monitoringServices, ...screeningServices].map((service) => (
-              <li key={service.id}>
-                <Link
-                  to={`/services/${service.id}`}
-                  className={styles.serviceCard}
-                >
-                  <div className={styles.serviceMedia}>
-                    <img
-                      src={SERVICE_IMAGES[service.kind]}
-                      alt=""
-                      className={styles.serviceImage}
-                      loading="lazy"
-                    />
-                    <span className={styles.serviceKindChip}>
-                      {SERVICE_KIND_LABELS[service.kind]}
-                    </span>
-                  </div>
-                  <div className={styles.serviceBody}>
-                    <p className={styles.serviceKicker}>
-                      {TECHNIQUE_LABELS[service.technique]}
-                    </p>
-                    <h3 className={styles.serviceTitle}>
-                      {siteById.get(service.site_id)?.name ?? "—"}
-                    </h3>
-                    <div className={styles.serviceFooter}>
-                      <StatusBadge
-                        status={service.status}
-                        label={SERVICE_STATUS_LABELS[service.status]}
+            {[...monitoringServices, ...screeningServices].map((service) => {
+              const site = siteById.get(service.site_id);
+              const serviceReports = reportsForService(service.id);
+              const inRequestStage =
+                service.status === "scoping" || service.status === "quoted";
+              const latestPublished = serviceReports.find(
+                (r) => r.state === "published",
+              );
+
+              return (
+                <li key={service.id}>
+                  <Link
+                    to={`/services/${service.id}`}
+                    className={styles.serviceCard}
+                  >
+                    {/* 1. Status dot and short state word. */}
+                    <span className={styles.serviceState}>
+                      <span
+                        className={`${styles.serviceDot} ${
+                          styles[
+                            `serviceDot_${cardDotTone(service, alertedServiceIds)}`
+                          ]
+                        }`}
+                        aria-hidden="true"
                       />
-                      {service.kind === "monitoring" ? (
-                        <span className={styles.serviceNext}>
-                          Next issue {formatDate(service.next_issue_due)}
-                        </span>
-                      ) : null}
+                      {SERVICE_STATUS_LABELS[service.status]}
+                    </span>
+
+                    {/* 2. The customer's own name — the headline. */}
+                    <h3
+                      className={styles.serviceTitle}
+                      title={serviceDisplayName(service, site)}
+                    >
+                      {serviceDisplayName(service, site)}
+                    </h3>
+
+                    {/* 3. "{cadence} {kind} · {location}, {country}" —
+                        never the technique, never location-first. */}
+                    <p className={styles.serviceKindLine}>
+                      {serviceKindLine(service, site)}
+                    </p>
+
+                    {/* 5. Latest published headline — or, in the request
+                        stage, an honest status line instead. */}
+                    {inRequestStage ? (
+                      <p className={styles.serviceStatusLine}>
+                        We're reviewing your request
+                      </p>
+                    ) : latestPublished?.headline ? (
+                      <p className={styles.serviceHeadline}>
+                        {latestPublished.headline}
+                      </p>
+                    ) : null}
+
+                    {/* 6. Next date. */}
+                    <span className={styles.serviceFooter}>
+                      <span className={styles.serviceNext}>
+                        {nextDateLine(service, serviceReports)}
+                      </span>
                       <span className={styles.cardArrow} aria-hidden="true">
                         →
                       </span>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

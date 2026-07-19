@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
 import { ReportViewer } from "@/components/reports/ReportViewer/ReportViewer";
-import { SERVICE_KIND_LABELS } from "@/types/domain";
+import { SERVICE_KIND_LABELS, serviceDisplayName } from "@/types/domain";
 import styles from "./ReportViewerPage.module.css";
 
 export function ReportViewerPage() {
@@ -29,16 +29,16 @@ export function ReportViewerPage() {
     ? sites.find((s) => s.id === service.site_id)
     : undefined;
 
-  // Breadcrumb goes into the shell's fixed context bar.
+  // Breadcrumb goes into the shell's fixed context bar. Service-first:
+  // "Monitoring / Esbjerg quay expansion / Issue 4" — never site-first.
   usePortalCrumbs(
     report
       ? [
-          { label: "Workspace", to: "/" },
-          ...(site ? [{ label: site.name, to: `/sites/${site.slug}` }] : []),
           ...(service
             ? [
+                { label: SERVICE_KIND_LABELS[service.kind] },
                 {
-                  label: SERVICE_KIND_LABELS[service.kind],
+                  label: serviceDisplayName(service, site),
                   to: `/services/${service.id}`,
                 },
               ]

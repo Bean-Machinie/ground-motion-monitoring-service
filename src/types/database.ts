@@ -95,9 +95,13 @@ export type Database = {
           id: string;
           site_id: string;
           org_id: string;
+          name: string;
           kind: Database["public"]["Enums"]["service_kind"];
           technique: Database["public"]["Enums"]["analysis_technique"];
           status: Database["public"]["Enums"]["service_status"];
+          requested_at: string | null;
+          requested_by: string | null;
+          scope_notes: string | null;
           started_on: string | null;
           ended_on: string | null;
           cadence: Database["public"]["Enums"]["service_cadence"] | null;
@@ -109,9 +113,13 @@ export type Database = {
           id?: string;
           site_id: string;
           org_id: string;
+          name: string;
           kind: Database["public"]["Enums"]["service_kind"];
           technique?: Database["public"]["Enums"]["analysis_technique"];
           status?: Database["public"]["Enums"]["service_status"];
+          requested_at?: string | null;
+          requested_by?: string | null;
+          scope_notes?: string | null;
           started_on?: string | null;
           ended_on?: string | null;
           cadence?: Database["public"]["Enums"]["service_cadence"] | null;
@@ -123,9 +131,13 @@ export type Database = {
           id?: string;
           site_id?: string;
           org_id?: string;
+          name?: string;
           kind?: Database["public"]["Enums"]["service_kind"];
           technique?: Database["public"]["Enums"]["analysis_technique"];
           status?: Database["public"]["Enums"]["service_status"];
+          requested_at?: string | null;
+          requested_by?: string | null;
+          scope_notes?: string | null;
           started_on?: string | null;
           ended_on?: string | null;
           cadence?: Database["public"]["Enums"]["service_cadence"] | null;
@@ -428,8 +440,8 @@ export type Database = {
       service_kind: "screening" | "monitoring";
       analysis_technique: "insar_sbas" | "insar_ps";
       service_status:
-        | "draft"
         | "scoping"
+        | "quoted"
         | "active"
         | "paused"
         | "completed"

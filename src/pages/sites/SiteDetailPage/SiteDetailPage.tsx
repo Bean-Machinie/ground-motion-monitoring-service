@@ -1,5 +1,8 @@
-// Site detail: the real home for an area of interest — location metadata
-// and a chronological timeline of every service and report issue on it.
+// Location page (/sites/:slug): a secondary lens, reached only from a
+// service page — never from the sidebar. Ground motion at a location is
+// physically continuous, so this answers "what else has happened here":
+// the geometry plus a chronological timeline of every service and report
+// issue ever run at the location.
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
@@ -14,7 +17,6 @@ import {
   REPORT_STATE_LABELS,
   SERVICE_KIND_LABELS,
   SERVICE_STATUS_LABELS,
-  TECHNIQUE_LABELS,
 } from "@/types/domain";
 import { formatDate } from "@/lib/dates";
 import styles from "./SiteDetailPage.module.css";
@@ -43,9 +45,9 @@ export function SiteDetailPage() {
 
     const serviceEvents: TimelineEvent[] = siteServices.map((s) => ({
       key: `service-${s.id}`,
-      date: s.started_on ?? s.created_at,
-      title: `${SERVICE_KIND_LABELS[s.kind]} engagement`,
-      meta: TECHNIQUE_LABELS[s.technique],
+      date: s.started_on ?? s.requested_at ?? s.created_at,
+      title: s.name || SERVICE_KIND_LABELS[s.kind],
+      meta: SERVICE_KIND_LABELS[s.kind],
       to: `/services/${s.id}`,
       status: s.status,
       statusLabel: SERVICE_STATUS_LABELS[s.status],
@@ -77,8 +79,8 @@ export function SiteDetailPage() {
   if (!site) {
     return (
       <EmptyState
-        title="Site not found"
-        description="This site does not exist or you do not have access to it."
+        title="Location not found"
+        description="This location does not exist or you do not have access to it."
         action={<Link to="/">Back to workspace</Link>}
       />
     );
@@ -126,7 +128,7 @@ export function SiteDetailPage() {
         </Card>
 
         <Card className={styles.locationCard}>
-          <h2 className={styles.cardTitle}>About this site</h2>
+          <h2 className={styles.cardTitle}>About this location</h2>
           <dl className={styles.meta}>
             <div>
               <dt>Country</dt>
@@ -147,8 +149,8 @@ export function SiteDetailPage() {
 
         {events.length === 0 ? (
           <EmptyState
-            title="Nothing on this site yet"
-            description="Services and report issues on this site will appear here in chronological order."
+            title="Nothing at this location yet"
+            description="Monitoring, screenings, and report issues here will appear in chronological order."
           />
         ) : (
           <ol className={styles.timeline}>

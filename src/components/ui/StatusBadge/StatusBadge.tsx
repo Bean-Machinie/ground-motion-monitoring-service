@@ -4,9 +4,9 @@ import styles from "./StatusBadge.module.css";
 type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
 const STATUS_TONES: Record<string, Tone> = {
-  // Service (engagement) statuses
-  draft: "neutral",
+  // Service statuses (lifecycle starts at scoping — no draft)
   scoping: "info",
+  quoted: "info",
   active: "success",
   paused: "warning",
   completed: "success",

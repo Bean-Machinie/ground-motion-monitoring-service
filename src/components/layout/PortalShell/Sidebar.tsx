@@ -1,16 +1,16 @@
 // Persistent portal sidebar. Top to bottom: New request (separated by a
-// hairline), primary nav (Workspace / Needs attention), the site tree in
-// its own scroll area (like a chat list — it scrolls, the rest stays
-// put), Library, and a footer with just the collapse toggle. No brand
-// (top panel has it), no profile (top panel has it), no Settings (the
-// profile menu has it).
+// hairline), primary nav (Workspace / Needs attention), the services
+// tree in its own scroll area (like a chat list — it scrolls, the rest
+// stays put), Library, and a footer with just the collapse toggle. No
+// brand (top panel has it), no profile (top panel has it), no Settings
+// (the profile menu has it).
 //
 // Collapse: the width animates while every icon keeps its exact
 // position — labels only fade. Nothing shifts, scales, or re-centers.
 import { NavLink } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
 import { usePortalChrome } from "@/components/layout/PortalShell/PortalShell";
-import { SiteTree } from "@/components/layout/PortalShell/SiteTree";
+import { ServiceTree } from "@/components/layout/PortalShell/ServiceTree";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import type { IconName } from "@/lib/icons";
 import styles from "./Sidebar.module.css";
@@ -146,8 +146,11 @@ export function Sidebar() {
         </ul>
 
         <ul className={styles.section}>
+          {/* `end`: individual report pages belong to their service in
+              the tree below — the library row only lights up on itself. */}
           <NavRow
             to="/reports"
+            end
             icon="file"
             label="All reports"
             collapsed={collapsed}
@@ -155,15 +158,11 @@ export function Sidebar() {
           <NavRow to="/map" icon="globe" label="Map view" collapsed={collapsed} />
         </ul>
 
-        {/* Just breathing room above the sites — no divider here. */}
-        <p className={styles.sectionLabel} id="sidebar-sites-label">
-          Your Sites
-        </p>
-
         {/* The tree scrolls on its own (chat-list style); everything else
-            in the sidebar stays anchored. */}
+            in the sidebar stays anchored. Group labels (MONITORING /
+            SCREENINGS) live inside the tree and scroll with it. */}
         <div className={styles.treeScroll}>
-          <SiteTree collapsed={collapsed} />
+          <ServiceTree collapsed={collapsed} />
         </div>
       </nav>
 
