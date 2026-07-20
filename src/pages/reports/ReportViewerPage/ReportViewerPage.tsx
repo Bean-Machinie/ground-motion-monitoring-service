@@ -1,9 +1,9 @@
 // Report viewer page: resolves the report, its service/site context, its
-// sibling issues, and its artifacts, then renders the unified viewer.
+// sibling issues, and its attachments, then renders the unified viewer.
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
-import { useReportArtifacts } from "@/hooks/useReportArtifacts";
+import { useReportAttachments } from "@/hooks/useReportAttachments";
 import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -18,9 +18,9 @@ export function ReportViewerPage() {
     usePortalData();
   const report = reports.find((r) => r.id === id);
   const {
-    artifacts,
-    loading: artifactsLoading,
-  } = useReportArtifacts(report?.id);
+    attachments,
+    loading: attachmentsLoading,
+  } = useReportAttachments(report?.id);
 
   const service = report
     ? services.find((s) => s.id === report.service_id)
@@ -48,7 +48,7 @@ export function ReportViewerPage() {
       : [],
   );
 
-  if (loading || artifactsLoading) {
+  if (loading || attachmentsLoading) {
     return <LoadingState label="Loading report…" />;
   }
 
@@ -77,7 +77,7 @@ export function ReportViewerPage() {
         service={service}
         site={site}
         siblings={siblings}
-        artifacts={artifacts}
+        attachments={attachments}
       />
     </div>
   );

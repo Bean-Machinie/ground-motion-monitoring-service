@@ -160,10 +160,9 @@ export type Database = {
           published_at: string | null;
           headline: string | null;
           summary: string | null;
-          pdf_url: string | null;
           supersedes_report_id: string | null;
-          cumulative_mm: number | null;
-          series_mm: Json | null;
+          headline_metric: Json | null;
+          chart_series: Json | null;
           created_at: string;
           updated_at: string;
         };
@@ -179,10 +178,9 @@ export type Database = {
           published_at?: string | null;
           headline?: string | null;
           summary?: string | null;
-          pdf_url?: string | null;
           supersedes_report_id?: string | null;
-          cumulative_mm?: number | null;
-          series_mm?: Json | null;
+          headline_metric?: Json | null;
+          chart_series?: Json | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -198,41 +196,49 @@ export type Database = {
           published_at?: string | null;
           headline?: string | null;
           summary?: string | null;
-          pdf_url?: string | null;
           supersedes_report_id?: string | null;
-          cumulative_mm?: number | null;
-          series_mm?: Json | null;
+          headline_metric?: Json | null;
+          chart_series?: Json | null;
           created_at?: string;
           updated_at?: string;
         };
         Relationships: [];
       };
-      report_artifacts: {
+      report_attachments: {
         Row: {
           id: string;
           report_id: string;
-          kind: Database["public"]["Enums"]["artifact_kind"];
-          storage_path: string;
+          filename: string;
+          label: string;
+          mime_type: string | null;
           bytes: number | null;
-          checksum: string | null;
+          storage_path: string;
+          is_primary: boolean;
+          sort_order: number;
           created_at: string;
         };
         Insert: {
           id?: string;
           report_id: string;
-          kind: Database["public"]["Enums"]["artifact_kind"];
-          storage_path: string;
+          filename: string;
+          label: string;
+          mime_type?: string | null;
           bytes?: number | null;
-          checksum?: string | null;
+          storage_path: string;
+          is_primary?: boolean;
+          sort_order?: number;
           created_at?: string;
         };
         Update: {
           id?: string;
           report_id?: string;
-          kind?: Database["public"]["Enums"]["artifact_kind"];
-          storage_path?: string;
+          filename?: string;
+          label?: string;
+          mime_type?: string | null;
           bytes?: number | null;
-          checksum?: string | null;
+          storage_path?: string;
+          is_primary?: boolean;
+          sort_order?: number;
           created_at?: string;
         };
         Relationships: [];
@@ -500,13 +506,6 @@ export type Database = {
         | "published"
         | "failed"
         | "superseded";
-      artifact_kind:
-        | "velocity_map"
-        | "displacement_timeseries"
-        | "coherence"
-        | "netcdf"
-        | "geotiff"
-        | "pdf";
       alert_severity: "info" | "warning" | "critical";
       run_status: "queued" | "running" | "succeeded" | "failed";
       /* Legacy enums (pending drop) */

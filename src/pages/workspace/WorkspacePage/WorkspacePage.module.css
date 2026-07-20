@@ -293,6 +293,20 @@
   color: var(--color-text-muted);
 }
 
+/* 70px trend slot between location and facts. Rendered only when the
+   report carries a chart_series — no placeholder when it does not. */
+.cardSpark {
+  height: 70px;
+  margin-bottom: var(--space-2);
+}
+
+/* Missing metric: the most recent report date, 13px, in its place. */
+.factPlain {
+  display: inline-block;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
 /* Labelled facts, two columns pinned to the bottom of the body. */
 .facts {
   display: grid;

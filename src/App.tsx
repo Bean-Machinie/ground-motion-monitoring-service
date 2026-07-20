@@ -35,7 +35,7 @@ import { RequestStartPage } from "@/pages/portal/RequestStartPage/RequestStartPa
 import { ExpertRequestPage } from "@/pages/portal/ExpertRequestPage/ExpertRequestPage";
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
-import { AdminPlaceholderPage } from "@/pages/admin/AdminPlaceholderPage/AdminPlaceholderPage";
+import { PublishReportPage } from "@/pages/admin/PublishReportPage/PublishReportPage";
 import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 
 export function App() {
@@ -97,11 +97,12 @@ export function App() {
         </Route>
         <Route path="requests/new/self-service" element={<NewRequestPage />} />
         <Route path="account" element={<AccountPage />} />
+        {/* Admin: the publish flow is the admin area for now. */}
         <Route
           path="admin"
           element={
             <AdminRoute>
-              <AdminPlaceholderPage />
+              <PublishReportPage />
             </AdminRoute>
           }
         />

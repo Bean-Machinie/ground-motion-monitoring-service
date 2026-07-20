@@ -5,7 +5,7 @@ import type { Enums, Tables } from "@/types/database";
 export type Site = Tables<"sites">;
 export type Service = Tables<"services">;
 export type Report = Tables<"reports">;
-export type ReportArtifact = Tables<"report_artifacts">;
+export type ReportAttachment = Tables<"report_attachments">;
 export type Alert = Tables<"alerts">;
 
 export type ServiceKind = Enums<"service_kind">;
@@ -13,8 +13,66 @@ export type ServiceStatus = Enums<"service_status">;
 export type AnalysisTechnique = Enums<"analysis_technique">;
 export type ReportKind = Enums<"report_kind">;
 export type ReportState = Enums<"report_state">;
-export type ArtifactKind = Enums<"artifact_kind">;
 export type AlertSeverity = Enums<"alert_severity">;
+
+/* ------------------- Report payload (hand-entered) -------------------- */
+
+/** reports.headline_metric — entered at publish time, optional. */
+export interface HeadlineMetric {
+  value: number;
+  unit: string;
+  tone: "danger" | "warning" | "neutral";
+}
+
+/** One point of reports.chart_series. */
+export interface ChartPoint {
+  t: string;
+  v: number;
+}
+
+/** Parse reports.headline_metric defensively: hand-entered JSONB, so a
+    malformed value degrades to "absent", never to a crash. */
+export function reportHeadlineMetric(report: Report): HeadlineMetric | null {
+  const raw = report.headline_metric;
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+    return null;
+  }
+  const value = (raw as Record<string, unknown>).value;
+  const unit = (raw as Record<string, unknown>).unit;
+  const tone = (raw as Record<string, unknown>).tone;
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  if (typeof unit !== "string" || unit.length === 0) return null;
+  return {
+    value,
+    unit,
+    tone: tone === "danger" || tone === "warning" ? tone : "neutral",
+  };
+}
+
+/** Parse reports.chart_series defensively; empty array means "absent". */
+export function reportChartSeries(report: Report): ChartPoint[] {
+  const raw = report.chart_series;
+  if (!Array.isArray(raw)) return [];
+  const points: ChartPoint[] = [];
+  for (const item of raw) {
+    if (item === null || typeof item !== "object" || Array.isArray(item)) {
+      continue;
+    }
+    const t = (item as Record<string, unknown>).t;
+    const v = (item as Record<string, unknown>).v;
+    if (typeof t === "string" && typeof v === "number" && Number.isFinite(v)) {
+      points.push({ t, v });
+    }
+  }
+  return points;
+}
+
+/** −14 → "−14", −0.42 → "−0.4". Unicode minus, like the reports. */
+export function formatMetricValue(value: number): string {
+  const rounded =
+    Math.abs(value) >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
+  return String(rounded).replace("-", "−");
+}
 
 export const SERVICE_KIND_LABELS: Record<ServiceKind, string> = {
   screening: "Screening",
@@ -97,15 +155,6 @@ export const REPORT_STATE_LABELS: Record<ReportState, string> = {
   published: "Published",
   failed: "Failed",
   superseded: "Superseded",
-};
-
-export const ARTIFACT_KIND_LABELS: Record<ArtifactKind, string> = {
-  velocity_map: "Velocity map",
-  displacement_timeseries: "Displacement time series",
-  coherence: "Coherence",
-  netcdf: "NetCDF",
-  geotiff: "GeoTIFF",
-  pdf: "PDF",
 };
 
 export const ALERT_SEVERITY_LABELS: Record<AlertSeverity, string> = {

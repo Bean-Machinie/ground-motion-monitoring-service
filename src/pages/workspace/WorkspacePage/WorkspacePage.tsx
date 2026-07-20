@@ -14,10 +14,13 @@ import { ActivityFeed } from "@/components/portal/ActivityFeed/ActivityFeed";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
+import { Sparkline } from "@/components/ui/Sparkline/Sparkline";
 import {
+  formatMetricValue,
+  reportChartSeries,
+  reportHeadlineMetric,
   serviceDisplayName,
   shortLocation,
-  type Report,
   type Service,
 } from "@/types/domain";
 import { formatShortDate } from "@/lib/dates";
@@ -74,67 +77,21 @@ function cardState(
 
 /* ---------------------------- Motion figures ---------------------------- */
 
-/** −14 → "−14", −0.42 → "−0.4". Unicode minus, like the reports. */
-function formatMm(value: number): string {
-  const rounded =
-    Math.abs(value) >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
-  return String(rounded).replace("-", "−");
-}
+/** headline_metric tones → stroke/text colours. */
+const METRIC_TONE_COLORS = {
+  danger: "var(--color-danger)",
+  warning: "var(--color-warning)",
+  neutral: "var(--color-text-subtle)",
+} as const;
 
-/** Displacement over the alert window when an alert is open, mean
-    velocity when stable, total displacement for a delivered screening. */
-function headlineFigure(
-  service: Service,
-  serviceReports: Report[],
-  hasOpenAlert: boolean,
-): string | null {
-  // typeof check, not != null: rows from before migration 006 have no
-  // cumulative_mm property at all, and undefined arithmetic yields NaN.
-  const published = serviceReports
-    .filter(
-      (r) => r.state === "published" && typeof r.cumulative_mm === "number",
-    )
-    .sort((a, b) => a.issue_number - b.issue_number);
-  const latest = published[published.length - 1];
-
-  if (service.kind === "screening") {
-    if (latest?.cumulative_mm == null) return null;
-    return `${formatMm(latest.cumulative_mm)} mm total`;
-  }
-
-  if (hasOpenAlert && published.length >= 2 && latest) {
-    const previous = published[published.length - 2];
-    const delta =
-      (latest.cumulative_mm as number) - (previous?.cumulative_mm as number);
-    const start = latest.period_start ? Date.parse(latest.period_start) : NaN;
-    const end = latest.period_end ? Date.parse(latest.period_end) : NaN;
-    const weeks =
-      Number.isFinite(start) && Number.isFinite(end)
-        ? Math.max(1, Math.round((end - start) / (7 * 86400000)))
-        : null;
-    return weeks
-      ? `${formatMm(delta)} mm / ${weeks} wks`
-      : `${formatMm(delta)} mm`;
-  }
-
-  if (published.length >= 2 && latest) {
-    const first = published[0];
-    const firstDate = Date.parse(
-      first?.period_end ?? first?.published_at ?? "",
-    );
-    const lastDate = Date.parse(latest.period_end ?? latest.published_at ?? "");
-    const years = (lastDate - firstDate) / (365.25 * 86400000);
-    if (years > 0) {
-      const velocity =
-        ((latest.cumulative_mm as number) -
-          (first?.cumulative_mm as number)) /
-        years;
-      return `${formatMm(velocity)} mm / yr`;
-    }
-  }
-
-  return null;
-}
+/** Sparkline fallback when the report carries no metric: the service
+    status colour, via the card-state tone. */
+const STATE_TONE_COLORS: Record<DotTone, string> = {
+  success: "var(--color-success)",
+  danger: "var(--color-danger)",
+  warning: "var(--color-warning)",
+  neutral: "var(--color-text-subtle)",
+};
 
 /* ------------------------------- The page ------------------------------- */
 
@@ -214,17 +171,45 @@ export function WorkspacePage() {
     const state = cardState(service, hasOpenAlert, isOverdue);
     const inRequestStage =
       service.status === "scoping" || service.status === "quoted";
-    const figure = inRequestStage
-      ? null
-      : headlineFigure(service, serviceReports, hasOpenAlert);
     const deliveredScreening =
       service.kind === "screening" && service.status === "completed";
     const latestPublished = serviceReports
       .filter((r) => r.state === "published")
       .sort((a, b) => b.issue_number - a.issue_number)[0];
 
-    /* Labelled facts, example-style: two small label/value pairs. */
-    let facts: { label: string; value: string; warning?: boolean }[];
+    // Hand-entered payload of the most recent published report. Either
+    // may be absent — the card must look deliberate in all four
+    // combinations, so absence removes the element, never substitutes a
+    // placeholder.
+    const metric = latestPublished
+      ? reportHeadlineMetric(latestPublished)
+      : null;
+    const series =
+      latestPublished && !inRequestStage
+        ? reportChartSeries(latestPublished)
+        : [];
+    const metricText = metric
+      ? `${formatMetricValue(metric.value)} ${metric.unit}`
+      : null;
+    const sparkStroke = metric
+      ? METRIC_TONE_COLORS[metric.tone]
+      : STATE_TONE_COLORS[state.tone];
+
+    // No metric → the date of the most recent report in its place.
+    const lastReportLine = latestPublished
+      ? `Last report ${formatShortDate(latestPublished.published_at)}`
+      : "No reports yet";
+
+    /* Labelled facts: two small label/value pairs, except that a missing
+       metric renders the last-report date as a plain 13px line. */
+    type Fact =
+      | { label: string; value: string; warning?: boolean }
+      | { plain: string };
+    const motionFact: Fact = metricText
+      ? { label: "Motion", value: metricText }
+      : { plain: lastReportLine };
+
+    let facts: Fact[];
     if (inRequestStage) {
       facts = [
         {
@@ -235,7 +220,9 @@ export function WorkspacePage() {
       ];
     } else if (deliveredScreening) {
       facts = [
-        { label: "Total motion", value: figure ?? "—" },
+        metricText
+          ? { label: "Total motion", value: metricText }
+          : { plain: lastReportLine },
         {
           label: "Delivered",
           value: formatShortDate(
@@ -245,7 +232,7 @@ export function WorkspacePage() {
       ];
     } else if (service.kind === "monitoring") {
       facts = [
-        { label: "Motion", value: figure ?? "No data yet" },
+        motionFact,
         isOverdue
           ? {
               label: "Next report",
@@ -261,7 +248,7 @@ export function WorkspacePage() {
       ];
     } else {
       facts = [
-        { label: "Motion", value: figure ?? "No data yet" },
+        motionFact,
         { label: "Latest report", value: latestPublished ? "Published" : "Pending" },
       ];
     }
@@ -295,15 +282,31 @@ export function WorkspacePage() {
             </h3>
             <p className={styles.cardLocation}>{shortLocation(site)}</p>
 
+            {/* 70px sparkline slot: series present → trend line; absent →
+                nothing at all, and the card is simply shorter. */}
+            {series.length >= 2 ? (
+              <div className={styles.cardSpark}>
+                <Sparkline points={series} stroke={sparkStroke} height={70} />
+              </div>
+            ) : null}
+
             <dl className={styles.facts}>
-              {facts.map((fact) => (
-                <div key={fact.label} className={styles.fact}>
-                  <dt>{fact.label}</dt>
-                  <dd className={fact.warning ? styles.factWarning : undefined}>
-                    {fact.value}
-                  </dd>
-                </div>
-              ))}
+              {facts.map((fact, i) =>
+                "plain" in fact ? (
+                  <div key={i} className={styles.fact}>
+                    <span className={styles.factPlain}>{fact.plain}</span>
+                  </div>
+                ) : (
+                  <div key={fact.label} className={styles.fact}>
+                    <dt>{fact.label}</dt>
+                    <dd
+                      className={fact.warning ? styles.factWarning : undefined}
+                    >
+                      {fact.value}
+                    </dd>
+                  </div>
+                ),
+              )}
             </dl>
           </div>
         </Link>

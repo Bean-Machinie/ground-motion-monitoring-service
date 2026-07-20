@@ -78,15 +78,9 @@ render the marketing page; a UUID renders the engagement detail
 
 ## PDF export
 
-`supabase/functions/report-pdf` is the `POST /reports/:id/pdf` equivalent:
-it authorises through the caller's RLS, refuses non-published reports,
-and owns the storage-upload + `report_artifacts(kind='pdf')` +
-`reports.pdf_url` bookkeeping. The actual renderer is deliberately left
-as a marked TODO (returns 501) rather than storing a fake PDF — wire a
-server-side renderer in and uncomment the final block. The viewer's
-"Generate PDF" button already calls this function and surfaces its
-response, and both web view and PDF read the same report row: one source
-of truth.
+~~`supabase/functions/report-pdf`~~ — removed by migration 008 (see below).
+There is no automatic PDF generation: the primary attachment is the
+deliverable, whatever format it happens to be.
 
 ## To drop in a follow-up migration (after backfill verification)
 
@@ -118,3 +112,28 @@ happens to be performed at one.
 - `sites` is unchanged structurally and remains lifecycle-free; the app
   now treats it purely as reference data. `/sites` (list) is gone and
   `/sites/:slug` is reached only from a service page.
+
+## 008: Generic report payload (rigid envelope, flexible payload)
+
+`supabase/migrations/008_generic_report_payload.sql`. The analysis is
+still bespoke and changing, so the payload is not locked: what a report
+contains is an arbitrary set of files plus a short, manually entered
+summary. The envelope (`service_id`, `kind`, `issue_number`,
+`period_start`, `period_end`, `state`, `published_at`) stays strict.
+
+- `report_artifacts` → `report_attachments` (`filename`, `label`,
+  `mime_type`, `bytes`, `storage_path`, `is_primary`, `sort_order`). Any
+  file type; no kind enum. Exactly one primary per report — what
+  "Read report →" opens. Files live in the private `reports` bucket under
+  `reports/{service_id}/{report_id}/{uuid}-{filename}` and are served
+  only through signed URLs expiring in under an hour.
+- `reports` gains nullable `headline_metric` and `chart_series` JSONB,
+  entered by hand at publish time; `pdf_url`, `cumulative_mm`, and
+  `series_mm` are dropped (the old headline figure is carried into
+  `headline_metric`). When the pipeline stabilises, automatic derivation
+  replaces the manual inputs — the columns and both consuming surfaces
+  do not change.
+- `processing_runs` stays but nothing depends on it; a report may be
+  published with no associated run.
+- The `report-pdf` edge function is deleted along with the viewer's
+  "Generate PDF" button.
