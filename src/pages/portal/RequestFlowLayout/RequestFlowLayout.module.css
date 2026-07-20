@@ -33,9 +33,9 @@
   opacity: 0.9;
   user-select: none;
   transition:
-    top 2800ms cubic-bezier(0.45, 0.05, 0.25, 1),
-    left 2800ms cubic-bezier(0.45, 0.05, 0.25, 1),
-    transform 2800ms cubic-bezier(0.45, 0.05, 0.25, 1);
+    top 2200ms cubic-bezier(0.45, 0.05, 0.25, 1),
+    left 2200ms cubic-bezier(0.45, 0.05, 0.25, 1),
+    transform 2200ms cubic-bezier(0.45, 0.05, 0.25, 1);
   will-change: top, left, transform;
 }
 

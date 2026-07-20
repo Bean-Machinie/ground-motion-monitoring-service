@@ -313,8 +313,11 @@ export function WorkspacePage() {
 
   /* --------------------------- Section header --------------------------- */
 
-  const countParts = (list: Service[], kind: Service["kind"]): string => {
-    const parts: string[] = [];
+  const countParts = (
+    list: Service[],
+    kind: Service["kind"],
+  ): { value: number; label: string }[] => {
+    const parts: { value: number; label: string }[] = [];
     const running = list.filter((s) => s.status === "active").length;
     const delivered = list.filter((s) => s.status === "completed").length;
     const scoped = list.filter(
@@ -323,15 +326,15 @@ export function WorkspacePage() {
     const paused = list.filter((s) => s.status === "paused").length;
 
     if (kind === "monitoring") {
-      if (running > 0) parts.push(`${running} running`);
-      if (scoped > 0) parts.push(`${scoped} being scoped`);
-      if (paused > 0) parts.push(`${paused} paused`);
+      if (running > 0) parts.push({ value: running, label: "running" });
+      if (scoped > 0) parts.push({ value: scoped, label: "being scoped" });
+      if (paused > 0) parts.push({ value: paused, label: "paused" });
     } else {
-      if (delivered > 0) parts.push(`${delivered} delivered`);
-      if (running > 0) parts.push(`${running} in progress`);
-      if (scoped > 0) parts.push(`${scoped} being scoped`);
+      if (delivered > 0) parts.push({ value: delivered, label: "delivered" });
+      if (running > 0) parts.push({ value: running, label: "in progress" });
+      if (scoped > 0) parts.push({ value: scoped, label: "being scoped" });
     }
-    return parts.join(" · ");
+    return parts;
   };
 
   const renderSection = (
@@ -346,11 +349,18 @@ export function WorkspacePage() {
 
     return (
       <section aria-label={heading} className={styles.section}>
+        {/* Reports-library-style strip: hairlines above and below, the
+            title divided from the counts — and the counts from each
+            other — by vertical rules. */}
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>{heading}</h2>
-          {list.length > 0 ? (
-            <span className={styles.sectionCount}>
-              {countParts(list, kind)}
+          {list.length > 0 && countParts(list, kind).length > 0 ? (
+            <span className={styles.sectionFacts}>
+              {countParts(list, kind).map((part) => (
+                <span key={part.label} className={styles.sectionFact}>
+                  <strong>{part.value}</strong> {part.label}
+                </span>
+              ))}
             </span>
           ) : null}
         </div>
