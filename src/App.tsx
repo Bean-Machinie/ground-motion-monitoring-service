@@ -36,6 +36,10 @@ import { ExpertRequestPage } from "@/pages/portal/ExpertRequestPage/ExpertReques
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
 import { AdminLayout } from "@/components/layout/AdminLayout/AdminLayout";
+import { AdminScopedLayout } from "@/components/layout/AdminScopedLayout/AdminScopedLayout";
+import { AdminCustomerIndexPage } from "@/pages/admin/AdminCustomerIndexPage/AdminCustomerIndexPage";
+import { WorkspacePage } from "@/pages/workspace/WorkspacePage/WorkspacePage";
+import { ServiceEngagementPage } from "@/pages/services/ServiceEngagementPage/ServiceEngagementPage";
 import { PublishReportPage } from "@/pages/admin/PublishReportPage/PublishReportPage";
 import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 
@@ -110,7 +114,28 @@ export function App() {
           </AdminRoute>
         }
       >
-        <Route index element={<PublishReportPage />} />
+        <Route index element={<AdminCustomerIndexPage />} />
+        <Route path="publish" element={<PublishReportPage />} />
+      </Route>
+
+      {/* Admin scoped browsing: the customer id lives in the URL, and the
+          existing portal components render inside an admin-mode scope. */}
+      <Route
+        path="admin/c/:customerId"
+        element={
+          <AdminRoute>
+            <AdminScopedLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<WorkspacePage />} />
+        <Route path="services/:id" element={<ServiceEngagementPage />} />
+        <Route path="reports" element={<ReportsLibraryPage />} />
+        <Route path="reports/:id" element={<ReportViewerPage />} />
+        <Route path="attention" element={<AttentionPage />} />
+        <Route path="activity" element={<ActivityPage />} />
+        <Route path="map" element={<MapPage />} />
+        <Route path="sites/:slug" element={<SiteDetailPage />} />
       </Route>
 
       {/* Legacy URLs from the projects/results era. */}

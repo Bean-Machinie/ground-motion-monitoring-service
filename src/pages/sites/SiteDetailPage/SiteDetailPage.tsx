@@ -6,6 +6,7 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { Card } from "@/components/ui/Card/Card";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
@@ -34,6 +35,7 @@ interface TimelineEvent {
 export function SiteDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { sites, services, reports, loading, error, refetch } = usePortalData();
+  const href = useScopedHref();
 
   const site = sites.find((s) => s.slug === slug);
 
@@ -81,7 +83,7 @@ export function SiteDetailPage() {
       <EmptyState
         title="Location not found"
         description="This location does not exist or you do not have access to it."
-        action={<Link to="/">Back to overview</Link>}
+        action={<Link to={href("/")}>Back to overview</Link>}
       />
     );
   }
@@ -159,7 +161,7 @@ export function SiteDetailPage() {
                 <span className={styles.timelineDate}>
                   {formatDate(event.date)}
                 </span>
-                <Link to={event.to} className={styles.timelineCard}>
+                <Link to={href(event.to)} className={styles.timelineCard}>
                   <span className={styles.timelineTitle}>{event.title}</span>
                   <span className={styles.timelineMeta}>{event.meta}</span>
                   <StatusBadge

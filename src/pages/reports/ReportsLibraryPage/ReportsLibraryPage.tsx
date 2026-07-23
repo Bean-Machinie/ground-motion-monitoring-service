@@ -15,6 +15,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
@@ -101,6 +102,7 @@ const FILTER_TOTAL = ALL_STATUSES.length + ALL_KINDS.length;
 export function ReportsLibraryPage() {
   const { reports, loading, error, refetch, siteById, serviceById } =
     usePortalData();
+  const href = useScopedHref();
 
   const [sortOption, setSortOption] = useState<SortOption>("latest");
   const [activeStatuses, setActiveStatuses] =
@@ -369,7 +371,7 @@ export function ReportsLibraryPage() {
             const site = service ? siteById.get(service.site_id) : undefined;
             return (
               <li key={report.id}>
-                <Link to={`/reports/${report.id}`} className={styles.card}>
+                <Link to={href(`/reports/${report.id}`)} className={styles.card}>
                   <div className={styles.cardTop}>
                     <span className={styles.iconChip} aria-hidden="true">
                       <AppIcon name="file" size={22} />

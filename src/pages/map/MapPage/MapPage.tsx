@@ -4,6 +4,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
@@ -51,6 +52,7 @@ function placeSites(sites: Site[]): PlacedSite[] {
 
 export function MapPage() {
   const { sites, services, loading, error, refetch } = usePortalData();
+  const href = useScopedHref();
 
   // Service-first: a marker opens the most recent service at the
   // location (the location page itself is reached from service pages).
@@ -99,7 +101,7 @@ export function MapPage() {
           {placed.map(({ site, x, y }) => (
             <Link
               key={site.id}
-              to={primaryTarget(site)}
+              to={href(primaryTarget(site))}
               className={styles.marker}
               style={{ left: `${x}%`, top: `${y}%` }}
             >
@@ -116,7 +118,7 @@ export function MapPage() {
           <ul className={styles.unmappedList}>
             {unmapped.map((site) => (
               <li key={site.id}>
-                <Link to={primaryTarget(site)} className={styles.unmappedLink}>
+                <Link to={href(primaryTarget(site))} className={styles.unmappedLink}>
                   <AppIcon name="globe" size={14} />
                   {site.name}
                   <span className={styles.unmappedNote}>

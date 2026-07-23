@@ -4,6 +4,7 @@
 // shell-level portal data, so it never refetches.
 import { Link } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { REPORT_KIND_LABELS, type Report, type Service } from "@/types/domain";
 import { formatDate } from "@/lib/dates";
@@ -18,6 +19,7 @@ function reportTitle(report: Report): string {
 
 export function AttentionList() {
   const { attention, siteById, serviceById } = usePortalData();
+  const href = useScopedHref();
 
   const siteNameForService = (service: Service | undefined) =>
     service ? (siteById.get(service.site_id)?.name ?? "—") : "—";
@@ -37,7 +39,7 @@ export function AttentionList() {
         return (
           <li key={alert.id}>
             <Link
-              to={`/services/${alert.service_id}`}
+              to={href(`/services/${alert.service_id}`)}
               className={`${styles.attentionCard} ${
                 alert.severity === "critical"
                   ? styles.attentionDanger
@@ -68,7 +70,7 @@ export function AttentionList() {
         return (
           <li key={report.id}>
             <Link
-              to={`/reports/${report.id}`}
+              to={href(`/reports/${report.id}`)}
               className={`${styles.attentionCard} ${styles.attentionDanger}`}
             >
               <span className={styles.attentionIcon} aria-hidden="true">
@@ -93,7 +95,7 @@ export function AttentionList() {
       {attention.overdueServices.map((service) => (
         <li key={service.id}>
           <Link
-            to={`/services/${service.id}`}
+            to={href(`/services/${service.id}`)}
             className={`${styles.attentionCard} ${styles.attentionWarning}`}
           >
             <span className={styles.attentionIcon} aria-hidden="true">

@@ -16,6 +16,7 @@ import {
 } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScope, useScopedHref, scopeBasePath } from "@/context/ScopeContext";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import {
   SERVICE_STATUS_LABELS,
@@ -98,23 +99,32 @@ function useActiveContext(): {
 } {
   const { pathname } = useLocation();
   const { reports } = usePortalData();
+  const { mode, customerId } = useScope();
 
   return useMemo(() => {
-    const serviceMatch = pathname.match(
+    // In admin scope the portal lives under /admin/c/:customerId; strip
+    // that prefix so the matchers below stay scope-agnostic.
+    const base = scopeBasePath(mode, customerId);
+    const path =
+      base && pathname.startsWith(base)
+        ? pathname.slice(base.length) || "/"
+        : pathname;
+
+    const serviceMatch = path.match(
       /^\/services\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i,
     );
     if (serviceMatch?.[1]) {
       return { serviceId: serviceMatch[1], reportId: null };
     }
 
-    const reportMatch = pathname.match(/^\/reports\/([^/]+)$/);
+    const reportMatch = path.match(/^\/reports\/([^/]+)$/);
     if (reportMatch) {
       const report = reports.find((r) => r.id === reportMatch[1]);
       if (report) return { serviceId: report.service_id, reportId: report.id };
     }
 
     return { serviceId: null, reportId: null };
-  }, [pathname, reports]);
+  }, [pathname, reports, mode, customerId]);
 }
 
 interface TreeNode {
@@ -130,6 +140,7 @@ interface ServiceTreeProps {
 
 export function ServiceTree({ collapsed }: ServiceTreeProps) {
   const { services, reports, alerts, siteById, loading } = usePortalData();
+  const href = useScopedHref();
   const { serviceId: activeServiceId, reportId: activeReportId } =
     useActiveContext();
 
@@ -417,7 +428,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                     return (
                       <div key={service.id}>
                         <Link
-                          to={`/services/${service.id}`}
+                          to={href(`/services/${service.id}`)}
                           className={styles.menuEntry}
                           role="menuitem"
                           title={displayName}
@@ -449,7 +460,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                             {issues.slice(0, LEAF_CAP).map((report) => (
                               <li key={report.id}>
                                 <Link
-                                  to={`/reports/${report.id}`}
+                                  to={href(`/reports/${report.id}`)}
                                   className={`${styles.row} ${styles.leafRow}`}
                                   role="menuitem"
                                 >
@@ -552,7 +563,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                   {/* Separate hit targets: the chevron toggles, the rest
                       of the row navigates to the service. */}
                   <NavLink
-                    to={`/services/${service.id}`}
+                    to={href(`/services/${service.id}`)}
                     role="treeitem"
                     aria-expanded={expandable ? isExpanded : undefined}
                     ref={registerRow(nodeId)}
@@ -621,7 +632,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                         return (
                           <li key={report.id} role="none">
                             <NavLink
-                              to={`/reports/${report.id}`}
+                              to={href(`/reports/${report.id}`)}
                               role="treeitem"
                               ref={registerRow(leafId)}
                               tabIndex={focusedId === leafId ? 0 : -1}
@@ -662,7 +673,7 @@ export function ServiceTree({ collapsed }: ServiceTreeProps) {
                       {issues.length > LEAF_CAP ? (
                         <li role="none">
                           <Link
-                            to={`/services/${service.id}`}
+                            to={href(`/services/${service.id}`)}
                             role="treeitem"
                             ref={registerRow(`all:${service.id}`)}
                             tabIndex={

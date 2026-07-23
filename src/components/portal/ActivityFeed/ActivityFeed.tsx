@@ -3,6 +3,7 @@
 // overdue events, neutral otherwise. Two lines per entry: event text,
 // then the date. Shared by the Overview (capped) and /activity (full).
 import { Link } from "react-router-dom";
+import { useScopedHref } from "@/context/ScopeContext";
 import type { ActivityEvent } from "@/lib/activity";
 import { formatShortDate } from "@/lib/dates";
 import styles from "./ActivityFeed.module.css";
@@ -15,6 +16,7 @@ function feedDate(iso: string): string {
 }
 
 export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
+  const href = useScopedHref();
   if (events.length === 0) return null;
 
   return (
@@ -25,7 +27,7 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
             className={`${styles.dot} ${styles[`dot_${event.tone}`]}`}
             aria-hidden="true"
           />
-          <Link to={event.to} className={styles.entryLink}>
+          <Link to={href(event.to)} className={styles.entryLink}>
             <span className={styles.text}>{event.text}</span>
             <span className={styles.date}>{feedDate(event.date)}</span>
           </Link>

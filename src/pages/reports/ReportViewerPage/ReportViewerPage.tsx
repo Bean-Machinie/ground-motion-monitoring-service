@@ -3,6 +3,7 @@
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { useReportAttachments } from "@/hooks/useReportAttachments";
 import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
@@ -21,6 +22,7 @@ export function ReportViewerPage() {
     attachments,
     loading: attachmentsLoading,
   } = useReportAttachments(report?.id);
+  const href = useScopedHref();
 
   const service = report
     ? services.find((s) => s.id === report.service_id)
@@ -61,7 +63,7 @@ export function ReportViewerPage() {
       <EmptyState
         title="Report not found"
         description="This report does not exist or you do not have access to it."
-        action={<Link to="/reports">Back to reports</Link>}
+        action={<Link to={href("/reports")}>Back to reports</Link>}
       />
     );
   }

@@ -9,6 +9,7 @@
 // only entry point to the location page.
 import { Link, Navigate, useParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
 import { Card } from "@/components/ui/Card/Card";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
@@ -33,6 +34,7 @@ export function ServiceEngagementPage() {
   const params = useParams<{ id?: string; slug?: string }>();
   const id = params.id ?? params.slug;
   const { sites, services, reports, alerts, loading } = usePortalData();
+  const href = useScopedHref();
 
   if (loading) {
     return <LoadingState label="Loading…" />;
@@ -44,7 +46,7 @@ export function ServiceEngagementPage() {
       <EmptyState
         title="Not found"
         description="This monitoring or screening does not exist or you do not have access to it."
-        action={<Link to="/">Back to overview</Link>}
+        action={<Link to={href("/")}>Back to overview</Link>}
       />
     );
   }
@@ -67,7 +69,7 @@ export function ServiceEngagementPage() {
 
   // A screening is its report: with exactly one issue, go straight there.
   if (service.kind === "screening" && issues.length === 1 && issues[0]) {
-    return <Navigate to={`/reports/${issues[0].id}`} replace />;
+    return <Navigate to={href(`/reports/${issues[0].id}`)} replace />;
   }
 
   const inRequestStage =
@@ -159,7 +161,7 @@ export function ServiceEngagementPage() {
                   {issues.map((report) => (
                     <li key={report.id}>
                       <Link
-                        to={`/reports/${report.id}`}
+                        to={href(`/reports/${report.id}`)}
                         className={styles.issueItem}
                       >
                         <span className={styles.issueNumber}>
@@ -220,7 +222,7 @@ export function ServiceEngagementPage() {
                         </p>
                         {alert.triggered_report_id ? (
                           <Link
-                            to={`/reports/${alert.triggered_report_id}`}
+                            to={href(`/reports/${alert.triggered_report_id}`)}
                             className={styles.alertLink}
                           >
                             View alert issue →
@@ -243,7 +245,7 @@ export function ServiceEngagementPage() {
 
       {site && earlierServices.length > 0 ? (
         <p className={styles.siteLine}>
-          <Link to={`/sites/${site.slug}`} className={styles.siteLink}>
+          <Link to={href(`/sites/${site.slug}`)} className={styles.siteLink}>
             {earlierServices.length} earlier{" "}
             {earlierServices.length === 1 ? "service" : "services"} at this
             location →

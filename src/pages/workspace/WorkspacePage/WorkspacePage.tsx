@@ -9,6 +9,7 @@
 import { useMemo } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { ActivityFeed } from "@/components/portal/ActivityFeed/ActivityFeed";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
@@ -106,6 +107,7 @@ export function WorkspacePage() {
     refetch,
     attention,
   } = usePortalData();
+  const href = useScopedHref();
 
   const [searchParams] = useSearchParams();
 
@@ -256,7 +258,7 @@ export function WorkspacePage() {
     return (
       <li key={service.id}>
         {/* No action button: the whole card is the link. */}
-        <Link to={`/services/${service.id}`} className={styles.card}>
+        <Link to={href(`/services/${service.id}`)} className={styles.card}>
           {/* Placeholder image, cycled 1-3; custom images come later.
               The status pill sits on the image, top-left. */}
           <div className={styles.imageHead}>
@@ -390,7 +392,7 @@ export function WorkspacePage() {
 
       {/* 1. Does anything need me? Rendered only when the answer is yes. */}
       {attention.count > 0 ? (
-        <Link to="/attention" className={styles.banner}>
+        <Link to={href("/attention")} className={styles.banner}>
           <span className={styles.bannerIcon} aria-hidden="true">
             <AppIcon name="warning" size={16} />
           </span>
@@ -425,7 +427,7 @@ export function WorkspacePage() {
               <h2 className={styles.sectionTitle}>Recent activity</h2>
             </div>
             <ActivityFeed events={events} />
-            <Link to="/activity" className={styles.asideLink}>
+            <Link to={href("/activity")} className={styles.asideLink}>
               All activity →
             </Link>
           </aside>

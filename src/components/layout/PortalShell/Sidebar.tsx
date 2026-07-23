@@ -9,6 +9,7 @@
 // position — labels only fade. Nothing shifts, scales, or re-centers.
 import { NavLink } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScopedHref } from "@/context/ScopeContext";
 import { usePortalChrome } from "@/components/layout/PortalShell/PortalShell";
 import { ServiceTree } from "@/components/layout/PortalShell/ServiceTree";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
@@ -87,6 +88,7 @@ export function Sidebar() {
   const { collapsed, toggleCollapsed, isNarrow, drawerOpen, setDrawerOpen } =
     usePortalChrome();
   const { attention } = usePortalData();
+  const href = useScopedHref();
 
   const className = [
     styles.sidebar,
@@ -130,14 +132,14 @@ export function Sidebar() {
 
         <ul className={styles.section}>
           <NavRow
-            to="/"
+            to={href("/")}
             end
             icon="desktop"
             label="Overview"
             collapsed={collapsed}
           />
           <NavRow
-            to="/attention"
+            to={href("/attention")}
             icon="warning"
             label="Needs attention"
             badge={attention.count}
@@ -149,13 +151,13 @@ export function Sidebar() {
           {/* `end`: individual report pages belong to their service in
               the tree below — the library row only lights up on itself. */}
           <NavRow
-            to="/reports"
+            to={href("/reports")}
             end
             icon="file"
             label="All reports"
             collapsed={collapsed}
           />
-          <NavRow to="/map" icon="globe" label="Map view" collapsed={collapsed} />
+          <NavRow to={href("/map")} icon="globe" label="Map view" collapsed={collapsed} />
         </ul>
 
         {/* The tree scrolls on its own (chat-list style); everything else
