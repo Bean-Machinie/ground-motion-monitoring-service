@@ -1,9 +1,15 @@
 // App-level portal data: sites, services, reports, and alerts are
-// fetched ONCE per session (as soon as a user is signed in) and shared
-// with the sidebar and every page through context. The provider lives
-// ABOVE routing, so navigating between portal pages never remounts it,
-// never refetches, and never flashes empty states. RLS scopes all rows
-// to the current org.
+// fetched ONCE per scope (as soon as a scope with a customerId is active)
+// and shared with the sidebar and every page through context. The provider
+// lives ABOVE routing, so navigating between portal pages never remounts
+// it, never refetches, and never flashes empty states.
+//
+// Every query filters explicitly by the active scope's customerId
+// (`.eq("org_id", …)`). For a customer this is redundant with RLS — which
+// already restricts them to their own org — but harmless. For admin scoped
+// browsing it is the mechanism: an admin may read all orgs, so the explicit
+// filter is what narrows the portal to the single customer being viewed.
+// RLS remains the real authorization boundary either way.
 import {
   createContext,
   useCallback,
@@ -15,7 +21,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
-import { useAuth } from "@/hooks/useAuth";
+import { useScope } from "@/context/ScopeContext";
 import type { Alert, Report, Service, Site } from "@/types/domain";
 
 interface PortalDataState {
@@ -56,25 +62,33 @@ const INITIAL: PortalDataState = {
 };
 
 export function PortalDataProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { customerId } = useScope();
   const [state, setState] = useState<PortalDataState>(INITIAL);
 
   const fetchAll = useCallback(async () => {
+    if (!customerId) return;
     setState((s) => ({ ...s, loading: true, error: null }));
     try {
       const [sites, services, reports, alerts] = await Promise.all([
-        supabase.from("sites").select("*").order("name"),
+        supabase
+          .from("sites")
+          .select("*")
+          .eq("org_id", customerId)
+          .order("name"),
         supabase
           .from("services")
           .select("*")
+          .eq("org_id", customerId)
           .order("created_at", { ascending: false }),
         supabase
           .from("reports")
           .select("*")
+          .eq("org_id", customerId)
           .order("published_at", { ascending: false, nullsFirst: false }),
         supabase
           .from("alerts")
           .select("*")
+          .eq("org_id", customerId)
           .order("detected_at", { ascending: false }),
       ]);
       const failed =
@@ -91,17 +105,19 @@ export function PortalDataProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       setState({ ...INITIAL, loading: false, error: getErrorMessage(err) });
     }
-  }, []);
+  }, [customerId]);
 
-  // Fetch when a user session appears; reset when it goes away. Keyed on
-  // the user id so switching accounts refetches.
+  // Fetch when a scope with a customerId is active; reset when there is
+  // none (signed out). Keyed on customerId so switching the scoped customer
+  // — signing into a different account, or an admin switching customers —
+  // refetches.
   useEffect(() => {
-    if (user) {
+    if (customerId) {
       void fetchAll();
     } else {
       setState({ ...INITIAL, loading: false });
     }
-  }, [user?.id, fetchAll]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [customerId, fetchAll]);
 
   const value = useMemo<PortalData>(() => {
     const siteById = new Map(state.sites.map((s) => [s.id, s]));

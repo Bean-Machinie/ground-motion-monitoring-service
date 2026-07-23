@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { ScopeProvider } from "@/context/ScopeContext";
 import { PortalDataProvider } from "@/context/PortalDataContext";
 import { App } from "@/App";
 import "@/styles/global.css";
@@ -16,11 +17,16 @@ createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        {/* Portal data lives above routing so signed-in navigation never
-            refetches or flashes empty sidebar states. */}
-        <PortalDataProvider>
-          <App />
-        </PortalDataProvider>
+        {/* Default scope: the signed-in customer viewing their own data.
+            Admin scoped browsing mounts its own nested ScopeProvider with
+            mode="admin" and the viewed customer's id. */}
+        <ScopeProvider>
+          {/* Portal data lives above routing so signed-in navigation never
+              refetches or flashes empty sidebar states. */}
+          <PortalDataProvider>
+            <App />
+          </PortalDataProvider>
+        </ScopeProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
