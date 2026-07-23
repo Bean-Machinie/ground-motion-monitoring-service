@@ -1,14 +1,15 @@
-// New request (/requests/new). Submitting the form creates a real
-// `services` row in 'scoping' status, owned by the customer — a request
-// IS a service from the moment it is asked for, so it appears in the
-// sidebar tree and on the Overview immediately. There is no separate
-// requests table and no dead-end contact block.
+// Self-service request (/requests/new/self-service). Deliberately bare
+// bones: pick the product — monitoring or screening — give it a name,
+// submit. Submitting creates a real `services` row in 'scoping' status,
+// owned by the customer (plus a minimal `sites` reference row behind the
+// scenes, since every service is performed somewhere), so the request
+// appears in the sidebar tree and on the Overview immediately and the
+// admin side can pick it up from there.
 //
-// The form collects: a name for the work, which product (monitoring or
-// screening), the area of interest (an existing location or a new one),
-// and free-text scope notes. Admin-side transitions (scoping → quoted →
-// active) stay in Supabase; the portal only reads them.
-import { useMemo, useState, type FormEvent } from "react";
+// Area-of-interest definition, scope notes, and output configuration
+// come later; the point right now is a working end-to-end path:
+// customer requests → admin publishes.
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
@@ -37,7 +38,7 @@ function makeSlug(name: string): string {
 export function NewRequestPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { sites, refetch } = usePortalData();
+  const { refetch } = usePortalData();
   const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
@@ -45,20 +46,8 @@ export function NewRequestPage() {
   const [kind, setKind] = useState<ServiceKind>(
     searchParams.get("product") === "screening" ? "screening" : "monitoring",
   );
-  // "" = create a new location; otherwise an existing site id.
-  const [siteId, setSiteId] = useState("");
-  const [locationName, setLocationName] = useState("");
-  const [country, setCountry] = useState("");
-  const [scopeNotes, setScopeNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const sortedSites = useMemo(
-    () => [...sites].sort((a, b) => a.name.localeCompare(b.name)),
-    [sites],
-  );
-
-  const creatingSite = siteId === "";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,36 +56,30 @@ export function NewRequestPage() {
     setSubmitting(true);
 
     try {
-      // Area of interest: match an existing location or create the
-      // reference record for a new one.
-      let targetSiteId = siteId;
-      if (creatingSite) {
-        const { data, error: siteError } = await supabase
-          .from("sites")
-          .insert({
-            org_id: user.id,
-            name: locationName.trim(),
-            slug: makeSlug(locationName),
-            country: country.trim() || null,
-          })
-          .select("id")
-          .single();
-        if (siteError) throw siteError;
-        targetSiteId = data.id;
-      }
+      // Minimal reference site behind the scenes: every service is
+      // performed somewhere, and the real AOI definition comes later.
+      const { data: siteRow, error: siteError } = await supabase
+        .from("sites")
+        .insert({
+          org_id: user.id,
+          name: name.trim(),
+          slug: makeSlug(name),
+        })
+        .select("id")
+        .single();
+      if (siteError) throw siteError;
 
       // The request is the service row, in scoping from the start.
       const { data: service, error: serviceError } = await supabase
         .from("services")
         .insert({
           org_id: user.id,
-          site_id: targetSiteId,
+          site_id: siteRow.id,
           name: name.trim(),
           kind,
           status: "scoping",
           requested_at: new Date().toISOString(),
           requested_by: user.id,
-          scope_notes: scopeNotes.trim() || null,
         })
         .select("id")
         .single();
@@ -117,7 +100,7 @@ export function NewRequestPage() {
       <PortalPageHeader
         crumbs={[{ label: "Overview", to: "/" }, { label: "New request" }]}
         title="New request"
-        lede="Tell us what you want to watch. We'll scope it and come back with a quote — the request appears in your overview right away."
+        lede="Pick the product and name the work. We'll scope it and come back with a quote — the request appears in your overview right away."
       />
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -187,83 +170,6 @@ export function NewRequestPage() {
             </label>
           </div>
         </fieldset>
-
-        {/* ----------------------- Area of interest ---------------------- */}
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="request-site">
-            Area of interest
-          </label>
-          <select
-            id="request-site"
-            className={styles.input}
-            value={siteId}
-            onChange={(e) => setSiteId(e.target.value)}
-          >
-            <option value="">New location…</option>
-            {sortedSites.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-                {s.country ? ` — ${s.country}` : ""}
-              </option>
-            ))}
-          </select>
-          {!creatingSite ? (
-            <p className={styles.hint}>
-              Work at a location you already use connects to everything
-              observed there before.
-            </p>
-          ) : null}
-        </div>
-
-        {creatingSite ? (
-          <div className={styles.locationRow}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="request-location">
-                Location
-              </label>
-              <input
-                id="request-location"
-                className={styles.input}
-                type="text"
-                required
-                maxLength={120}
-                placeholder="e.g. Port of Esbjerg"
-                value={locationName}
-                onChange={(e) => setLocationName(e.target.value)}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="request-country">
-                Country
-              </label>
-              <input
-                id="request-country"
-                className={styles.input}
-                type="text"
-                maxLength={56}
-                placeholder="e.g. Denmark"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
-            </div>
-          </div>
-        ) : null}
-
-        {/* ------------------------- Scope notes ------------------------- */}
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="request-notes">
-            Scope notes
-          </label>
-          <textarea
-            id="request-notes"
-            className={`${styles.input} ${styles.textarea}`}
-            rows={4}
-            maxLength={2000}
-            placeholder="What is the structure or area, what movement are you concerned about, and is there a deadline?"
-            value={scopeNotes}
-            onChange={(e) => setScopeNotes(e.target.value)}
-          />
-        </div>
 
         <div className={styles.actions}>
           <button type="submit" className={styles.submit} disabled={submitting}>

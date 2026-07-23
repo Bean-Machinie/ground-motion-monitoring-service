@@ -11,13 +11,15 @@
 //   5. Publish: stamp published_at. (Notification email and audit row
 //      belong to systems that do not exist yet — marked below.)
 //
+// The flow is customer-first: pick the customer, then one of the
+// services they have created, then the issue.
+//
 // The envelope stays strict; the payload is whatever was uploaded.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
 import { usePortalData } from "@/context/PortalDataContext";
-import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { Button } from "@/components/ui/Button/Button";
 import { Select } from "@/components/ui/Select/Select";
 import { Sparkline } from "@/components/ui/Sparkline/Sparkline";
@@ -30,6 +32,7 @@ import {
   type ReportAttachment,
   type ReportKind,
 } from "@/types/domain";
+import type { ProfileRow } from "@/types/database";
 import { formatShortDate } from "@/lib/dates";
 import styles from "./PublishReportPage.module.css";
 
@@ -101,16 +104,27 @@ export function PublishReportPage() {
     refetch,
   } = usePortalData();
 
-  usePortalCrumbs(
-    useMemo(() => [{ label: "Admin" }, { label: "Publish a report" }], []),
-  );
-
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  /* Step 1 — target. */
+  /* Step 1 — customer first, then one of their services. Admin RLS
+     makes all profiles selectable. */
+  const [customers, setCustomers] = useState<ProfileRow[]>([]);
+  const [customerId, setCustomerId] = useState("");
   const [serviceId, setServiceId] = useState("");
+
+  useEffect(() => {
+    void supabase
+      .from("profiles")
+      .select("*")
+      .eq("role", "customer")
+      .order("email")
+      .then(({ data, error: profilesError }) => {
+        if (profilesError) setError(getErrorMessage(profilesError));
+        else setCustomers(data ?? []);
+      });
+  }, []);
   const [target, setTarget] = useState<"new" | string>("new"); // draft id
   const [newKind, setNewKind] = useState<ReportKind>("periodic");
   const [periodStart, setPeriodStart] = useState("");
@@ -143,14 +157,35 @@ export function PublishReportPage() {
     (r) => r.state === "pending" || r.state === "in_review",
   );
 
-  const serviceOptions = services
-    .filter((s) => s.status !== "cancelled")
-    .map((s) => ({
+  const customerOptions = [
+    { value: "", label: "Choose a customer…" },
+    ...customers.map((c) => ({
+      value: c.id,
+      label: c.organization_name
+        ? `${c.organization_name} — ${c.full_name ?? c.email}`
+        : (c.full_name ?? c.email),
+    })),
+  ];
+
+  /** Only the services the chosen customer has created. */
+  const customerServices = services.filter(
+    (s) => s.org_id === customerId && s.status !== "cancelled",
+  );
+  const serviceOptions = [
+    {
+      value: "",
+      label:
+        customerServices.length > 0
+          ? "Choose a service…"
+          : "This customer has no services",
+    },
+    ...customerServices.map((s) => ({
       value: s.id,
       label: `${serviceDisplayName(s, siteById.get(s.site_id))} — ${
         s.kind === "monitoring" ? "monitoring" : "screening"
       }`,
-    }));
+    })),
+  ];
 
   /* ------------------------------ Step 1 ------------------------------ */
 
@@ -377,6 +412,45 @@ export function PublishReportPage() {
         .single();
       if (publishError) throw publishError;
       setReport(data);
+
+      // The engagement follows the deliverable. A screening is delivered
+      // once: publishing completes it. A monitoring subscription becomes
+      // active on its first published issue and gets a next-issue date a
+      // quarter out.
+      if (service) {
+        const today = new Date().toISOString().slice(0, 10);
+        if (
+          service.kind === "screening" &&
+          service.status !== "completed" &&
+          service.status !== "cancelled"
+        ) {
+          await supabase
+            .from("services")
+            .update({
+              status: "completed",
+              started_on: service.started_on ?? today,
+              ended_on: today,
+            })
+            .eq("id", service.id);
+        } else if (service.kind === "monitoring") {
+          const next = new Date();
+          next.setMonth(next.getMonth() + 3);
+          await supabase
+            .from("services")
+            .update({
+              ...(service.status === "scoping" || service.status === "quoted"
+                ? {
+                    status: "active",
+                    started_on: service.started_on ?? today,
+                  }
+                : {}),
+              cadence: service.cadence ?? "quarterly",
+              next_issue_due: next.toISOString().slice(0, 10),
+            })
+            .eq("id", service.id);
+        }
+      }
+
       setPublished(true);
       // The activity feed derives from the published report itself.
       // TODO: notification email + audit row, once those systems exist.
@@ -390,6 +464,7 @@ export function PublishReportPage() {
 
   function reset() {
     setStep(0);
+    setCustomerId("");
     setServiceId("");
     setTarget("new");
     setPeriodStart("");
@@ -446,18 +521,27 @@ export function PublishReportPage() {
       {step === 0 ? (
         <section className={styles.panel}>
           <Select
-            label="Service"
-            value={serviceId}
-            options={
-              serviceOptions.length > 0
-                ? serviceOptions
-                : [{ value: "", label: "No services" }]
-            }
+            label="Customer"
+            value={customerId}
+            options={customerOptions}
             onChange={(v) => {
-              setServiceId(v);
+              setCustomerId(v);
+              setServiceId("");
               setTarget("new");
             }}
           />
+
+          {customerId ? (
+            <Select
+              label="Service"
+              value={serviceId}
+              options={serviceOptions}
+              onChange={(v) => {
+                setServiceId(v);
+                setTarget("new");
+              }}
+            />
+          ) : null}
 
           {service ? (
             <>

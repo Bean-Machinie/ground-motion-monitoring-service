@@ -1,18 +1,17 @@
 // Request start chooser (/requests/new). Before any form, the customer
-// picks how to begin: the guided self-service flow (kept visible but not
-// yet wired — its button is intentionally disabled) or specialist
+// picks how to begin: the self-service flow (bare bones for now — pick a
+// product, name it, submit) at /requests/new/self-service, or specialist
 // guidance, which leads to the expert-assisted request form at
-// /requests/new/expert. The old self-service form remains routed at
-// /requests/new/self-service for when the flow is switched on.
+// /requests/new/expert.
 import { Link } from "react-router-dom";
 import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import styles from "./RequestStartPage.module.css";
 
 const SELF_SERVICE_POINTS = [
-  "Define or upload your area of interest",
-  "Choose screening, monitoring, or custom analysis",
-  "Configure outputs such as maps, alerts, reports, or GIS-ready data",
+  "Choose screening or monitoring",
+  "Name the work and submit",
+  "The request appears in your overview immediately",
 ];
 
 const EXPERT_POINTS = [
@@ -57,15 +56,12 @@ export function RequestStartPage() {
             ))}
           </ul>
           <div className={styles.cardFooter}>
-            {/* Intentionally inert: the guided flow is wired up later. */}
-            <button
-              type="button"
+            <Link
+              to="/requests/new/self-service"
               className={styles.primaryButton}
-              disabled
-              title="Coming soon"
             >
               Start Self-Service Request
-            </button>
+            </Link>
             <p className={styles.footnote}>
               Best when your objective, area, and required outputs are already
               clear.

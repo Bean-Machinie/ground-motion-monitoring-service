@@ -20,6 +20,10 @@ create policy "reports_bucket_admin_all"
 -- Customers read files under their own services: the first path segment
 -- is the service id, and the service row carries the org. Signed-URL
 -- creation authorises through this select policy.
+--
+-- objects.name must be qualified: inside the exists subquery an
+-- unqualified `name` binds to services.name, silently breaking the
+-- policy (it would parse the service's display name as a path).
 create policy "reports_bucket_customer_read"
   on storage.objects for select
   using (
@@ -27,7 +31,7 @@ create policy "reports_bucket_customer_read"
     and exists (
       select 1
       from public.services s
-      where s.id::text = (storage.foldername(name))[1]
+      where s.id::text = (storage.foldername(objects.name))[1]
         and s.org_id = auth.uid()
     )
   );

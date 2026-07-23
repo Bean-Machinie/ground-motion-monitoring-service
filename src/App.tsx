@@ -35,6 +35,7 @@ import { RequestStartPage } from "@/pages/portal/RequestStartPage/RequestStartPa
 import { ExpertRequestPage } from "@/pages/portal/ExpertRequestPage/ExpertRequestPage";
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
+import { AdminLayout } from "@/components/layout/AdminLayout/AdminLayout";
 import { PublishReportPage } from "@/pages/admin/PublishReportPage/PublishReportPage";
 import { NotFoundPage } from "@/pages/not-found/NotFoundPage/NotFoundPage";
 
@@ -97,15 +98,19 @@ export function App() {
         </Route>
         <Route path="requests/new/self-service" element={<NewRequestPage />} />
         <Route path="account" element={<AccountPage />} />
-        {/* Admin: the publish flow is the admin area for now. */}
-        <Route
-          path="admin"
-          element={
-            <AdminRoute>
-              <PublishReportPage />
-            </AdminRoute>
-          }
-        />
+      </Route>
+
+      {/* Admin: its own minimal chrome, outside the customer portal
+          shell — no sidebar, no customer navigation. */}
+      <Route
+        path="admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<PublishReportPage />} />
       </Route>
 
       {/* Legacy URLs from the projects/results era. */}

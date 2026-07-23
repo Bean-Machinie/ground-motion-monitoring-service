@@ -77,6 +77,7 @@ export function ReportViewer({
 }: ReportViewerProps) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
   const isMonitoring = service?.kind === "monitoring";
 
@@ -93,13 +94,18 @@ export function ReportViewer({
   // Signed URL for the inline PDF preview only; downloads sign on click.
   useEffect(() => {
     setPreviewUrl(null);
+    setPreviewError(null);
     if (!primary || primary.mime_type !== "application/pdf") return;
     let cancelled = false;
     void supabase.storage
       .from(BUCKET)
       .createSignedUrl(primary.storage_path, SIGNED_URL_TTL_SECONDS)
-      .then(({ data }) => {
-        if (!cancelled && data?.signedUrl) setPreviewUrl(data.signedUrl);
+      .then(({ data, error: signError }) => {
+        if (cancelled) return;
+        if (data?.signedUrl) setPreviewUrl(data.signedUrl);
+        // Surface the failure instead of silently hiding the preview —
+        // a missing storage read policy would otherwise be invisible.
+        else if (signError) setPreviewError(getErrorMessage(signError));
       });
     return () => {
       cancelled = true;
@@ -261,6 +267,11 @@ export function ReportViewer({
         )}
         {downloadError ? (
           <p className={styles.downloadError}>{downloadError}</p>
+        ) : null}
+        {previewError ? (
+          <p className={styles.downloadError}>
+            Preview unavailable: {previewError}
+          </p>
         ) : null}
       </section>
 

@@ -182,6 +182,12 @@
   background-color: var(--yellow-hover);
 }
 
+/* Rendered as a Link now: beat the global a:hover underline/colour. */
+.primaryButton:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
 .primaryButton:disabled {
   opacity: 0.55;
   cursor: default;
