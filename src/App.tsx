@@ -35,7 +35,8 @@ import { RequestStartPage } from "@/pages/portal/RequestStartPage/RequestStartPa
 import { ExpertRequestPage } from "@/pages/portal/ExpertRequestPage/ExpertRequestPage";
 import { NewRequestPage } from "@/pages/portal/NewRequestPage/NewRequestPage";
 import { AccountPage } from "@/pages/portal/AccountPage/AccountPage";
-import { AdminLayout } from "@/components/layout/AdminLayout/AdminLayout";
+import { AdminGlobalLayout } from "@/components/layout/AdminGlobalLayout/AdminGlobalLayout";
+import { AdminAllReportsPage } from "@/pages/admin/AdminAllReportsPage/AdminAllReportsPage";
 import { AdminScopedLayout } from "@/components/layout/AdminScopedLayout/AdminScopedLayout";
 import { AdminCustomerIndexPage } from "@/pages/admin/AdminCustomerIndexPage/AdminCustomerIndexPage";
 import { WorkspacePage } from "@/pages/workspace/WorkspacePage/WorkspacePage";
@@ -110,11 +111,12 @@ export function App() {
         path="admin"
         element={
           <AdminRoute>
-            <AdminLayout />
+            <AdminGlobalLayout />
           </AdminRoute>
         }
       >
         <Route index element={<AdminCustomerIndexPage />} />
+        <Route path="reports" element={<AdminAllReportsPage />} />
       </Route>
 
       {/* Admin scoped browsing: the customer id lives in the URL, and the
