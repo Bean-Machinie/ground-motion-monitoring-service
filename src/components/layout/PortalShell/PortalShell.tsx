@@ -16,6 +16,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute/ProtectedRoute";
 import { TopPanel } from "@/components/layout/TopPanel/TopPanel";
 import { Sidebar } from "@/components/layout/PortalShell/Sidebar";
+import { AdminContextBar } from "@/components/layout/AdminContextBar/AdminContextBar";
+import { useScope } from "@/context/ScopeContext";
 import { type Crumb } from "@/components/ui/Breadcrumbs/Breadcrumbs";
 import styles from "./PortalShell.module.css";
 
@@ -70,6 +72,7 @@ function readCollapsed(): boolean {
 
 export function PortalShell({ children }: { children?: ReactNode }) {
   const location = useLocation();
+  const { mode } = useScope();
 
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [isNarrow, setIsNarrow] = useState(false);
@@ -125,6 +128,8 @@ export function PortalShell({ children }: { children?: ReactNode }) {
             </a>
 
             <TopPanel />
+
+            {mode === "admin" ? <AdminContextBar /> : null}
 
             <div className={styles.shell}>
               <Sidebar />

@@ -1,0 +1,52 @@
+/* Distinct teal band — deliberately unlike the warm off-white app chrome,
+   so a scoped customer view is never mistaken for the admin's own. */
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-sm);
+  border-bottom: var(--border-width) solid var(--color-primary-dark);
+  z-index: 5;
+}
+
+.badge {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.exit {
+  flex: none;
+  margin-left: auto;
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+.exit:hover {
+  opacity: 1;
+  color: var(--color-text-inverse);
+}

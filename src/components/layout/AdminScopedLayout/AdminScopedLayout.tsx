@@ -3,7 +3,9 @@
 // The customer id lives in the URL (so refresh, back, and bookmarks are
 // unambiguous). This thin layout reads it and mounts, around the ordinary
 // portal shell:
-//   - a nested ScopeProvider in admin mode, scoped to that customer, and
+//   - a nested ScopeProvider in admin mode, scoped to that customer,
+//   - AdminCustomersProvider, so the sidebar switcher and context bar share
+//     one customer roster, and
 //   - a nested PortalDataProvider, which therefore fetches that customer's
 //     rows (RLS permits it because the signed-in user is an admin).
 // PortalShell then renders the same sidebar, top panel, and page components
@@ -11,6 +13,7 @@
 // param, which re-keys the data provider and refetches.
 import { useParams } from "react-router-dom";
 import { ScopeProvider } from "@/context/ScopeContext";
+import { AdminCustomersProvider } from "@/context/AdminCustomersContext";
 import { PortalDataProvider } from "@/context/PortalDataContext";
 import { PortalShell } from "@/components/layout/PortalShell/PortalShell";
 
@@ -19,11 +22,13 @@ export function AdminScopedLayout() {
 
   return (
     <ScopeProvider customerId={customerId} mode="admin">
-      <PortalDataProvider>
-        {/* No children → PortalShell renders its <Outlet />, i.e. the
-            scoped portal page for the current sub-route. */}
-        <PortalShell />
-      </PortalDataProvider>
+      <AdminCustomersProvider>
+        <PortalDataProvider>
+          {/* No children → PortalShell renders its <Outlet />, i.e. the
+              scoped portal page for the current sub-route. */}
+          <PortalShell />
+        </PortalDataProvider>
+      </AdminCustomersProvider>
     </ScopeProvider>
   );
 }

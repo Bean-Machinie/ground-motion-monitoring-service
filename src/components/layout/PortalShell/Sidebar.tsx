@@ -9,9 +9,10 @@
 // position — labels only fade. Nothing shifts, scales, or re-centers.
 import { NavLink } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
-import { useScopedHref } from "@/context/ScopeContext";
+import { useScope, useScopedHref } from "@/context/ScopeContext";
 import { usePortalChrome } from "@/components/layout/PortalShell/PortalShell";
 import { ServiceTree } from "@/components/layout/PortalShell/ServiceTree";
+import { AdminSidebarTop } from "@/components/layout/PortalShell/AdminSidebarTop";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import type { IconName } from "@/lib/icons";
 import styles from "./Sidebar.module.css";
@@ -89,6 +90,7 @@ export function Sidebar() {
     usePortalChrome();
   const { attention } = usePortalData();
   const href = useScopedHref();
+  const { mode } = useScope();
 
   const className = [
     styles.sidebar,
@@ -118,15 +120,20 @@ export function Sidebar() {
       ) : null}
 
       <nav className={styles.body} aria-label="Primary">
-        {/* Primary action first, cleanly separated from the places below. */}
-        <ul className={styles.section}>
-          <NavRow
-            to="/requests/new"
-            icon="add"
-            label="New request"
-            collapsed={collapsed}
-          />
-        </ul>
+        {/* Primary action first, cleanly separated from the places below.
+            In admin scope this slot becomes the customer switcher. */}
+        {mode === "admin" ? (
+          <AdminSidebarTop collapsed={collapsed} />
+        ) : (
+          <ul className={styles.section}>
+            <NavRow
+              to="/requests/new"
+              icon="add"
+              label="New request"
+              collapsed={collapsed}
+            />
+          </ul>
+        )}
 
         <div className={styles.divider} role="separator" />
 
