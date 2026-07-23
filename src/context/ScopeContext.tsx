@@ -10,8 +10,15 @@
 // This is not impersonation: the signed-in user never changes, no JWT is
 // swapped, and RLS is still the real authorization boundary — is_admin() is
 // what actually permits an admin to read another org's rows. Scope only
-// decides which customerId the portal queries filter on.
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+// decides which customerId the portal queries filter on, and (via
+// useScopedHref) which URL prefix intra-portal links carry.
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 export type ScopeMode = "customer" | "admin";
@@ -27,6 +34,53 @@ export interface Scope {
 }
 
 const ScopeContext = createContext<Scope | null>(null);
+
+/* ---------------------------------------------------------------------------
+ * Scoped links.
+ *
+ * In customer mode the portal lives at the root ("/", "/services/:id",
+ * "/reports", …). In admin mode the very same pages live under
+ * "/admin/c/:customerId/…". Rather than fork components, shared components
+ * build their hrefs through useScopedHref(), which prefixes portal-absolute
+ * paths with the admin base when — and only when — mode is "admin". In
+ * customer mode it is the identity function, so nothing changes.
+ * ------------------------------------------------------------------------- */
+
+/** Portal path roots that belong to a scoped customer. Marketing/identity
+    paths (/account, /sign-in, /home, /requests, /admin) are deliberately
+    absent — they are never rewritten. */
+const SCOPED_ROOTS = [
+  "/services",
+  "/reports",
+  "/attention",
+  "/activity",
+  "/map",
+  "/sites",
+];
+
+/** The scope's URL prefix ("" in customer mode). Also used to strip the
+    prefix back off when matching the current pathname. */
+export function scopeBasePath(mode: ScopeMode, customerId: string): string {
+  return mode === "admin" && customerId ? `/admin/c/${customerId}` : "";
+}
+
+/** Pure path mapper. Root ("/") becomes the scope base; a scoped-root path
+    is prefixed; everything else (marketing, identity, query-only, external)
+    passes through unchanged. */
+export function scopedPath(
+  path: string,
+  mode: ScopeMode,
+  customerId: string,
+): string {
+  if (mode !== "admin" || !customerId) return path;
+  const base = scopeBasePath(mode, customerId);
+  if (path === "/") return base;
+  if (!path.startsWith("/")) return path;
+  const isScoped = SCOPED_ROOTS.some(
+    (root) => path === root || path.startsWith(`${root}/`),
+  );
+  return isScoped ? base + path : path;
+}
 
 export function ScopeProvider({
   children,
@@ -67,4 +121,14 @@ export function useScope(): Scope {
     throw new Error("useScope must be used inside a ScopeProvider");
   }
   return ctx;
+}
+
+/** Returns a path mapper bound to the current scope. Identity in customer
+    mode; prefixes portal paths with /admin/c/:customerId in admin mode. */
+export function useScopedHref(): (path: string) => string {
+  const { mode, customerId } = useScope();
+  return useCallback(
+    (path: string) => scopedPath(path, mode, customerId),
+    [mode, customerId],
+  );
 }
