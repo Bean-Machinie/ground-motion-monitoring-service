@@ -127,8 +127,11 @@ export async function cancelService(id: string) {
 
 /** Hard delete. The row's FKs cascade to reports, alerts, attachment rows
     and processing runs, but storage objects are NOT cascaded — so gather
-    the attachment paths and remove the files first, then drop the row. */
-export async function deleteServiceDeep(serviceId: string) {
+    the attachment paths and remove the files first, then drop the row.
+    Finally clean up the site if this was its last service: a site is
+    reference data with no life of its own, so an emptied one should not
+    linger (e.g. on the Map view) with nothing behind it. */
+export async function deleteServiceDeep(serviceId: string, siteId: string) {
   const { data: reportRows } = await supabase
     .from("reports")
     .select("id")
@@ -147,7 +150,21 @@ export async function deleteServiceDeep(serviceId: string) {
     }
   }
 
-  return supabase.from("services").delete().eq("id", serviceId);
+  const result = await supabase.from("services").delete().eq("id", serviceId);
+  if (result.error) return result;
+
+  // Orphan-site cleanup. Best-effort — the service is already gone, so a
+  // failure here is not fatal; the site just remains until next time.
+  const { data: siblings } = await supabase
+    .from("services")
+    .select("id")
+    .eq("site_id", siteId)
+    .limit(1);
+  if (!siblings || siblings.length === 0) {
+    await supabase.from("sites").delete().eq("id", siteId);
+  }
+
+  return result;
 }
 
 /** Counts used by the delete dialog to state exactly what will be lost. */

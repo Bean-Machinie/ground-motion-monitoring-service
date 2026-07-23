@@ -67,7 +67,7 @@ export function AdminServiceActions({
     setBusy(true);
     setError(null);
     try {
-      const { error: e } = await deleteServiceDeep(service.id);
+      const { error: e } = await deleteServiceDeep(service.id, service.site_id);
       if (e) throw e;
       setDialog(null);
       onChanged();
