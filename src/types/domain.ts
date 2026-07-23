@@ -14,6 +14,7 @@ export type AnalysisTechnique = Enums<"analysis_technique">;
 export type ReportKind = Enums<"report_kind">;
 export type ReportState = Enums<"report_state">;
 export type AlertSeverity = Enums<"alert_severity">;
+export type ServiceCadence = Enums<"service_cadence">;
 
 /* ------------------- Report payload (hand-entered) -------------------- */
 

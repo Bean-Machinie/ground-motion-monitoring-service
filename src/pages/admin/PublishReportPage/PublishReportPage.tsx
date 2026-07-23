@@ -16,10 +16,11 @@
 //
 // The envelope stays strict; the payload is whatever was uploaded.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
 import { usePortalData } from "@/context/PortalDataContext";
+import { useScope, useScopedHref } from "@/context/ScopeContext";
 import { Button } from "@/components/ui/Button/Button";
 import { Select } from "@/components/ui/Select/Select";
 import { Sparkline } from "@/components/ui/Sparkline/Sparkline";
@@ -32,7 +33,6 @@ import {
   type ReportAttachment,
   type ReportKind,
 } from "@/types/domain";
-import type { ProfileRow } from "@/types/database";
 import { formatShortDate } from "@/lib/dates";
 import styles from "./PublishReportPage.module.css";
 
@@ -103,28 +103,22 @@ export function PublishReportPage() {
     siteById,
     refetch,
   } = usePortalData();
+  const { customerId } = useScope();
+  const href = useScopedHref();
+  const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  /* Step 1 — customer first, then one of their services. Admin RLS
-     makes all profiles selectable. */
-  const [customers, setCustomers] = useState<ProfileRow[]>([]);
-  const [customerId, setCustomerId] = useState("");
+  /* Step 1 — the customer is fixed by the scoped route; pick one of
+     their services (optionally preselected via ?service=). */
   const [serviceId, setServiceId] = useState("");
 
   useEffect(() => {
-    void supabase
-      .from("profiles")
-      .select("*")
-      .eq("role", "customer")
-      .order("email")
-      .then(({ data, error: profilesError }) => {
-        if (profilesError) setError(getErrorMessage(profilesError));
-        else setCustomers(data ?? []);
-      });
-  }, []);
+    const preset = searchParams.get("service");
+    if (preset) setServiceId(preset);
+  }, [searchParams]);
   const [target, setTarget] = useState<"new" | string>("new"); // draft id
   const [newKind, setNewKind] = useState<ReportKind>("periodic");
   const [periodStart, setPeriodStart] = useState("");
@@ -156,16 +150,6 @@ export function PublishReportPage() {
   const drafts = serviceReports.filter(
     (r) => r.state === "pending" || r.state === "in_review",
   );
-
-  const customerOptions = [
-    { value: "", label: "Choose a customer…" },
-    ...customers.map((c) => ({
-      value: c.id,
-      label: c.organization_name
-        ? `${c.organization_name} — ${c.full_name ?? c.email}`
-        : (c.full_name ?? c.email),
-    })),
-  ];
 
   /** Only the services the chosen customer has created. */
   const customerServices = services.filter(
@@ -464,7 +448,6 @@ export function PublishReportPage() {
 
   function reset() {
     setStep(0);
-    setCustomerId("");
     setServiceId("");
     setTarget("new");
     setPeriodStart("");
@@ -521,27 +504,14 @@ export function PublishReportPage() {
       {step === 0 ? (
         <section className={styles.panel}>
           <Select
-            label="Customer"
-            value={customerId}
-            options={customerOptions}
+            label="Service"
+            value={serviceId}
+            options={serviceOptions}
             onChange={(v) => {
-              setCustomerId(v);
-              setServiceId("");
+              setServiceId(v);
               setTarget("new");
             }}
           />
-
-          {customerId ? (
-            <Select
-              label="Service"
-              value={serviceId}
-              options={serviceOptions}
-              onChange={(v) => {
-                setServiceId(v);
-                setTarget("new");
-              }}
-            />
-          ) : null}
 
           {service ? (
             <>
@@ -862,7 +832,7 @@ export function PublishReportPage() {
                 {service ? serviceDisplayName(service, site) : "the service"}.
               </p>
               <div className={styles.actions}>
-                <Button to={`/reports/${report.id}`}>View report</Button>
+                <Button to={href(`/reports/${report.id}`)}>View report</Button>
                 <Button variant="secondary" onClick={reset}>
                   Publish another
                 </Button>
@@ -891,7 +861,7 @@ export function PublishReportPage() {
         <p className={styles.draftNote}>
           Working on {REPORT_KIND_LABELS[report.kind]} #{report.issue_number}
           {" — saved as a draft; nothing is customer-visible until step 5. "}
-          <Link to="/reports">Reports library</Link>
+          <Link to={href("/reports")}>Reports library</Link>
         </p>
       ) : null}
     </div>

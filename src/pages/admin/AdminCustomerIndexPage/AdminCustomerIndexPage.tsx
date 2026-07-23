@@ -11,7 +11,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { getErrorMessage } from "@/lib/errors";
-import { Button } from "@/components/ui/Button/Button";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
@@ -151,9 +150,6 @@ export function AdminCustomerIndexPage() {
             Everyone, across every account — sorted by who is waiting on you.
           </p>
         </div>
-        <Button to="/admin/publish" variant="secondary">
-          Publish a report
-        </Button>
       </header>
 
       {error ? <ErrorMessage message={error} /> : null}

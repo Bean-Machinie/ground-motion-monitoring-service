@@ -9,9 +9,10 @@
 import { useMemo } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
-import { useScopedHref } from "@/context/ScopeContext";
+import { useScope, useScopedHref } from "@/context/ScopeContext";
 import { usePortalCrumbs } from "@/components/layout/PortalShell/PortalShell";
 import { ActivityFeed } from "@/components/portal/ActivityFeed/ActivityFeed";
+import { AdminNewServiceButton } from "@/components/admin/AdminNewServiceButton/AdminNewServiceButton";
 import { AppIcon } from "@/components/ui/AppIcon/AppIcon";
 import { ErrorMessage } from "@/components/ui/ErrorMessage/ErrorMessage";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
@@ -108,6 +109,7 @@ export function WorkspacePage() {
     attention,
   } = usePortalData();
   const href = useScopedHref();
+  const { mode } = useScope();
 
   const [searchParams] = useSearchParams();
 
@@ -388,6 +390,7 @@ export function WorkspacePage() {
 
   return (
     <div className={styles.page}>
+      {mode === "admin" ? <AdminNewServiceButton /> : null}
       {error ? <ErrorMessage message={error} onRetry={refetch} /> : null}
 
       {/* 1. Does anything need me? Rendered only when the answer is yes. */}

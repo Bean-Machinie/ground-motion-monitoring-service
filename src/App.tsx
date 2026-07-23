@@ -115,7 +115,6 @@ export function App() {
         }
       >
         <Route index element={<AdminCustomerIndexPage />} />
-        <Route path="publish" element={<PublishReportPage />} />
       </Route>
 
       {/* Admin scoped browsing: the customer id lives in the URL, and the
@@ -136,6 +135,7 @@ export function App() {
         <Route path="activity" element={<ActivityPage />} />
         <Route path="map" element={<MapPage />} />
         <Route path="sites/:slug" element={<SiteDetailPage />} />
+        <Route path="publish" element={<PublishReportPage />} />
       </Route>
 
       {/* Legacy URLs from the projects/results era. */}

@@ -9,8 +9,9 @@
 // only entry point to the location page.
 import { Link, Navigate, useParams } from "react-router-dom";
 import { usePortalData } from "@/context/PortalDataContext";
-import { useScopedHref } from "@/context/ScopeContext";
+import { useScope, useScopedHref } from "@/context/ScopeContext";
 import { PortalPageHeader } from "@/components/layout/PortalShell/PortalPageHeader";
+import { AdminServiceActions } from "@/components/admin/AdminServiceActions/AdminServiceActions";
 import { Card } from "@/components/ui/Card/Card";
 import { EmptyState } from "@/components/ui/EmptyState/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState/LoadingState";
@@ -33,8 +34,10 @@ export function ServiceEngagementPage() {
   // engagement UUID arrives as either param name.
   const params = useParams<{ id?: string; slug?: string }>();
   const id = params.id ?? params.slug;
-  const { sites, services, reports, alerts, loading } = usePortalData();
+  const { sites, services, reports, alerts, loading, refetch } =
+    usePortalData();
   const href = useScopedHref();
+  const { mode } = useScope();
 
   if (loading) {
     return <LoadingState label="Loading…" />;
@@ -68,7 +71,13 @@ export function ServiceEngagementPage() {
     : [];
 
   // A screening is its report: with exactly one issue, go straight there.
-  if (service.kind === "screening" && issues.length === 1 && issues[0]) {
+  // Admins stay on the service page so they can manage it.
+  if (
+    mode !== "admin" &&
+    service.kind === "screening" &&
+    issues.length === 1 &&
+    issues[0]
+  ) {
     return <Navigate to={href(`/reports/${issues[0].id}`)} replace />;
   }
 
@@ -89,6 +98,17 @@ export function ServiceEngagementPage() {
         }}
         lede={serviceKindLine(service, site)}
       />
+
+      {mode === "admin" ? (
+        <AdminServiceActions
+          service={service}
+          sites={sites}
+          reports={reports}
+          alerts={alerts}
+          customerId={service.org_id}
+          onChanged={refetch}
+        />
+      ) : null}
 
       {inRequestStage ? (
         /* ------------------- Request under review ---------------------- */
